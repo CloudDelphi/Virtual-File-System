@@ -58,12 +58,14 @@ type
 
     function  IsEnd: boolean;
     procedure AddItem ({U} FileInfo: PNativeFileInfo; const FileName: WideString = ''; const InsertBefore: integer = High(integer));
-    function  GetNextItem ({OUT} var Res: TFileInfo): boolean;
+    function  GetNextItem ({OUT} var {U} Res: TFileInfo): boolean;
     procedure Rewind;
 
     (* Always seeks as close as possible *)
     function Seek (SeekInd: integer): boolean;
     function SeekRel (RelInd: integer): boolean;
+
+    function GetDebugDump: string;
 
     property FileInd: integer read fFileInd;
     property Count:   integer read GetCount;
@@ -95,6 +97,11 @@ type
     function IterNext ({OUT} var FileName: WideString; {n} FileInfo: WinNative.PFILE_ID_BOTH_DIR_INFORMATION = nil): boolean;
   end; // .class TSysDirScanner
 
+(* Packs lower cased WideString bytes into AnsiString buffer *)
+function WideStrToCaselessKey (const Str: WideString): string;
+
+(* The opposite of WideStrToKey *)
+function CaselessKeyToWideStr (const CaselessKey: string): WideString;
 
 (* Returns expanded unicode path, preserving trailing delimiter, or original path on error *)
 function ExpandPath (const Path: WideString): WideString;
@@ -117,7 +124,7 @@ function StripNtAbsPathPrefix (const Path: WideString): WideString;
 function SaveAndRet (Res: integer; out ResCopy): integer;
 
 (* Opens file/directory using absolute NT path and returns success flag *)
-function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: integer = Int(GENERIC_READ) or SYNCHRONIZE): boolean;
+function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = GENERIC_READ or SYNCHRONIZE): boolean;
 
 (* Returns TNativeFileInfo record for single file/directory. Short names and files indexes/ids in the result are always empty. *)
 function GetFileInfo (const FilePath: WideString; {OUT} var Res: TNativeFileInfo): boolean;
@@ -125,8 +132,43 @@ function GetFileInfo (const FilePath: WideString; {OUT} var Res: TNativeFileInfo
 function SysScanDir (const hDir: Windows.THandle; const Mask: WideString): ISysDirScanner; overload;
 function SysScanDir (const DirPath, Mask: WideString): ISysDirScanner; overload;
 
+(* Scans specified directory and adds sorted entries to directory listing. Optionally exclude names from Exclude dictionary.
+   Excluded items must be preprocessed via WideStringToCaselessKey routine *)
+procedure GetDirectoryListing (const SearchPath, FileMask: WideString; {Un} Exclude: TDict {OF CaselessKey => not NIL}; DirListing: TDirListing);
+
 (***)  implementation  (***)
 
+
+type
+  TDirListingItem = class
+    SearchName: WideString;
+    Info:       TNativeFileInfo;
+  end;
+
+
+function WideStrToCaselessKey (const Str: WideString): string;
+var
+  ProcessedPath: WideString;
+
+begin
+  result := '';
+
+  if Str <> '' then begin
+    ProcessedPath := StrLib.WideLowerCase(Str);
+    SetLength(result, Length(ProcessedPath) * sizeof(ProcessedPath[1]) div sizeof(result[1]));
+    Utils.CopyMem(Length(result) * sizeof(result[1]), PWideChar(ProcessedPath), PChar(result));
+  end;
+end;
+
+function CaselessKeyToWideStr (const CaselessKey: string): WideString;
+begin
+  result := '';
+
+  if CaselessKey <> '' then begin
+    SetLength(result, Length(CaselessKey) * sizeof(CaselessKey[1]) div sizeof(result[1]));
+    Utils.CopyMem(Length(result) * sizeof(result[1]), pchar(CaselessKey), PWideChar(result));
+  end;
+end;
 
 function ExpandPath (const Path: WideString): WideString;
 var
@@ -309,7 +351,22 @@ begin
   result := Self.Seek(Self.fFileInd + RelInd);    
 end;
 
-function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: integer = Int(GENERIC_READ) or SYNCHRONIZE): boolean;
+function TDirListing.GetDebugDump: string;
+var
+  FileNames: Utils.TArrayOfStr;
+  i:         integer;
+
+begin
+  SetLength(FileNames, Self.fFileList.Count);
+
+  for i := 0 to Self.fFileList.Count - 1 do begin
+    FileNames[i] := TFileInfo(Self.fFileList[i]).Data.FileName;
+  end;
+
+  result := StrLib.Join(FileNames, #13#10);
+end;
+
+function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = GENERIC_READ or SYNCHRONIZE): boolean;
 var
   FilePathU:     WinNative.UNICODE_STRING;
   hFile:         Windows.THandle;
@@ -319,7 +376,7 @@ var
 begin
   FilePathU.AssignExistingStr(NtAbsPath);
   ObjAttrs.Init(@FilePathU);
-  
+
   result := WinNative.NtOpenFile(@hFile, AccessMode, @ObjAttrs, @IoStatusBlock, FILE_SHARE_READ or FILE_SHARE_WRITE, ord(OpenMode) or FILE_SYNCHRONOUS_IO_NONALERT) = WinNative.STATUS_SUCCESS;
 
   if result then begin
@@ -477,5 +534,51 @@ function SysScanDir (const DirPath, Mask: WideString): ISysDirScanner; overload;
 begin
   result := TSysDirScanner.Create(DirPath, Mask);
 end;
+
+function CompareFileItemsByNameAsc (Item1, Item2: integer): integer;
+begin
+  result := StrLib.CompareBinStringsW(TDirListingItem(Item1).SearchName, TDirListingItem(Item2).SearchName);
+
+  if result = 0 then begin
+    result := StrLib.CompareBinStringsW(TDirListingItem(Item1).Info.FileName, TDirListingItem(Item2).Info.FileName);
+  end;
+end;
+
+procedure SortDirListing ({U} List: TList {OF TDirListingItem});
+begin
+  List.CustomSort(CompareFileItemsByNameAsc);
+end;
+
+procedure GetDirectoryListing (const SearchPath, FileMask: WideString; {Un} Exclude: TDict {OF CaselessKey => not NIL}; DirListing: TDirListing);
+var
+{O} Items: {O} TList {OF TDirListingItem};
+{O} Item:  {O} TDirListingItem;
+    i:     integer;
+
+begin
+  {!} Assert(DirListing <> nil);
+  // * * * * * //
+  Items := DataLib.NewList(Utils.OWNS_ITEMS);
+  Item  := TDirListingItem.Create;
+  // * * * * * //
+  with VfsUtils.SysScanDir(SearchPath, FileMask) do begin
+    while IterNext(Item.Info.FileName, @Item.Info.Base) do begin     
+      if (Exclude = nil) or (Exclude[WideStrToCaselessKey(Item.Info.FileName)] = nil) then begin
+        Item.SearchName := StrLib.WideLowerCase(Item.Info.FileName);
+        Items.Add(Item); Item := nil;
+        Item := TDirListingItem.Create;
+      end;
+    end;
+  end;
+
+  SortDirListing(Items);
+
+  for i := 0 to Items.Count - 1 do begin
+    DirListing.AddItem(@TDirListingItem(Items[i]).Info);
+  end;
+  // * * * * * //
+  SysUtils.FreeAndNil(Items);
+  SysUtils.FreeAndNil(Item);
+end; // .procedure GetDirectoryListing
 
 end.

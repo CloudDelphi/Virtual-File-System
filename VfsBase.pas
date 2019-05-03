@@ -22,6 +22,9 @@ type
   TList    = Lists.TList;
 
 const
+  OVERWRITE_EXISTING      = true;
+  DONT_OVERWRITE_EXISTING = false;
+
   AUTO_PRIORITY                = MAXLONGINT div 2;
   INITIAL_OVERWRITING_PRIORITY = AUTO_PRIORITY + 1;
   INITIAL_ADDING_PRIORITY      = AUTO_PRIORITY - 1;
@@ -76,11 +79,24 @@ type
     procedure RestoreVfsForThread;
   end;
 
+var
+  (* Global VFS access synchronizer *)
+  VfsCritSection: Concur.TCritSection;
 
-function  GetThreadVfsDisabler: TThreadVfsDisabler;
-procedure RunVfs (DirListingOrder: TDirListingSortType);
-function  ResetVfs: boolean;
 
+function GetThreadVfsDisabler: TThreadVfsDisabler;
+
+(* Runs VFS. Higher level API must install hooks in VfsCritSection protected area *)
+function RunVfs (DirListingOrder: TDirListingSortType): boolean;
+
+(* Stops VFS and clears all mappings *)
+function ResetVfs: boolean;
+
+(* Returns real path for VFS item by its absolute virtual path or empty string. Optionally returns file info structure *)
+function GetVfsItemRealPath (const AbsVirtPath: WideString; {n} FileInfo: PNativeFileInfo = nil): WideString;
+
+(* Returns virtual directory info. Adds virtual entries to specified directory listing container *)
+function GetVfsDirInfo (const AbsVirtPath, Mask: WideString; {OUT} var DirInfo: TNativeFileInfo; DirListing: TDirListing): boolean;
 
 (* Maps real directory contents to virtual path. Target must exist for success *)
 function MapDir (const VirtPath, RealPath: WideString; OverwriteExisting: boolean; Flags: integer = 0): boolean;
@@ -96,9 +112,6 @@ var
   Represents the whole cached virtual file system contents.
 *)
 {O} VfsItems: {O} TDict {OF TVfsItem};
-    
-  (* Global VFS access synchronizer *)
-  VfsCritSection: Concur.TCritSection;
   
   (* Global VFS state indicator. If false, all VFS search operations must fail *)
   VfsIsRunning: boolean = false;
@@ -164,32 +177,6 @@ end;
 procedure LeaveVfs;
 begin
   VfsCritSection.Leave;
-end;
-
-(* Packs lower cased WideString bytes into AnsiString buffer *)
-function WideStrToCaselessKey (const Str: WideString): string;
-var
-  ProcessedPath: WideString;
-
-begin
-  result := '';
-
-  if Str <> '' then begin
-    ProcessedPath := StrLib.WideLowerCase(Str);
-    SetLength(result, Length(ProcessedPath) * sizeof(ProcessedPath[1]) div sizeof(result[1]));
-    Utils.CopyMem(Length(result) * sizeof(result[1]), PWideChar(ProcessedPath), PChar(result));
-  end;
-end;
-
-(* The opposite of WideStrToKey *)
-function UnpackPath (const PackedPath: string): WideString;
-begin
-  result := '';
-
-  if PackedPath <> '' then begin
-    SetLength(result, Length(PackedPath) * sizeof(PackedPath[1]) div sizeof(result[1]));
-    Utils.CopyMem(Length(result) * sizeof(result[1]), pchar(PackedPath), PWideChar(result));
-  end;
 end;
 
 function CompareVfsItemsByPriorityDescAndNameAsc (Item1, Item2: integer): integer;
@@ -266,7 +253,7 @@ begin
   // * * * * * //
   with DataLib.IterateDict(VfsItems) do begin
     while IterNext() do begin
-      AbsDirPath := StrLib.ExtractDirPathW(UnpackPath(IterKey));
+      AbsDirPath := StrLib.ExtractDirPathW(CaselessKeyToWideStr(IterKey));
 
       if FindVfsItemByNormalizedPath(AbsDirPath, DirVfsItem) then begin
         DirVfsItem.Children.Add(IterValue);
@@ -275,31 +262,93 @@ begin
   end;
 end; // .procedure BuildVfsItemsTree
 
-procedure RunVfs (DirListingOrder: TDirListingSortType);
+function RunVfs (DirListingOrder: TDirListingSortType): boolean;
 begin
-  with VfsCritSection do begin
-    Enter;
+  result := not DisableVfsForThisThread;
 
-    if not VfsIsRunning then begin
-      BuildVfsItemsTree();
-      SortVfsDirListings(DirListingOrder);
-      VfsIsRunning := true;
+  if result then begin
+    with VfsCritSection do begin
+      Enter;
+
+      if not VfsIsRunning then begin
+        BuildVfsItemsTree();
+        SortVfsDirListings(DirListingOrder);
+        VfsIsRunning := true;
+      end;
+
+      Leave;
     end;
-
-    Leave;
   end;
-end; // .procedure RunVfs
+end; // .function RunVfs
 
 function ResetVfs: boolean;
 begin
+  result := not DisableVfsForThisThread;
+
+  if result then begin
+    with VfsCritSection do begin
+      Enter;
+      VfsIsRunning := false;
+      VfsItems.Clear();
+      Leave;
+    end;
+  end;
+end;
+
+(* Returns real path for vfs item by its absolute virtual path or empty string. Optionally returns file info structure *)
+function GetVfsItemRealPath (const AbsVirtPath: WideString; {n} FileInfo: PNativeFileInfo = nil): WideString;
+var
+{n} VfsItem: TVfsItem;
+
+begin
+  VfsItem := nil;
+  result  := '';
+  // * * * * * //
+  if EnterVfs then begin
+    if FindVfsItemByNormalizedPath(AbsVirtPath, VfsItem) then begin
+      result := VfsItem.RealPath;
+
+      if FileInfo <> nil then begin
+        FileInfo^ := VfsItem.Info;
+      end;
+    end;
+
+    LeaveVfs;
+  end; // .if
+end; // .function GetVfsItemRealPath
+
+function GetVfsDirInfo (const AbsVirtPath, Mask: WideString; {OUT} var DirInfo: TNativeFileInfo; DirListing: TDirListing): boolean;
+var
+{n} VfsItem:        TVfsItem;
+    NormalizedMask: WideString;
+    i:              integer;
+
+begin
+  {!} Assert(DirListing <> nil);
+  VfsItem := nil;
+  // * * * * * //
   result := EnterVfs;
 
   if result then begin
-    VfsIsRunning := false;
-    VfsItems.Clear();
+    result := FindVfsItemByNormalizedPath(AbsVirtPath, VfsItem) and VfsItem.IsDir;
+
+    if result then begin
+      DirInfo := VfsItem.Info;
+
+      if VfsItem.Children <> nil then begin
+        NormalizedMask := StrLib.WideLowerCase(Mask);
+
+        for i := 0 to VfsItem.Children.Count - 1 do begin
+          if StrLib.MatchW(TVfsItem(VfsItem.Children[i]).SearchName, NormalizedMask) then begin
+            DirListing.AddItem(@TVfsItem(VfsItem.Children[i]).Info);
+          end;
+        end;
+      end; // .if
+    end; // .if
+
     LeaveVfs;
-  end;
-end;
+  end; // .if
+end; // .function GetVfsDirInfo
 
 procedure CopyFileInfoWithoutNames (var Src, Dest: WinNative.FILE_ID_BOTH_DIR_INFORMATION);
 begin
