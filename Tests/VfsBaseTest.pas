@@ -46,8 +46,14 @@ begin
   VfsBase.MapDir(RootDir, RootDir + '\Mods\B', DONT_OVERWRITE_EXISTING);
   VfsBase.MapDir(RootDir, RootDir + '\Mods\A', DONT_OVERWRITE_EXISTING);
   VfsBase.RunVfs(SORT_FIFO);
-  VfsBase.GetVfsDirInfo(RootDir, '*', DirInfo, DirListing);
 
+  VfsBase.PauseVfs;
+  VfsBase.GetVfsDirInfo(RootDir, '*', DirInfo, DirListing);
+  DirListing.Rewind;
+  Check(DirListing.GetDebugDump() = '', 'Virtual directory listing must be empty when VFS is paused. Got: ' + DirListing.GetDebugDump());
+
+  VfsBase.RunVfs(SORT_FIFO);
+  VfsBase.GetVfsDirInfo(RootDir, '*', DirInfo, DirListing);
   DirListing.Rewind;
   Check(DirListing.GetDebugDump() = 'vcredist.bmp'#13#10'eula.1028.txt', 'Invalid virtual directoring listing. Got: ' + DirListing.GetDebugDump());
 

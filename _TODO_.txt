@@ -1,0 +1,15 @@
+UTF-8 Logging
+
+SetCurrentDirectoryW(GetCurrentDirectoryW)
+System.IsMultiThread for DLL and exported API
+
+(* Trying to turn off DEP *)
+SetProcessDEPPolicyAddr := Windows.GetProcAddress(Kernel32Handle, 'SetProcessDEPPolicy');
+
+if SetProcessDEPPolicyAddr <> nil then begin
+  if PatchApi.Call(PatchApi.STDCALL_, SetProcessDEPPolicyAddr, [0]) <> 0 then begin
+    Log.Write('VFS', 'SetProcessDEPPolicy', 'DEP was turned off');
+  end else begin
+    Log.Write('VFS', 'SetProcessDEPPolicy', 'Failed to turn DEP off');
+  end;
+end;

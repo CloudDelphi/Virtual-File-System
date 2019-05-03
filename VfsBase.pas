@@ -36,7 +36,7 @@ type
     SORT_FIFO - Items of the first mapped directory will be listed before the second mapped directory items.
     SORT_LIFO - Items of The last mapped directory will be listed before all other mapped directory items.
   *)
-  TDirListingSortType = (SORT_FIFO, SORT_LIFO);
+  TDirListingSortType = (SORT_FIFO = 0, SORT_LIFO = 1);
 
   (* Single redirected VFS entry: file or directory *)
   TVfsItem = class
@@ -79,6 +79,8 @@ type
     procedure RestoreVfsForThread;
   end;
 
+  TSingleArgExternalFunc = function (Arg: pointer = nil): integer; stdcall;
+
 var
   (* Global VFS access synchronizer *)
   VfsCritSection: Concur.TCritSection;
@@ -86,8 +88,12 @@ var
 
 function GetThreadVfsDisabler: TThreadVfsDisabler;
 
-(* Runs VFS. Higher level API must install hooks in VfsCritSection protected area *)
+(* Runs VFS. Higher level API must install hooks in VfsCritSection protected area.
+   Listing order is ignored if VFS is resumed from pause *)
 function RunVfs (DirListingOrder: TDirListingSortType): boolean;
+
+(* Temporarily pauses VFS, but does not reset existing mappings *)
+function PauseVfs: boolean;
 
 (* Stops VFS and clears all mappings *)
 function ResetVfs: boolean;
@@ -100,6 +106,9 @@ function GetVfsDirInfo (const AbsVirtPath, Mask: WideString; {OUT} var DirInfo: 
 
 (* Maps real directory contents to virtual path. Target must exist for success *)
 function MapDir (const VirtPath, RealPath: WideString; OverwriteExisting: boolean; Flags: integer = 0): boolean;
+
+(* Calls specified function with a single argument and returns its result. VFS is disabled for current thread during function exection *)
+function CallWithoutVfs (Func: TSingleArgExternalFunc; Arg: pointer = nil): integer; stdcall;
 
 
 (***)  implementation  (***)
@@ -115,6 +124,9 @@ var
   
   (* Global VFS state indicator. If false, all VFS search operations must fail *)
   VfsIsRunning: boolean = false;
+
+  (* If true, VFS file/directory hierarchy is built and no mapping is allowed untill full reset *)
+  VfsTreeIsBuilt: boolean = false;
     
   (* Automatical VFS items priority management *)
   OverwritingPriority: integer = INITIAL_OVERWRITING_PRIORITY;
@@ -271,15 +283,32 @@ begin
       Enter;
 
       if not VfsIsRunning then begin
-        BuildVfsItemsTree();
-        SortVfsDirListings(DirListingOrder);
+        if not VfsTreeIsBuilt then begin
+          BuildVfsItemsTree();
+          SortVfsDirListings(DirListingOrder);
+          VfsTreeIsBuilt := true;
+        end;
+        
         VfsIsRunning := true;
       end;
 
       Leave;
+    end; // .with
+  end; // .if
+end; // .function RunVfs
+
+function PauseVfs: boolean;
+begin
+  result := not DisableVfsForThisThread;
+
+  if result then begin
+    with VfsCritSection do begin
+      Enter;
+      VfsIsRunning := false;
+      Leave;
     end;
   end;
-end; // .function RunVfs
+end;
 
 function ResetVfs: boolean;
 begin
@@ -288,8 +317,9 @@ begin
   if result then begin
     with VfsCritSection do begin
       Enter;
-      VfsIsRunning := false;
       VfsItems.Clear();
+      VfsIsRunning   := false;
+      VfsTreeIsBuilt := false;
       Leave;
     end;
   end;
@@ -481,8 +511,35 @@ end; // .function _MapDir
 
 function MapDir (const VirtPath, RealPath: WideString; OverwriteExisting: boolean; Flags: integer = 0): boolean;
 begin
-  result := _MapDir(NormalizePath(VirtPath), NormalizePath(RealPath), nil, OverwriteExisting, AUTO_PRIORITY) <> nil;
+  with VfsCritSection do begin
+    Enter;
+    
+    result := not VfsIsRunning and not VfsTreeIsBuilt;
+
+    if result then begin
+      result := _MapDir(NormalizePath(VirtPath), NormalizePath(RealPath), nil, OverwriteExisting, AUTO_PRIORITY) <> nil;
+    end;
+    
+    Leave;
+  end;
 end;
+
+function CallWithoutVfs (Func: TSingleArgExternalFunc; Arg: pointer = nil): integer; stdcall;
+begin
+  with GetThreadVfsDisabler do begin
+    try
+      DisableVfsForThread;
+      result := Func(Arg);
+    except
+      on E: Exception do begin
+        RestoreVfsForThread;
+        raise E;
+      end;
+    end; // .try
+
+    RestoreVfsForThread;
+  end; // .with  
+end; // .function CallWithoutVfs
 
 begin
   VfsCritSection.Init;
