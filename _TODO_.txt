@@ -1,5 +1,7 @@
 UTF-8 Logging
 
+Move copyright to single file license?
+
 SetCurrentDirectoryW(GetCurrentDirectoryW)
 System.IsMultiThread for DLL and exported API
 

@@ -21,6 +21,7 @@ type
 
    published
     procedure TestGetFileAttributes;
+    procedure TestGetFileAttributesEx;
   end;
 
 (***)  implementation  (***)
@@ -90,7 +91,31 @@ begin
   Check(HasValidAttrs(RootDir + '\503.html', 0, Windows.FILE_ATTRIBUTE_DIRECTORY), '{3}');
   Check(HasValidAttrs(RootDir + '\Hobbots\', Windows.FILE_ATTRIBUTE_DIRECTORY), '{4}');
   Check(HasValidAttrs(RootDir + '\Mods', Windows.FILE_ATTRIBUTE_DIRECTORY), '{5}');
-end;
+end; // .procedure TestIntegrated.TestGetFileAttributes;
+
+procedure TestIntegrated.TestGetFileAttributesEx;
+var
+  RootDir: string;
+
+  function GetFileSize (const Path: string): integer;
+  var
+    FileData: Windows.TWin32FileAttributeData;
+
+  begin
+    result := -1;
+
+    if Windows.GetFileAttributesExA(pchar(Path), Windows.GetFileExInfoStandard, @FileData) then begin
+      result := Int(FileData.nFileSizeLow);
+    end;
+  end;
+
+begin
+  RootDir := Self.GetRootDir;
+  CheckEquals(-1, GetFileSize(RootDir + '\non-existing.non'), '{1}');
+  CheckEquals(47, GetFileSize(RootDir + '\Hobbots\mms.cfg'), '{2}');
+  CheckEquals(22, GetFileSize(RootDir + '\503.html'), '{3}');
+  CheckEquals(318, GetFileSize(RootDir + '\default'), '{4}');
+end; // .procedure TestIntegrated.TestGetFileAttributesEx;
 
 begin
   RegisterTest(TestIntegrated.Suite);

@@ -84,7 +84,7 @@ var
 
 begin
   if VfsDebug.LoggingEnabled then begin
-    WriteLog('NtQueryAttributesFile', Format('Dir: %d. Path: "%s"', [ObjectAttributes.RootDirectory, ObjectAttributes.ObjectName.ToWideStr()]));
+    WriteLog('[ENTER] NtQueryAttributesFile', Format('Dir: %d.'#13#10'Path: "%s"', [ObjectAttributes.RootDirectory, ObjectAttributes.ObjectName.ToWideStr()]));
   end;
 
   ReplacedObjAttrs        := ObjectAttributes^;
@@ -127,7 +127,7 @@ begin
   end; // .else
 
   if VfsDebug.LoggingEnabled then begin
-    WriteLog('NtQueryAttributesFile', Format('Result: %x. Attrs: 0x%x. Path: "%s" => "%s"', [result, FileInformation.FileAttributes, string(ExpandedPath), string(RedirectedPath)]));
+    WriteLog('[LEAVE] NtQueryAttributesFile', Format('Result: %x. Attrs: 0x%x.'#13#10'Expanded:   "%s"'#13#10'Redirected: "%s"', [result, FileInformation.FileAttributes, string(ExpandedPath), string(RedirectedPath)]));
   end;
 end; // .function Hook_NtQueryAttributesFile
 
@@ -136,11 +136,12 @@ var
   ExpandedPath:     WideString;
   RedirectedPath:   WideString;
   ReplacedObjAttrs: WinNative.TObjectAttributes;
+  FileInfo:         TNativeFileInfo;
   HadTrailingDelim: boolean;
 
 begin
   if VfsDebug.LoggingEnabled then begin
-    WriteLog('NtQueryFullAttributesFile', Format('Dir: %d. Path: "%s"', [ObjectAttributes.RootDirectory, ObjectAttributes.ObjectName.ToWideStr()]));
+    WriteLog('[ENTER] NtQueryFullAttributesFile', Format('Dir: %d.'#13#10'Path: "%s"', [ObjectAttributes.RootDirectory, ObjectAttributes.ObjectName.ToWideStr()]));
   end;
 
   ReplacedObjAttrs        := ObjectAttributes^;
@@ -149,27 +150,44 @@ begin
   RedirectedPath          := '';
 
   if ExpandedPath <> '' then begin
-    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingDelimW(ExpandedPath, @HadTrailingDelim));
+    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingDelimW(ExpandedPath, @HadTrailingDelim), @FileInfo);
   end;
 
-  if RedirectedPath = '' then begin
+  // Return cached VFS file info
+  if RedirectedPath <> '' then begin
+    if not HadTrailingDelim or Utils.HasFlag(FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes) then begin
+      FileInformation.CreationTime   := FileInfo.Base.CreationTime;
+      FileInformation.LastAccessTime := FileInfo.Base.LastAccessTime;
+      FileInformation.LastWriteTime  := FileInfo.Base.LastWriteTime;
+      FileInformation.ChangeTime     := FileInfo.Base.ChangeTime;
+      FileInformation.AllocationSize := FileInfo.Base.AllocationSize;
+      FileInformation.EndOfFile      := FileInfo.Base.EndOfFile;
+      FileInformation.FileAttributes := FileInfo.Base.FileAttributes;
+      FileInformation.Reserved       := 0;
+      result                         := WinNative.STATUS_SUCCESS;
+    end else begin
+      result := WinNative.STATUS_NO_SUCH_FILE;
+    end;
+  end
+  // Query file with real path
+  else begin
     RedirectedPath := ExpandedPath;
-  end else if HadTrailingDelim then begin
-    RedirectedPath := RedirectedPath + '\';
-  end;
-    
-  if (RedirectedPath <> '') and (RedirectedPath[1] <> '\') then begin
-    RedirectedPath := '\??\' + RedirectedPath;
-  end;
 
-  ReplacedObjAttrs.RootDirectory := 0;
-  ReplacedObjAttrs.Attributes    := ReplacedObjAttrs.Attributes or WinNative.OBJ_CASE_INSENSITIVE;
-  ReplacedObjAttrs.ObjectName.AssignExistingStr(RedirectedPath);
-  
-  result := OrigFunc(@ReplacedObjAttrs, FileInformation);
+    if RedirectedPath <> '' then begin
+      if RedirectedPath[1] <> '\' then begin
+        RedirectedPath := '\??\' + RedirectedPath;
+      end;
+
+      ReplacedObjAttrs.RootDirectory := 0;
+      ReplacedObjAttrs.Attributes    := ReplacedObjAttrs.Attributes or WinNative.OBJ_CASE_INSENSITIVE;
+      ReplacedObjAttrs.ObjectName.AssignExistingStr(RedirectedPath);
+    end;
+    
+    result := OrigFunc(@ReplacedObjAttrs, FileInformation);
+  end; // .else
 
   if VfsDebug.LoggingEnabled then begin
-    WriteLog('NtQueryFullAttributesFile', Format('Result: %x. Attrs: 0x%x. Path: "%s" => "%s"', [result, FileInformation.FileAttributes, string(ExpandedPath), string(RedirectedPath)]));
+    WriteLog('[LEAVE] NtQueryFullAttributesFile', Format('Result: %x. Attrs: 0x%x.'#13#10'Expanded:   "%s"'#13#10'Redirected: "%s"', [result, FileInformation.FileAttributes, string(ExpandedPath), string(RedirectedPath)]));
   end;
 end; // .Hook_NtQueryFullAttributesFile
 
@@ -511,12 +529,12 @@ begin
         @Hook_NtQueryAttributesFile
       );
 
-      // WriteLog('InstallHook', 'Installing NtQueryFullAttributesFile hook');
-      // NativeNtQueryFullAttributesFile := VfsPatching.SpliceWinApi
-      // (
-      //   VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtQueryFullAttributesFile'),
-      //   @Hook_NtQueryFullAttributesFile
-      // );
+      WriteLog('InstallHook', 'Installing NtQueryFullAttributesFile hook');
+      NativeNtQueryFullAttributesFile := VfsPatching.SpliceWinApi
+      (
+        VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtQueryFullAttributesFile'),
+        @Hook_NtQueryFullAttributesFile
+      );
 
       // WriteLog('InstallHook', 'Installing NtOpenFile hook');
       // NativeNtOpenFile := VfsPatching.SpliceWinApi
