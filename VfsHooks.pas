@@ -32,6 +32,13 @@ var
   NativeNtClose:                   WinNative.TNtClose;
   NativeNtQueryDirectoryFile:      WinNative.TNtQueryDirectoryFile;
 
+  NtQueryAttributesFilePatch:     VfsPatching.TAppliedPatch;
+  NtQueryFullAttributesFilePatch: VfsPatching.TAppliedPatch;
+  NtOpenFilePatch:                VfsPatching.TAppliedPatch;
+  NtCreateFilePatch:              VfsPatching.TAppliedPatch;
+  NtClosePatch:                   VfsPatching.TAppliedPatch;
+  NtQueryDirectoryFilePatch:      VfsPatching.TAppliedPatch;
+
 
 (* There is no 100% portable and reliable way to get file path by handle, unless file creation/opening
    was tracked. Thus we rely heavily on VfsOpenFiles.
@@ -66,7 +73,7 @@ begin
           result := DirPath + '\' + FilePath;
         end else begin
           result := DirPath + FilePath;
-        end;        
+        end;
       end;
     end else begin
       result := FilePath;
@@ -209,11 +216,9 @@ var
   ReplacedObjAttrs: WinNative.TObjectAttributes;
   HadTrailingDelim: boolean;
 
-  FileInfo: Windows.TWin32FindDataW;
-
 begin
   if VfsDebug.LoggingEnabled then begin
-    WriteLog('NtCreateFile', ObjectAttributes.ObjectName.ToWideStr());
+    WriteLog('[ENTER] NtCreateFile', Format('Access: 0x%x. CreateDisposition: 0x%x'#13#10'Path: "%s"', [Int(DesiredAccess), Int(CreateDisposition), ObjectAttributes.ObjectName.ToWideStr()]));
   end;
 
   ReplacedObjAttrs        := ObjectAttributes^;
@@ -222,7 +227,7 @@ begin
   RedirectedPath          := '';
 
   if (ExpandedPath <> '') and ((DesiredAccess and WinNative.DELETE) = 0) and (CreateDisposition = WinNative.FILE_OPEN) then begin
-    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingDelimW(ExpandedPath, @HadTrailingDelim), @FileInfo);
+    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingDelimW(ExpandedPath, @HadTrailingDelim));
   end;
 
   if RedirectedPath = '' then begin
@@ -231,25 +236,33 @@ begin
     RedirectedPath := RedirectedPath + '\';
   end;
 
-  if (RedirectedPath <> '') and (RedirectedPath[1] <> '\') then begin
-    RedirectedPath := '\??\' + RedirectedPath;
+  if RedirectedPath <> '' then begin
+    if RedirectedPath[1] <> '\' then begin
+      RedirectedPath := '\??\' + RedirectedPath;
+    end;
+
+    ReplacedObjAttrs.RootDirectory := 0;
+    ReplacedObjAttrs.Attributes    := ReplacedObjAttrs.Attributes or WinNative.OBJ_CASE_INSENSITIVE;
+    ReplacedObjAttrs.ObjectName.AssignExistingStr(RedirectedPath);
   end;
 
-  ReplacedObjAttrs.RootDirectory := 0;
-  ReplacedObjAttrs.Attributes    := ReplacedObjAttrs.Attributes or WinNative.OBJ_CASE_INSENSITIVE;
-  ReplacedObjAttrs.ObjectName.AssignExistingStr(RedirectedPath);
+  with VfsOpenFiles.OpenFilesCritSection do begin
+    Enter;
 
-  result := OrigFunc(FileHandle, DesiredAccess, @ReplacedObjAttrs, IoStatusBlock, AllocationSize, FileAttributes, ShareAccess, CreateDisposition, CreateOptions, EaBuffer, EaLength);
+    result := OrigFunc(FileHandle, DesiredAccess, @ReplacedObjAttrs, IoStatusBlock, AllocationSize, FileAttributes, ShareAccess, CreateDisposition, CreateOptions, EaBuffer, EaLength);
 
-  if (result = WinNative.STATUS_SUCCESS) and Utils.HasFlag(WinNative.FILE_SYNCHRONOUS_IO_NONALERT, CreateOptions) and Utils.HasFlag(WinNative.SYNCHRONIZE, DesiredAccess) then begin
-    VfsOpenFiles.SetOpenedFileInfo(FileHandle^, TOpenedFile.Create(FileHandle^, ExpandedPath));
-  end;
+    if (result = WinNative.STATUS_SUCCESS) and (ExpandedPath <> '') then begin
+      VfsOpenFiles.SetOpenedFileInfo(FileHandle^, TOpenedFile.Create(FileHandle^, ExpandedPath));
+    end;
+
+    Leave;
+  end;  
 
   if VfsDebug.LoggingEnabled then begin
     if ExpandedPath <> StripNtAbsPathPrefix(RedirectedPath) then begin
-      WriteLog('NtCreateFile', Format('Access: 0x%x. Handle: %x. Status: %x. Redirected "%s" => "%s"', [DesiredAccess, FileHandle^, result, StrLib.WideToAnsiSubstitute(ExpandedPath), StrLib.WideToAnsiSubstitute(StripNtAbsPathPrefix(RedirectedPath))]));
+      WriteLog('[LEAVE] NtCreateFile', Format('Handle: %x. Status: %x.'#13#10'Expanded:   "%s"'#13#10'Redirected: "%s"', [FileHandle^, result, ExpandedPath, StripNtAbsPathPrefix(RedirectedPath)]));
     end else begin
-      WriteLog('NtCreateFile', Format('Access: 0x%x. Handle: %x. Status: %x. Path: "%s"', [DesiredAccess, FileHandle^, result, StrLib.WideToAnsiSubstitute(ExpandedPath)]));
+      WriteLog('[LEAVE] NtCreateFile', Format('Handle: %x. Status: %x.'#13#10'Expanded: "%s"', [FileHandle^, result, ExpandedPath]));
     end;
   end;
 end; // .function Hook_NtCreateFile
@@ -257,11 +270,12 @@ end; // .function Hook_NtCreateFile
 function Hook_NtClose (OrigFunc: WinNative.TNtClose; hData: HANDLE): NTSTATUS; stdcall;
 begin
   if VfsDebug.LoggingEnabled then begin
-    WriteLog('NtClose', Format('Handle: %x', [integer(hData)]));
+    WriteLog('[ENTER] NtClose', Format('Handle: %x', [integer(hData)]));
   end;
 
-  with OpenFilesCritSection do begin
+  with VfsOpenFiles.OpenFilesCritSection do begin
     Enter;
+
     result := OrigFunc(hData);
 
     if WinNative.NT_SUCCESS(result) then begin
@@ -272,7 +286,7 @@ begin
   end;
   
   if VfsDebug.LoggingEnabled then begin
-    WriteLog('NtClose', Format('Status: %x', [integer(result)]));
+    WriteLog('[LEAVE] NtClose', Format('Status: %x', [integer(result)]));
   end;
 end; // .function Hook_NtClose
 
@@ -526,36 +540,41 @@ begin
       NativeNtQueryAttributesFile := VfsPatching.SpliceWinApi
       (
         VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtQueryAttributesFile'),
-        @Hook_NtQueryAttributesFile
+        @Hook_NtQueryAttributesFile,
+        @NtQueryAttributesFilePatch
       );
 
       WriteLog('InstallHook', 'Installing NtQueryFullAttributesFile hook');
       NativeNtQueryFullAttributesFile := VfsPatching.SpliceWinApi
       (
         VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtQueryFullAttributesFile'),
-        @Hook_NtQueryFullAttributesFile
+        @Hook_NtQueryFullAttributesFile,
+        @NtQueryFullAttributesFilePatch
       );
 
-      // WriteLog('InstallHook', 'Installing NtOpenFile hook');
-      // NativeNtOpenFile := VfsPatching.SpliceWinApi
-      // (
-      //   VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtOpenFile'),
-      //   @Hook_NtOpenFile
-      // );
+      WriteLog('InstallHook', 'Installing NtOpenFile hook');
+      NativeNtOpenFile := VfsPatching.SpliceWinApi
+      (
+        VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtOpenFile'),
+        @Hook_NtOpenFile,
+        @NtOpenFilePatch
+      );
 
-      // WriteLog('InstallHook', 'Installing NtCreateFile hook');
-      // NativeNtCreateFile := VfsPatching.SpliceWinApi
-      // (
-      //   VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtCreateFile'),
-      //   @Hook_NtCreateFile
-      // );
+      WriteLog('InstallHook', 'Installing NtCreateFile hook');
+      NativeNtCreateFile := VfsPatching.SpliceWinApi
+      (
+        VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtCreateFile'),
+        @Hook_NtCreateFile,
+        @NtCreateFilePatch
+      );
 
-      // WriteLog('InstallHook', 'Installing NtClose hook');
-      // NativeNtClose := VfsPatching.SpliceWinApi
-      // (
-      //   VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtClose'),
-      //   @Hook_NtClose
-      // );
+      WriteLog('InstallHook', 'Installing NtClose hook');
+      NativeNtClose := VfsPatching.SpliceWinApi
+      (
+        VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtClose'),
+        @Hook_NtClose,
+        @NtClosePatch
+      );
 
       // WriteLog('InstallHook', 'Installing NtQueryDirectoryFile hook');
       // NativeNtQueryDirectoryFile := VfsPatching.SpliceWinApi
@@ -569,6 +588,28 @@ begin
   end; // .with
 end; // .procedure InstallHooks
 
+procedure UninstallHooks;
 begin
+  with HooksCritSection do begin
+    Enter;
+
+    NtQueryAttributesFilePatch.Rollback;
+    NtQueryFullAttributesFilePatch.Rollback;
+    NtOpenFilePatch.Rollback;
+    NtCreateFilePatch.Rollback;
+    NtClosePatch.Rollback;
+
+    Leave;
+  end;
+end;
+
+initialization
   HooksCritSection.Init;
+finalization
+  with VfsBase.VfsCritSection do begin
+    Enter;
+    VfsBase.ResetVfs;
+    UninstallHooks;
+    Leave;
+  end;
 end.

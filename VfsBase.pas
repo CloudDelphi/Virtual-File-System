@@ -530,15 +530,10 @@ begin
     try
       DisableVfsForThread;
       result := Func(Arg);
-    except
-      on E: Exception do begin
-        RestoreVfsForThread;
-        raise E;
-      end;
-    end; // .try
-
-    RestoreVfsForThread;
-  end; // .with  
+    finally
+      RestoreVfsForThread;
+    end;
+  end;
 end; // .function CallWithoutVfs
 
 begin

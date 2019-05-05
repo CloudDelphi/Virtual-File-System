@@ -4,9 +4,9 @@ unit VfsIntegratedTest;
 
 uses
   SysUtils, TestFramework, Windows,
-  Utils, WinUtils, ConsoleApi,
+  Utils, WinUtils, ConsoleApi, Files,
   VfsUtils, VfsBase, VfsDebug,
-  VfsControl;
+  VfsOpenFiles, VfsControl, DlgMes;
 
 type
   TestIntegrated = class (TTestCase)
@@ -22,7 +22,9 @@ type
    published
     procedure TestGetFileAttributes;
     procedure TestGetFileAttributesEx;
+    procedure TestFilesOpenClose;
   end;
+
 
 (***)  implementation  (***)
 
@@ -34,7 +36,7 @@ end;
 
 function TestIntegrated.GetRootDir: string;
 begin
-  result := SysUtils.ExtractFileDir(WinUtils.GetExePath) + '\Tests\Fs';
+  result := VfsUtils.NormalizePath(SysUtils.ExtractFileDir(WinUtils.GetExePath) + '\Tests\Fs');
 end;
 
 procedure TestIntegrated.SetUp;
@@ -42,22 +44,20 @@ var
   RootDir: string;
 
 begin
-  if not Inited then begin
-    Inited  := true;
-    RootDir := Self.GetRootDir;
-    VfsBase.ResetVfs();
-    VfsBase.MapDir(RootDir, RootDir + '\Mods\FullyVirtual', DONT_OVERWRITE_EXISTING);
-    VfsBase.MapDir(RootDir, RootDir + '\Mods\B', DONT_OVERWRITE_EXISTING);
-    VfsBase.MapDir(RootDir, RootDir + '\Mods\A', DONT_OVERWRITE_EXISTING);
-    VfsBase.MapDir(RootDir, RootDir + '\Mods\Apache', DONT_OVERWRITE_EXISTING);
-    VfsDebug.SetLoggingProc(LogSomething);
-    VfsControl.RunVfs(VfsBase.SORT_FIFO);
-  end;
+  RootDir := Self.GetRootDir;
+  VfsBase.ResetVfs();
+  VfsBase.MapDir(RootDir, RootDir + '\Mods\FullyVirtual_2', DONT_OVERWRITE_EXISTING);
+  VfsBase.MapDir(RootDir, RootDir + '\Mods\FullyVirtual', DONT_OVERWRITE_EXISTING);
+  VfsBase.MapDir(RootDir, RootDir + '\Mods\B', DONT_OVERWRITE_EXISTING);
+  VfsBase.MapDir(RootDir, RootDir + '\Mods\A', DONT_OVERWRITE_EXISTING);
+  VfsBase.MapDir(RootDir, RootDir + '\Mods\Apache', DONT_OVERWRITE_EXISTING);
+  VfsDebug.SetLoggingProc(LogSomething);
+  VfsControl.RunVfs(VfsBase.SORT_FIFO);
 end;
 
 procedure TestIntegrated.TearDown;
 begin
-  VfsBase.PauseVfs();
+  VfsBase.ResetVfs();
   VfsDebug.SetLoggingProc(nil);
 end;
 
@@ -112,10 +112,57 @@ var
 begin
   RootDir := Self.GetRootDir;
   CheckEquals(-1, GetFileSize(RootDir + '\non-existing.non'), '{1}');
-  CheckEquals(47, GetFileSize(RootDir + '\Hobbots\mms.cfg'), '{2}');
+  CheckEquals(42, GetFileSize(RootDir + '\Hobbots\mms.cfg'), '{2}');
   CheckEquals(22, GetFileSize(RootDir + '\503.html'), '{3}');
   CheckEquals(318, GetFileSize(RootDir + '\default'), '{4}');
 end; // .procedure TestIntegrated.TestGetFileAttributesEx;
+
+procedure TestIntegrated.TestFilesOpenClose;
+var
+  CurrDir:  string;
+  RootDir:  string;
+  FileData: string;
+  hFile:    integer;
+
+  function OpenFile (const Path: string): integer;
+  begin
+    result := SysUtils.FileOpen(Path, fmOpenRead or fmShareDenyNone);
+  end;
+
+begin
+  CurrDir := SysUtils.GetCurrentDir;
+  RootDir := Self.GetRootDir;
+
+  try
+    Check(SysUtils.SetCurrentDir(RootDir), 'Setting current directory to real path must succeed');
+    
+    Check(OpenFile(RootDir + '\non-existing.non') <= 0, 'Opening non-existing file must fail');
+
+    hFile := OpenFile(RootDir + '\Hobbots\mms.cfg');
+    Check(hFile > 0, 'Opening fully virtual file must succeed');
+    CheckEquals(RootDir + '\Hobbots\mms.cfg', VfsOpenFiles.GetOpenedFilePath(hFile), 'There must be created a corresponding TOpenedFile record for opened file handle with valid virtual path');
+    SysUtils.FileClose(hFile);
+    CheckEquals('', VfsOpenFiles.GetOpenedFilePath(hFile), 'TOpenedFile record must be destroyed on file handle closing {1}');
+
+    hFile := OpenFile('Hobbots\mms.cfg');
+    Check(hFile > 0, 'Opening fully virtual file using relative path must succeed');
+    CheckEquals(RootDir + '\Hobbots\mms.cfg', VfsOpenFiles.GetOpenedFilePath(hFile), 'There must be created a corresponding TOpenedFile record for opened file handle with valid virtual path when relative path was used');
+    SysUtils.FileClose(hFile);
+    CheckEquals('', VfsOpenFiles.GetOpenedFilePath(hFile), 'TOpenedFile record must be destroyed on file handle closing {2}');
+
+    Check(SysUtils.SetCurrentDir(RootDir + '\Hobbots'), 'Setting current durectory to fully virtual must succeed');
+    hFile := OpenFile('mms.cfg');
+    Check(hFile > 0, 'Opening fully virtual file in fully virtual directory using relative path must succeed');
+    CheckEquals(RootDir + '\Hobbots\mms.cfg', VfsOpenFiles.GetOpenedFilePath(hFile), 'There must be created a corresponding TOpenedFile record for opened file handle with valid virtual path when relative path was used for fully virtual directory');
+    SysUtils.FileClose(hFile);
+    CheckEquals('', VfsOpenFiles.GetOpenedFilePath(hFile), 'TOpenedFile record must be destroyed on file handle closing {3}');
+
+    Check(Files.ReadFileContents('mms.cfg', FileData), 'File mms.cfg must be readable');
+    CheckEquals('It was a pleasure to override you, friend!', FileData);
+  finally
+    SysUtils.SetCurrentDir(CurrDir);
+  end; // .try
+end; // .procedure TestIntegrated.TestFilesOpenClose;
 
 begin
   RegisterTest(TestIntegrated.Suite);

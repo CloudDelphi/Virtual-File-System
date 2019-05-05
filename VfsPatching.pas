@@ -4,17 +4,24 @@ unit VfsPatching;
                All hooks are thread-safe.
 *)
 
-
 (***)  interface  (***)
 
 uses
   Windows, SysUtils, Utils, PatchForge;
 
+type
+  PAppliedPatch = ^TAppliedPatch;
+  TAppliedPatch = record
+    Addr:  pointer;
+    Bytes: Utils.TArrayOfByte;
+
+    procedure Rollback;
+  end;
 
 (* Replaces original STDCALL function with the new one with the same prototype and one extra argument.
    The argument is callable pointer, used to execute original function. The pointer is passed as THE FIRST
    argument before other arguments. *)
-function SpliceWinApi (OrigFunc, HandlerFunc: pointer): pointer;
+function SpliceWinApi (OrigFunc, HandlerFunc: pointer; {n} AppliedPatch: PAppliedPatch = nil): pointer;
 
 
 (***)  implementation  (***)
@@ -68,7 +75,7 @@ begin
   end;
 end; // .function WritePatchAtCode
 
-function SpliceWinApi (OrigFunc, HandlerFunc: pointer): pointer;
+function SpliceWinApi (OrigFunc, HandlerFunc: pointer; {n} AppliedPatch: PAppliedPatch = nil): pointer;
 const
   CODE_ADDR_ALIGNMENT = 8;
 
@@ -121,9 +128,23 @@ begin
   // Create and apply hook at target function start
   p.Clear();
   p.Jump(PatchForge.JMP, SpliceBridge);
+
+  if AppliedPatch <> nil then begin
+    AppliedPatch.Addr := OrigFunc;
+    SetLength(AppliedPatch.Bytes, p.Size);
+    Utils.CopyMem(p.Size, OrigFunc, @AppliedPatch.Bytes[0]);
+  end;
+
   WritePatchAtCode(p.PatchMaker, OrigFunc);
   // * * * * * //
   p.Release;
+end;
+
+procedure TAppliedPatch.Rollback;
+begin
+  if Self.Bytes <> nil then begin
+    WriteAtCode(Length(Self.Bytes), @Self.Bytes[0], Self.Addr);
+  end;
 end;
 
 end.
