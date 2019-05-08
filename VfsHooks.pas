@@ -252,7 +252,7 @@ begin
     result := OrigFunc(FileHandle, DesiredAccess, @ReplacedObjAttrs, IoStatusBlock, AllocationSize, FileAttributes, ShareAccess, CreateDisposition, CreateOptions, EaBuffer, EaLength);
 
     if (result = WinNative.STATUS_SUCCESS) and (ExpandedPath <> '') then begin
-      VfsOpenFiles.SetOpenedFileInfo(FileHandle^, TOpenedFile.Create(FileHandle^, ExpandedPath));
+      VfsOpenFiles.SetOpenedFileInfo(FileHandle^, TOpenedFile.Create(FileHandle^, VfsUtils.NormalizeAbsPath(ExpandedPath)));
     end;
 
     Leave;
@@ -375,6 +375,7 @@ var
      StructConvertResult:    TFileInfoConvertResult;
      EmptyMask:              UNICODE_STRING;
      EntryName:              WideString;
+     VfsIsActive:            boolean;
 
 begin
   OpenedFile := nil;
@@ -383,23 +384,24 @@ begin
   PrevEntry  := nil;
   BufSize    := 0;
   // * * * * * //
-  with OpenFilesCritSection do begin
+  with VfsOpenFiles.OpenFilesCritSection do begin
     if Mask = nil then begin
       EmptyMask.Reset;
       Mask := @EmptyMask;
     end;
 
     if VfsDebug.LoggingEnabled then begin
-      WriteLog('NtQueryDirectoryFile', Format('Handle: %x. InfoClass: %s. Mask: %s', [integer(FileHandle), WinNative.FileInformationClassToStr(InfoClass), AnsiString(Mask.ToWideStr())]));
+      WriteLog('[ENTER] NtQueryDirectoryFile', Format('Handle: %x. InfoClass: %s. Mask: %s. SingleEntry: %d', [Int(FileHandle), WinNative.FileInformationClassToStr(InfoClass), string(Mask.ToWideStr()), ord(SingleEntry)]));
     end;
 
     Enter;
 
-    // FIXME REWRITE ME
-    //OpenedFile := OpenedFiles[pointer(FileHandle)];
+    OpenedFile  := VfsOpenFiles.GetOpenedFile(FileHandle);
+    VfsIsActive := VfsBase.IsVfsActive;
 
-    if (OpenedFile = nil) or (Event <> 0) or (ApcRoutine <> nil) or (ApcContext <> nil) then begin
-      WriteLog('NtQueryDirectoryFile', Format('Calling native NtQueryDirectoryFile. OpenedFile: %x. %d %d %d', [integer(OpenedFile), integer(Event), integer(ApcRoutine), integer(ApcContext)]));
+    if (OpenedFile = nil) or (Event <> 0) or (ApcRoutine <> nil) or (ApcContext <> nil) or (not VfsIsActive) then begin
+      Leave;
+      WriteLog('[INNER] NtQueryDirectoryFile', Format('Calling native NtQueryDirectoryFile. OpenedFileRec: %x, VfsIsOn: %d, Event: %d. ApcRoutine: %d. ApcContext: %d', [Int(OpenedFile), ord(VfsIsActive), Int(Event), Int(ApcRoutine), Int(ApcContext)]));
       result := OrigFunc(FileHandle, Event, ApcRoutine, ApcContext, Io, Buffer, BufLength, InfoClass, SingleEntry, Mask, RestartScan);
     end else begin
       int(Io.Information) := 0;
@@ -434,12 +436,20 @@ begin
         Proceed := not OpenedFile.DirListing.IsEnd;
 
         if not Proceed then begin
-          result := STATUS_NO_MORE_FILES;
+          if OpenedFile.DirListing.Count > 0 then begin
+            result := STATUS_NO_MORE_FILES;
+          end else begin
+            result := STATUS_NO_SUCH_FILE;
+          end;
         end;
       end;
 
       // Scan directory
       if Proceed then begin
+        if VfsDebug.LoggingEnabled then begin
+          WriteLog('[INNER] NtQueryDirectoryFile', Format('Writing entries for buffer of size %d. Single entry: %d', [BufSize, ord(SingleEntry)]));
+        end;
+
         BufCurret    := Buffer;
         BytesWritten := 1;
 
@@ -460,10 +470,8 @@ begin
 
           if VfsDebug.LoggingEnabled then begin
             EntryName := Copy(FileInfo.Data.FileName, 1, Min(BytesWritten - WinNative.GetFileInformationClassSize(InfoClass), FileInfo.Data.Base.FileNameLength) div 2);
-            WriteLog('NtQueryDirectoryFile', 'Written entry: ' + EntryName);
+            WriteLog('[INNER] NtQueryDirectoryFile', 'Written entry: ' + EntryName);
           end;
-
-          //VarDump(['Converted struct to buf offset:', int(BufCurret) - int(Buffer), 'Written:', BytesWritten, 'Result:', ord(StructConvertResult)]);
 
           with PFILE_ID_BOTH_DIR_INFORMATION(BufCurret)^ do begin
             NextEntryOffset := 0;
@@ -497,8 +505,6 @@ begin
 
           PrevEntry := BufCurret;
 
-          //Msg(Format('Written: %d. Total: %d', [BytesWritten, int(Io.Information)]));
-
           if SingleEntry then begin
             BytesWritten := 0;
           end;
@@ -506,20 +512,21 @@ begin
       end; // .if    
 
       Io.Status.Status := result;
-    end; // .else
 
-    Leave;
+      Leave;
+    end; // .else
   end; // .with
 
   if VfsDebug.LoggingEnabled then begin
-    WriteLog('NtQueryDirectoryFile', Format('Status: %x. Written: %d bytes', [integer(result), integer(Io.Information)]));
+    WriteLog('[LEAVE] NtQueryDirectoryFile', Format('Handle: %x. Status: %x. Written: %d bytes', [int(FileHandle), int(result), int(Io.Information)]));
   end;
 end; // .function Hook_NtQueryDirectoryFile
 
 procedure InstallHooks;
 var
-  hDll:        Windows.THandle;
-  NtdllHandle: integer;
+  SetProcessDEPPolicy: function (dwFlags: integer): LONGBOOL; stdcall;
+  hDll:                Windows.THandle;
+  NtdllHandle:         integer;
 
 begin
   with HooksCritSection do begin
@@ -527,6 +534,17 @@ begin
 
     if not HooksInstalled then begin
       HooksInstalled := true;
+
+      (* Trying to turn off DEP *)
+      SetProcessDEPPolicy := Windows.GetProcAddress(Windows.GetModuleHandle('kernel32.dll'), 'SetProcessDEPPolicy');
+
+      if @SetProcessDEPPolicy <> nil then begin
+        if SetProcessDEPPolicy(0) then begin
+          WriteLog('SetProcessDEPPolicy', 'DEP was turned off');
+        end else begin
+          WriteLog('SetProcessDEPPolicy', 'Failed to turn DEP off');
+        end;
+      end;
 
       // Ensure, that library with VFS hooks installed is never unloaded
       if System.IsLibrary then begin
@@ -576,12 +594,12 @@ begin
         @NtClosePatch
       );
 
-      // WriteLog('InstallHook', 'Installing NtQueryDirectoryFile hook');
-      // NativeNtQueryDirectoryFile := VfsPatching.SpliceWinApi
-      // (
-      //   VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtQueryDirectoryFile'),
-      //   @Hook_NtQueryDirectoryFile
-      // );
+      WriteLog('InstallHook', 'Installing NtQueryDirectoryFile hook');
+      NativeNtQueryDirectoryFile := VfsPatching.SpliceWinApi
+      (
+        VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtQueryDirectoryFile'),
+        @Hook_NtQueryDirectoryFile
+      );
     end; // .if
 
     Leave;
@@ -598,6 +616,7 @@ begin
     NtOpenFilePatch.Rollback;
     NtCreateFilePatch.Rollback;
     NtClosePatch.Rollback;
+    NtQueryDirectoryFilePatch.Rollback;
 
     Leave;
   end;

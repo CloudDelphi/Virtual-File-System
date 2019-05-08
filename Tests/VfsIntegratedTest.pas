@@ -4,15 +4,14 @@ unit VfsIntegratedTest;
 
 uses
   SysUtils, TestFramework, Windows,
-  Utils, WinUtils, ConsoleApi, Files,
+  Utils, WinUtils, ConsoleApi, Files, FilesEx,
+  DataLib,
   VfsUtils, VfsBase, VfsDebug,
   VfsOpenFiles, VfsControl, DlgMes;
 
 type
   TestIntegrated = class (TTestCase)
    private
-    Inited: boolean;
-
     function GetRootDir: string;
 
    protected
@@ -23,6 +22,7 @@ type
     procedure TestGetFileAttributes;
     procedure TestGetFileAttributesEx;
     procedure TestFilesOpenClose;
+    procedure TestDirectoryListing;
   end;
 
 
@@ -163,6 +163,83 @@ begin
     SysUtils.SetCurrentDir(CurrDir);
   end; // .try
 end; // .procedure TestIntegrated.TestFilesOpenClose;
+
+procedure TestIntegrated.TestDirectoryListing;
+const
+  VALID_ROOT_DIR_LISTING          = 'Hobbots'#13#10'vcredist.bmp'#13#10'eula.1028.txt'#13#10'503.html'#13#10'.'#13#10'..'#13#10'default'#13#10'Mods';
+  VALID_ROOT_DIR_MASKED_LISTING_1 = 'vcredist.bmp'#13#10'eula.1028.txt'#13#10'503.html';
+  VALID_ROOT_DIR_MASKED_LISTING_2 = 'eula.1028.txt';
+
+var
+{O} FileList:    {U} DataLib.TStrList;
+{O} DirListing:  VfsUtils.TDirListing;
+    CurrDir:     string;
+    RootDir:     string;
+    DirContents: string;
+
+  function GetDirListing (const Path: string): {O} DataLib.TStrList;
+  var
+    FoundData:    TWin32FindDataA;
+    SearchHandle: Windows.THandle;
+
+  begin
+    result := DataLib.NewStrList(not Utils.OWNS_ITEMS, DataLib.CASE_SENSITIVE);
+    // * * * * * //
+    SearchHandle := Windows.FindFirstFileA(pchar(Path), FoundData);
+    
+    if SearchHandle <> Windows.INVALID_HANDLE_VALUE then begin
+      result.Add(pchar(@FoundData.cFileName));
+
+      while Windows.FindNextFileA(SearchHandle, FoundData) do begin
+        result.Add(pchar(@FoundData.cFileName));
+      end;
+
+      Windows.FindClose(SearchHandle);
+    end;
+  end; // .function GetDirListing
+
+  function GetDirListingLow (const Path, Mask: WideString): {O} DataLib.TStrList;
+  var
+    FileName: WideString;
+
+  begin
+    result := DataLib.NewStrList(not Utils.OWNS_ITEMS, DataLib.CASE_SENSITIVE);
+    // * * * * * //
+    with VfsUtils.SysScanDir(Path, Mask) do begin
+      while IterNext(FileName) do begin
+        result.Add(FileName);
+      end;
+    end;
+  end; // .function GetDirListingLow
+
+begin
+  FileList   := nil;
+  DirListing := VfsUtils.TDirListing.Create;
+  // * * * * * //
+  CurrDir := SysUtils.GetCurrentDir;
+  RootDir := Self.GetRootDir;
+
+  try
+    FileList    := GetDirListing(RootDir + '\*');
+    DirContents := FileList.ToText(#13#10);
+    CheckEquals(VALID_ROOT_DIR_LISTING, DirContents);
+    SysUtils.FreeAndNil(FileList);
+
+    FileList    := GetDirListingLow(RootDir, '*.??*');
+    DirContents := FileList.ToText(#13#10);
+    CheckEquals(VALID_ROOT_DIR_MASKED_LISTING_1, DirContents);
+    SysUtils.FreeAndNil(FileList);
+    
+    FileList    := GetDirListing(RootDir + '\*.txt');
+    DirContents := FileList.ToText(#13#10);
+    CheckEquals(VALID_ROOT_DIR_MASKED_LISTING_2, DirContents);
+    SysUtils.FreeAndNil(FileList);
+  finally
+    SysUtils.SetCurrentDir(CurrDir);
+    SysUtils.FreeAndNil(FileList);
+    SysUtils.FreeAndNil(DirListing);
+  end; // .try
+end; // .procedure TestIntegrated.TestDirectoryListing;
 
 begin
   RegisterTest(TestIntegrated.Suite);

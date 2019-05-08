@@ -33,8 +33,9 @@ end;
 
 procedure TestOpenFiles.GetCombinedDirListing;
 const
-  VALID_FULLY_VIRT_DIR_LISTING = 'mms.cfg'#13#10'.'#13#10'..';
-  VALID_COMBINED_LISTING       = 'Hobbots'#13#10'vcredist.bmp'#13#10'.'#13#10'..'#13#10'503.html'#13#10'default'#13#10'Mods';
+  VALID_FULLY_VIRT_DIR_LISTING  = 'mms.cfg'#13#10'.'#13#10'..';
+  VALID_COMBINED_LISTING        = 'Hobbots'#13#10'vcredist.bmp'#13#10'.'#13#10'..'#13#10'503.html'#13#10'default'#13#10'Mods';
+  VALID_COMBINED_MASKED_LISTING = '503.html';
 
 var
 {O} OpenedFile: VfsOpenFiles.TOpenedFile;
@@ -53,13 +54,20 @@ begin
   OpenedFile := VfsOpenFiles.TOpenedFile.Create(777, DirPath);
   OpenedFile.FillDirListing('*');
   Check(OpenedFile.DirListing <> nil, 'Directory listing must be assigned');
-  Check(OpenedFile.DirListing.GetDebugDump() = VALID_FULLY_VIRT_DIR_LISTING, 'Invalid listing for fully virtual directory "' + DirPath + '". Got: ' + OpenedFile.DirListing.GetDebugDump());
+  CheckEquals(VALID_FULLY_VIRT_DIR_LISTING, OpenedFile.DirListing.GetDebugDump(), 'Invalid listing for fully virtual directory "' + DirPath + '"');
   FreeAndNil(OpenedFile);
 
   OpenedFile := VfsOpenFiles.TOpenedFile.Create(888, RootDir);
   OpenedFile.FillDirListing('*');
   Check(OpenedFile.DirListing <> nil, 'Directory listing must be assigned');
-  Check(OpenedFile.DirListing.GetDebugDump() = VALID_COMBINED_LISTING, 'Invalid combined listing for directory "' + RootDir + '". Got: ' + OpenedFile.DirListing.GetDebugDump());
+  CheckEquals(VALID_COMBINED_LISTING, OpenedFile.DirListing.GetDebugDump(), 'Invalid combined listing for directory "' + RootDir + '"');
+  FreeAndNil(OpenedFile);
+
+  OpenedFile := VfsOpenFiles.TOpenedFile.Create(999, RootDir);
+  OpenedFile.FillDirListing('*.????');
+  Check(OpenedFile.DirListing <> nil, 'Directory listing must be assigned');
+  CheckEquals(VALID_COMBINED_MASKED_LISTING, OpenedFile.DirListing.GetDebugDump(), 'Invalid combined masked listing for directory "' + RootDir + '"');
+  FreeAndNil(OpenedFile);
   // * * * * * //
   SysUtils.FreeAndNil(OpenedFile);
 end;

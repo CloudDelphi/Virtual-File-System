@@ -12,7 +12,7 @@ uses
   SysUtils, Math, Windows,
   Utils, WinNative, Alg, Concur, TypeWrappers, Lists, DataLib,
   StrLib,
-  VfsUtils;
+  VfsUtils, VfsMatching;
 
 type
   (* Import *)
@@ -97,6 +97,9 @@ function PauseVfs: boolean;
 
 (* Stops VFS and clears all mappings *)
 function ResetVfs: boolean;
+
+(* Returns true if VFS is active globally and for current thread *)
+function IsVfsActive: boolean;
 
 (* Returns real path for VFS item by its absolute virtual path or empty string. Optionally returns file info structure *)
 function GetVfsItemRealPath (const AbsVirtPath: WideString; {n} FileInfo: PNativeFileInfo = nil): WideString;
@@ -325,6 +328,12 @@ begin
   end;
 end;
 
+function IsVfsActive: boolean;
+begin
+  result := EnterVfs;
+  LeaveVfs;
+end;
+
 (* Returns real path for vfs item by its absolute virtual path or empty string. Optionally returns file info structure *)
 function GetVfsItemRealPath (const AbsVirtPath: WideString; {n} FileInfo: PNativeFileInfo = nil): WideString;
 var
@@ -351,6 +360,7 @@ function GetVfsDirInfo (const AbsVirtPath, Mask: WideString; {OUT} var DirInfo: 
 var
 {n} VfsItem:        TVfsItem;
     NormalizedMask: WideString;
+    MaskPattern:    Utils.TArrayOfByte;
     i:              integer;
 
 begin
@@ -367,9 +377,10 @@ begin
 
       if VfsItem.Children <> nil then begin
         NormalizedMask := StrLib.WideLowerCase(Mask);
+        MaskPattern    := VfsMatching.CompilePattern(NormalizedMask);
 
         for i := 0 to VfsItem.Children.Count - 1 do begin
-          if StrLib.MatchW(TVfsItem(VfsItem.Children[i]).SearchName, NormalizedMask) then begin
+          if VfsMatching.MatchPattern(TVfsItem(VfsItem.Children[i]).SearchName, pointer(MaskPattern)) then begin
             DirListing.AddItem(@TVfsItem(VfsItem.Children[i]).Info);
           end;
         end;

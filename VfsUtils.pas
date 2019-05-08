@@ -60,6 +60,7 @@ type
     procedure AddItem ({U} FileInfo: PNativeFileInfo; const FileName: WideString = ''; const InsertBefore: integer = High(integer));
     function  GetNextItem ({OUT} var {U} Res: TFileInfo): boolean;
     procedure Rewind;
+    procedure Clear;
 
     (* Always seeks as close as possible *)
     function Seek (SeekInd: integer): boolean;
@@ -97,6 +98,7 @@ type
     function IterNext ({OUT} var FileName: WideString; {n} FileInfo: WinNative.PFILE_ID_BOTH_DIR_INFORMATION = nil): boolean;
   end; // .class TSysDirScanner
 
+
 (* Packs lower cased WideString bytes into AnsiString buffer *)
 function WideStrToCaselessKey (const Str: WideString): string;
 
@@ -105,6 +107,10 @@ function CaselessKeyToWideStr (const CaselessKey: string): WideString;
 
 (* Returns expanded unicode path, preserving trailing delimiter, or original path on error *)
 function ExpandPath (const Path: WideString): WideString;
+
+(* Returns path without trailing delimiter (for non-drives). Optionally returns flag, whether path had trailing delim or not.
+   The flag is false for drives *)
+function NormalizeAbsPath (const Path: WideString; {n} HadTrailingDelim: pboolean = nil): WideString;
 
 (* Returns expanded path without trailing delimiter (for non-drives). Optionally returns flag, whether path had trailing delim or not.
    The flag is false for drives *)
@@ -197,9 +203,9 @@ begin
   end; // .if
 end; // .function ExpandPath
 
-function NormalizePath (const Path: WideString; {n} HadTrailingDelim: pboolean = nil): WideString;
+function NormalizeAbsPath (const Path: WideString; {n} HadTrailingDelim: pboolean = nil): WideString;
 begin
-  result := StrLib.ExcludeTrailingDelimW(ExpandPath(Path), HadTrailingDelim);
+  result := StrLib.ExcludeTrailingDelimW(Path, HadTrailingDelim);
 
   if (Length(result) = 2) and (result[1] = ':') then begin
     result := result + '\';
@@ -208,6 +214,11 @@ begin
       HadTrailingDelim^ := false;
     end;
   end;
+end;
+
+function NormalizePath (const Path: WideString; {n} HadTrailingDelim: pboolean = nil): WideString;
+begin
+  result := NormalizeAbsPath(ExpandPath(Path), HadTrailingDelim);
 end;
 
 function ToNtAbsPath (const Path: WideString; {n} HadTrailingDelim: pboolean = nil): WideString;
@@ -337,6 +348,12 @@ end;
 
 procedure TDirListing.Rewind;
 begin
+  Self.fFileInd := 0;
+end;
+
+procedure TDirListing.Clear;
+begin
+  Self.fFileList.Clear;
   Self.fFileInd := 0;
 end;
 
@@ -507,14 +524,11 @@ begin
       FileInfo.FileNameLength := FileNameLen * sizeof(WideChar);
     end;
 
-    //VarDump(['Read entry: ', FileName]);
-
     Self.fBufPos := Utils.IfThen(FileInfoInBuf.NextEntryOffset <> 0, Self.fBufPos + integer(FileInfoInBuf.NextEntryOffset), Self.BUF_SIZE);
   end else begin
     Self.fBufPos  := 0;
     Status        := WinNative.NtQueryDirectoryFile(Self.fDirHandle, 0, nil, nil, @IoStatusBlock, @Self.fBuf, Self.BUF_SIZE, ord(WinNative.FileIdBothDirectoryInformation), MULTIPLE_ENTRIES, @Self.fMaskU, Self.fIsStart);
     result        := (Status = WinNative.STATUS_SUCCESS) and (integer(IoStatusBlock.Information) <> 0);
-    //VarDump([Format('Called NtQueryDirectoryFile. Status: %x. Io.Information: %d', [Status, int(IoStatusBlock.Information)])]);
     Self.fIsStart := false;
 
     if result then begin

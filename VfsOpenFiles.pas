@@ -14,7 +14,7 @@ unit VfsOpenFiles;
 uses
   Windows, SysUtils,
   Utils, Concur, DataLib, StrLib,
-  VfsUtils, VfsBase;
+  VfsUtils, VfsBase, VfsMatching;
 
 type
   (* Import *)
@@ -43,6 +43,9 @@ type
 var
   OpenFilesCritSection: Concur.TCritSection;
 
+
+(* Returns TOpenedFile by handle or nil. MUST BE called in OpenFilesCritSection protected area *)
+function GetOpenedFile (hFile: Windows.THandle): {n} TOpenedFile;
 
 (* Returns absolute virtual/real path to opened file by its handle in a thread-safe way. Empty string on failure. The result path is the one, passed to open file API *)
 function GetOpenedFilePath (hFile: Windows.THandle): WideString;
@@ -81,7 +84,6 @@ var
      DirInfo:        TNativeFileInfo;
      ParentDirInfo:  TNativeFileInfo;
      DirItem:        TFileInfo;
-     i:              integer;
 
 begin
   ExcludedItems := nil;
@@ -113,17 +115,22 @@ begin
 
   // No real items added, maybe there is a need to add '.' and/or '..' manually
   if VfsItemFound and (Self.DirListing.Count = NumVfsChildren) then begin
-    if StrLib.MatchW('.', Mask) then begin
+    if VfsMatching.MatchPattern('.', Mask) then begin
       Self.DirListing.AddItem(@DirInfo, '.');
     end;
 
-    if StrLib.MatchW('..', Mask) and VfsUtils.GetFileInfo(Self.AbsPath + '\..', ParentDirInfo) then begin
+    if VfsMatching.MatchPattern('..', Mask) and VfsUtils.GetFileInfo(Self.AbsPath + '\..', ParentDirInfo) then begin
       Self.DirListing.AddItem(@ParentDirInfo, '..');
     end;
   end;
   // * * * * * //
   SysUtils.FreeAndNil(ExcludedItems);
 end; // .procedure TOpenedFile.FillDirListing
+
+function GetOpenedFile (hFile: Windows.THandle): {n} TOpenedFile;
+begin
+  result := OpenedFiles[pointer(hFile)];
+end;
 
 function GetOpenedFilePath (hFile: Windows.THandle): WideString;
 var

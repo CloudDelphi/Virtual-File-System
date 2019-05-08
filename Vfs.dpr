@@ -5,14 +5,6 @@ library Vfs;
 
 uses Windows;
 
-procedure DLLEntryPoint (Reason: DWORD);
 begin
-  // Stop VFS globally!!!!!!!!!
-end;
-
-begin
-  if System.DllProc = nil then begin
-    System.DllProc := @DLLEntryPoint;
-    DllEntryPoint(Windows.DLL_PROCESS_ATTACH);
-  end;
+  System.IsMultiThread := true;
 end.

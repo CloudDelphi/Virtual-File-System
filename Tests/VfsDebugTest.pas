@@ -52,17 +52,30 @@ begin
 end;
 
 procedure TestDebug.TestLogging;
-begin
-  ClearLog;
-  VfsDebug.SetLoggingProc(@WriteLog);
-  VfsDebug.WriteLog('TestOperation', 'TestMessage');
-  Check(GetLog() = 'TestOperation;TestMessage', 'Custom logging proc should have written certain message to log');
+var
+  PrevLoggingProc: VfsDebug.TLoggingProc;
 
-  ClearLog;
-  VfsDebug.SetLoggingProc(nil);
-  VfsDebug.WriteLog('TestOperation', 'TestMessage');
-  Check(GetLog() = '', 'Nil logging proc must not write anything to log');
-end;
+begin
+  PrevLoggingProc := Ptr(1);
+  // * * * * * //
+  try
+    ClearLog;
+    PrevLoggingProc := VfsDebug.SetLoggingProc(@WriteLog);
+    VfsDebug.WriteLog('TestOperation', 'TestMessage');
+    Check(GetLog() = 'TestOperation;TestMessage', 'Custom logging proc should have written certain message to log');
+    VfsDebug.SetLoggingProc(PrevLoggingProc);
+
+    ClearLog;
+    VfsDebug.SetLoggingProc(nil);
+    VfsDebug.WriteLog('TestOperation', 'TestMessage');
+    Check(GetLog() = '', 'Nil logging proc must not write anything to log');
+    VfsDebug.SetLoggingProc(PrevLoggingProc);
+  finally
+    if @PrevLoggingProc <> Ptr(1) then begin
+      VfsDebug.SetLoggingProc(PrevLoggingProc);
+    end;
+  end; // .try
+end; // .procedure TestDebug.TestLogging
 
 begin
   RegisterTest(TestDebug.Suite);
