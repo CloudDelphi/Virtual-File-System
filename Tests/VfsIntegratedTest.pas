@@ -26,9 +26,20 @@ type
 (***)  implementation  (***)
 
 
+var
+  LogFile: Windows.THandle;
+
 procedure LogSomething (Operation, Message: pchar); stdcall;
+var
+  OutputHandle: integer;
+
 begin
   WriteLn('>> ', string(Operation), ': ', string(Message), #13#10);
+  
+  OutputHandle := pinteger(@System.Output)^;
+  pinteger(@System.Output)^ := integer(LogFile);
+  WriteLn('>> ', string(Operation), ': ', string(Message), #13#10);
+  pinteger(@System.Output)^ := OutputHandle;
 end;
 
 procedure TestIntegrated.SetUp;
@@ -235,4 +246,5 @@ end; // .procedure TestIntegrated.TestDirectoryListing;
 
 begin
   RegisterTest(TestIntegrated.Suite);
+  LogFile := SysUtils.FileCreate(SysUtils.ExtractFileDir(WinUtils.GetExePath()) + '\_LOG_.txt');
 end.

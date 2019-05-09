@@ -9,8 +9,10 @@ uses
 
 type
   TestDebug = class (TTestCase)
-   published
+   private
     procedure TestAssertHandler;
+
+   published
     procedure TestLogging;
   end;
 

@@ -7,7 +7,7 @@ uses
   VfsHooks, VfsControl, VfsMatching,
   VfsTestHelper, VfsMatchingTest,
   VfsDebugTest, VfsUtilsTest, VfsBaseTest,
-  VfsApiDiggerTest, VfsOpenFilesTest, VfsIntegratedTest;
+  VfsOpenFilesTest, VfsIntegratedTest;
 
 begin
   System.IsMultiThread := true;
