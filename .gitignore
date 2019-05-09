@@ -2,4 +2,5 @@
 *.exe
 *.ini
 *.identcache
+*.map
 __history/

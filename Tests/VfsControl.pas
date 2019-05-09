@@ -13,7 +13,7 @@ uses
 
 
 (* Runs all VFS subsystems, unless VFS is already running *)
-function RunVfs (DirListingOrder: VfsBase.TDirListingSortType): boolean;
+function RunVfs (DirListingOrder: VfsBase.TDirListingSortType): boolean; stdcall;
 
 
 (***)  implementation  (***)
@@ -43,7 +43,7 @@ begin
   result  := Windows.SetCurrentDirectoryW(PWideChar(AbsPath));
 end;
 
-function RunVfs (DirListingOrder: VfsBase.TDirListingSortType): boolean;
+function RunVfs (DirListingOrder: VfsBase.TDirListingSortType): boolean; stdcall;
 var
   CurrDir: WideString;
 

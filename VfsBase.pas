@@ -93,10 +93,10 @@ function GetThreadVfsDisabler: TThreadVfsDisabler;
 function RunVfs (DirListingOrder: TDirListingSortType): boolean;
 
 (* Temporarily pauses VFS, but does not reset existing mappings *)
-function PauseVfs: boolean;
+function PauseVfs: boolean; stdcall;
 
 (* Stops VFS and clears all mappings *)
-function ResetVfs: boolean;
+function ResetVfs: boolean; stdcall;
 
 (* Returns true if VFS is active globally and for current thread *)
 function IsVfsActive: boolean;
@@ -300,7 +300,7 @@ begin
   end; // .if
 end; // .function RunVfs
 
-function PauseVfs: boolean;
+function PauseVfs: boolean; stdcall;
 begin
   result := not DisableVfsForThisThread;
 
@@ -313,7 +313,7 @@ begin
   end;
 end;
 
-function ResetVfs: boolean;
+function ResetVfs: boolean; stdcall;
 begin
   result := not DisableVfsForThisThread;
 

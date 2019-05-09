@@ -1,6 +1,6 @@
 
  Start         Length     Name                   Class
- 0001:00401000 000AD414H .text                   CODE
+ 0001:00401000 000AD54CH .text                   CODE
  0002:004AF000 00000BECH .itext                  ICODE
  0003:004B0000 00002884H .data                   DATA
  0004:004B3000 00004E88H .bss                    BSS
@@ -73,32 +73,33 @@ Detailed map of segments
  0001:000A23D8 00001D8A C=CODE     S=.text    G=(none)   M=PatchForge ACBP=A9
  0001:000A4164 0000052E C=CODE     S=.text    G=(none)   M=VfsMatching ACBP=A9
  0001:000A4694 00000033 C=CODE     S=.text    G=(none)   M=Concur   ACBP=A9
- 0001:000A46C8 00000D1E C=CODE     S=.text    G=(none)   M=VfsBase  ACBP=A9
- 0001:000A53E8 00000059 C=CODE     S=.text    G=(none)   M=DlgMesLng ACBP=A9
- 0001:000A5444 0000004F C=CODE     S=.text    G=(none)   M=CLang    ACBP=A9
- 0001:000A5494 0000010A C=CODE     S=.text    G=(none)   M=CLngPack ACBP=A9
- 0001:000A55A0 00000230 C=CODE     S=.text    G=(none)   M=CFiles   ACBP=A9
- 0001:000A57D0 0000042A C=CODE     S=.text    G=(none)   M=Log      ACBP=A9
- 0001:000A5BFC 0000003C C=CODE     S=.text    G=(none)   M=WinWrappers ACBP=A9
- 0001:000A5C38 0000099D C=CODE     S=.text    G=(none)   M=Files    ACBP=A9
- 0001:000A65D8 000002B4 C=CODE     S=.text    G=(none)   M=Lang     ACBP=A9
- 0001:000A688C 0000007A C=CODE     S=.text    G=(none)   M=DlgMes   ACBP=A9
- 0001:000A6908 000002F2 C=CODE     S=.text    G=(none)   M=VfsDebug ACBP=A9
- 0001:000A6BFC 00000266 C=CODE     S=.text    G=(none)   M=VfsApiDigger ACBP=A9
- 0001:000A6E64 00000436 C=CODE     S=.text    G=(none)   M=VfsOpenFiles ACBP=A9
- 0001:000A729C 000004D5 C=CODE     S=.text    G=(none)   M=VfsPatching ACBP=A9
- 0001:000A7774 00001EF6 C=CODE     S=.text    G=(none)   M=VfsHooks ACBP=A9
- 0001:000A966C 00000133 C=CODE     S=.text    G=(none)   M=VfsControl ACBP=A9
- 0001:000A97A0 0000008A C=CODE     S=.text    G=(none)   M=VfsTestHelper ACBP=A9
- 0001:000A982C 0000058A C=CODE     S=.text    G=(none)   M=VfsMatchingTest ACBP=A9
- 0001:000A9DB8 00000566 C=CODE     S=.text    G=(none)   M=VfsDebugTest ACBP=A9
- 0001:000AA320 000000CA C=CODE     S=.text    G=(none)   M=WinUtils ACBP=A9
- 0001:000AA3EC 000005CE C=CODE     S=.text    G=(none)   M=VfsUtilsTest ACBP=A9
- 0001:000AA9BC 00000642 C=CODE     S=.text    G=(none)   M=VfsBaseTest ACBP=A9
- 0001:000AB000 0000035E C=CODE     S=.text    G=(none)   M=VfsApiDiggerTest ACBP=A9
- 0001:000AB360 0000070A C=CODE     S=.text    G=(none)   M=VfsOpenFilesTest ACBP=A9
- 0001:000ABA6C 0000160E C=CODE     S=.text    G=(none)   M=VfsIntegratedTest ACBP=A9
- 0001:000AD07C 00000398 C=CODE     S=.text    G=(none)   M=VfsTest  ACBP=A9
+ 0001:000A46C8 00000D72 C=CODE     S=.text    G=(none)   M=VfsBase  ACBP=A9
+ 0001:000A543C 00000059 C=CODE     S=.text    G=(none)   M=DlgMesLng ACBP=A9
+ 0001:000A5498 0000004F C=CODE     S=.text    G=(none)   M=CLang    ACBP=A9
+ 0001:000A54E8 0000010A C=CODE     S=.text    G=(none)   M=CLngPack ACBP=A9
+ 0001:000A55F4 00000230 C=CODE     S=.text    G=(none)   M=CFiles   ACBP=A9
+ 0001:000A5824 0000042A C=CODE     S=.text    G=(none)   M=Log      ACBP=A9
+ 0001:000A5C50 0000003C C=CODE     S=.text    G=(none)   M=WinWrappers ACBP=A9
+ 0001:000A5C8C 0000099D C=CODE     S=.text    G=(none)   M=Files    ACBP=A9
+ 0001:000A662C 000002B4 C=CODE     S=.text    G=(none)   M=Lang     ACBP=A9
+ 0001:000A68E0 0000007A C=CODE     S=.text    G=(none)   M=DlgMes   ACBP=A9
+ 0001:000A695C 000002F2 C=CODE     S=.text    G=(none)   M=VfsDebug ACBP=A9
+ 0001:000A6C50 00000266 C=CODE     S=.text    G=(none)   M=VfsApiDigger ACBP=A9
+ 0001:000A6EB8 00000436 C=CODE     S=.text    G=(none)   M=VfsOpenFiles ACBP=A9
+ 0001:000A72F0 000004D5 C=CODE     S=.text    G=(none)   M=VfsPatching ACBP=A9
+ 0001:000A77C8 00001EF6 C=CODE     S=.text    G=(none)   M=VfsHooks ACBP=A9
+ 0001:000A96C0 00000155 C=CODE     S=.text    G=(none)   M=VfsControl ACBP=A9
+ 0001:000A9818 0000006F C=CODE     S=.text    G=(none)   M=VfsExport ACBP=A9
+ 0001:000A9888 0000008A C=CODE     S=.text    G=(none)   M=VfsTestHelper ACBP=A9
+ 0001:000A9914 0000058A C=CODE     S=.text    G=(none)   M=VfsMatchingTest ACBP=A9
+ 0001:000A9EA0 00000566 C=CODE     S=.text    G=(none)   M=VfsDebugTest ACBP=A9
+ 0001:000AA408 000000CA C=CODE     S=.text    G=(none)   M=WinUtils ACBP=A9
+ 0001:000AA4D4 000005CE C=CODE     S=.text    G=(none)   M=VfsUtilsTest ACBP=A9
+ 0001:000AAAA4 0000067A C=CODE     S=.text    G=(none)   M=VfsBaseTest ACBP=A9
+ 0001:000AB120 0000035E C=CODE     S=.text    G=(none)   M=VfsApiDiggerTest ACBP=A9
+ 0001:000AB480 00000722 C=CODE     S=.text    G=(none)   M=VfsOpenFilesTest ACBP=A9
+ 0001:000ABBA4 0000160E C=CODE     S=.text    G=(none)   M=VfsIntegratedTest ACBP=A9
+ 0001:000AD1B4 00000398 C=CODE     S=.text    G=(none)   M=VfsTest  ACBP=A9
  0002:00000000 00000095 C=ICODE    S=.itext   G=(none)   M=System   ACBP=A9
  0002:00000098 00000011 C=ICODE    S=.itext   G=(none)   M=Windows  ACBP=A9
  0002:000000AC 00000088 C=ICODE    S=.itext   G=(none)   M=SysUtils ACBP=A9
@@ -393,12 +394,12 @@ Detailed map of segments
  0002:00000728       Buttons.Buttons
  0001:000749FC       Buttons.DestroyLocals
  0001:00074A94       Buttons.Finalization
- 0001:000A55A0       CFiles..TAbstractFile
- 0001:000A5608       CFiles.TAbstractFile.Read
- 0001:000A5708       CFiles.TAbstractFile.ReadAllToStr
- 0001:000A56C4       CFiles.TAbstractFile.ReadStr
- 0001:000A5478       CLang.IsValidClientName
- 0001:000A5444       CLang.IsValidLangName
+ 0001:000A55F4       CFiles..TAbstractFile
+ 0001:000A565C       CFiles.TAbstractFile.Read
+ 0001:000A575C       CFiles.TAbstractFile.ReadAllToStr
+ 0001:000A5718       CFiles.TAbstractFile.ReadStr
+ 0001:000A54CC       CLang.IsValidClientName
+ 0001:000A5498       CLang.IsValidLangName
  0004:000049B4       Classes..95
  0001:0001683C       Classes..EBitsError
  0001:0001672C       Classes..EClassNotFound
@@ -1035,9 +1036,9 @@ Detailed map of segments
  0001:0004464C       Clipbrd.TClipboard.SetAsText
  0001:00044568       Clipbrd.TClipboard.SetBuffer
  0001:00044548       Clipbrd.TClipboard.WndProc
- 0001:000A5494       CLngPack..TLngPackReader
- 0001:000A54F0       CLngPack.TLngPackReader.Create
- 0001:000A556C       CLngPack.TLngPackReader.Destroy
+ 0001:000A54E8       CLngPack..TLngPackReader
+ 0001:000A5544       CLngPack.TLngPackReader.Create
+ 0001:000A55C0       CLngPack.TLngPackReader.Destroy
  0004:00004D14       ComCtrls..76
  0001:00076FC4       ComCtrls..ETreeViewError
  0001:0007E2F4       ComCtrls..TComboBoxExActionLink
@@ -2795,14 +2796,14 @@ Detailed map of segments
  0004:00004D98       DlgMes..1
  0004:00004D94       DlgMes.DialogsTitle
  0002:00000854       DlgMes.DlgMes
- 0001:000A68CC       DlgMes.Finalization
+ 0001:000A6920       DlgMes.Finalization
  0003:00002388       DlgMes.hParentWindow
  0004:00004D9C       DlgMes.Lng
- 0001:000A68B8       DlgMes.MsgError
- 0001:000A688C       DlgMes.MsgEx
+ 0001:000A690C       DlgMes.MsgError
+ 0001:000A68E0       DlgMes.MsgEx
  0004:00004D74       DlgMesLng..1
  0002:000007A8       DlgMesLng.DlgMesLng
- 0001:000A53FC       DlgMesLng.Finalization
+ 0001:000A5450       DlgMesLng.Finalization
  0003:00002378       DlgMesLng.Strs
  0004:00004B74       DwmApi..1
  0002:000003D8       DwmApi.DwmApi
@@ -2883,14 +2884,14 @@ Detailed map of segments
  0003:000019BC       ExtDlgs.DefaultEncodingNames
  0002:00000750       ExtDlgs.ExtDlgs
  0001:00074ACC       ExtDlgs.Finalization
- 0001:000A5C38       Files..TFile
- 0001:000A6578       Files.ReadFileContents
- 0001:000A5FAC       Files.TFile.Close
- 0001:000A5CA8       Files.TFile.Destroy
- 0001:000A5CC8       Files.TFile.Open
- 0001:000A6080       Files.TFile.ReadUpTo
- 0001:000A63EC       Files.TFile.Seek
- 0001:000A6238       Files.TFile.WriteUpTo
+ 0001:000A5C8C       Files..TFile
+ 0001:000A65CC       Files.ReadFileContents
+ 0001:000A6000       Files.TFile.Close
+ 0001:000A5CFC       Files.TFile.Destroy
+ 0001:000A5D1C       Files.TFile.Open
+ 0001:000A60D4       Files.TFile.ReadUpTo
+ 0001:000A6440       Files.TFile.Seek
+ 0001:000A628C       Files.TFile.WriteUpTo
  0004:00004BD8       FlatSB..1
  0001:00044EB4       FlatSB.Finalization
  0002:0000055C       FlatSB.FlatSB
@@ -4065,12 +4066,12 @@ Detailed map of segments
  0004:00004D84       Lang.ClientList
  0003:00002380       Lang.FilePackName
  0004:00004D8C       Lang.FilePackReader
- 0001:000A6834       Lang.Finalization
- 0001:000A663C       Lang.IsClientRegistered
+ 0001:000A6888       Lang.Finalization
+ 0001:000A6690       Lang.IsClientRegistered
  0002:000007CC       Lang.Lang
  0003:0000237C       Lang.LangDir
  0004:00004D90       Lang.Language
- 0001:000A6654       Lang.RegisterClient
+ 0001:000A66A8       Lang.RegisterClient
  0003:00002384       Lang.ResPackName
  0004:00004D88       Lang.ResPackReader
  0001:00074FD0       ListActns..TCustomListAction
@@ -4166,22 +4167,22 @@ Detailed map of segments
  0001:0009F31C       Lists.TStringList.Sort
  0001:0009F4B8       Lists.TStringList.ToText
  0004:00004D78       Log..3
- 0001:000A5800       Log..TLogger
- 0001:000A5874       Log..TMemLogger
- 0001:000A5BCC       Log.Finalization
+ 0001:000A5854       Log..TLogger
+ 0001:000A58C8       Log..TMemLogger
+ 0001:000A5C20       Log.Finalization
  0002:000007B0       Log.Log
  0004:00004D7C       Log.Logger
- 0001:000A58EC       Log.TMemLogger.Create
- 0001:000A5944       Log.TMemLogger.Destroy
- 0001:000A5B8C       Log.TMemLogger.GetCount
- 0001:000A5AC0       Log.TMemLogger.GetPos
- 0001:000A5A68       Log.TMemLogger.IsLocked
- 0001:000A5A88       Log.TMemLogger.Lock
- 0001:000A5A04       Log.TMemLogger.Read
- 0001:000A5AE8       Log.TMemLogger.Seek
- 0001:000A5AA4       Log.TMemLogger.Unlock
- 0001:000A5970       Log.TMemLogger.Write
- 0001:000A5BB8       Log.Write
+ 0001:000A5940       Log.TMemLogger.Create
+ 0001:000A5998       Log.TMemLogger.Destroy
+ 0001:000A5BE0       Log.TMemLogger.GetCount
+ 0001:000A5B14       Log.TMemLogger.GetPos
+ 0001:000A5ABC       Log.TMemLogger.IsLocked
+ 0001:000A5ADC       Log.TMemLogger.Lock
+ 0001:000A5A58       Log.TMemLogger.Read
+ 0001:000A5B3C       Log.TMemLogger.Seek
+ 0001:000A5AF8       Log.TMemLogger.Unlock
+ 0001:000A59C4       Log.TMemLogger.Write
+ 0001:000A5C0C       Log.Write
  0004:00004D04       Mapi..1
  0001:00074B5C       Mapi.Finalization
  0002:00000764       Mapi.Mapi
@@ -6167,26 +6168,27 @@ Detailed map of segments
  0004:00004934       VarUtils.VarXor
  0004:00004DC0       VfsApiDigger..1
  0004:00004DC4       VfsApiDigger.DllRealApiAddrs
- 0001:000A6E34       VfsApiDigger.Finalization
- 0001:000A6BFC       VfsApiDigger.FindOutRealSystemApiAddrs
- 0001:000A6D0C       VfsApiDigger.GetRealAddress
- 0001:000A6DF0       VfsApiDigger.GetRealProcAddress
+ 0001:000A6E88       VfsApiDigger.Finalization
+ 0001:000A6C50       VfsApiDigger.FindOutRealSystemApiAddrs
+ 0001:000A6D60       VfsApiDigger.GetRealAddress
+ 0001:000A6E44       VfsApiDigger.GetRealProcAddress
  0002:000008EC       VfsApiDigger.VfsApiDigger
  0004:00004E7C       VfsApiDiggerTest..2
- 0001:000AB000       VfsApiDiggerTest..TestApiDigger
- 0001:000AB330       VfsApiDiggerTest.Finalization
- 0001:000AB1A4       VfsApiDiggerTest.TestApiDigger.DetermineRealApiAddress
+ 0001:000AB120       VfsApiDiggerTest..TestApiDigger
+ 0001:000AB450       VfsApiDiggerTest.Finalization
+ 0001:000AB2C4       VfsApiDiggerTest.TestApiDigger.DetermineRealApiAddress
  0002:00000AC4       VfsApiDiggerTest.VfsApiDiggerTest
  0004:00004D6C       VfsBase..2
  0001:000A46C8       VfsBase..TVfsItem
  0003:00002374       VfsBase.AddingPriority
  0001:000A49D4       VfsBase.BuildVfsItemsTree
+ 0001:000A53B8       VfsBase.CallWithoutVfs
  0001:000A4868       VfsBase.CompareVfsItemsByPriorityAscAndNameAsc
  0001:000A482C       VfsBase.CompareVfsItemsByPriorityDescAndNameAsc
  0001:000A4DA4       VfsBase.CopyFileInfoWithoutNames
  0005:00000040       VfsBase.DisableVfsForThisThread
  0001:000A47DC       VfsBase.EnterVfs
- 0001:000A53B8       VfsBase.Finalization
+ 0001:000A540C       VfsBase.Finalization
  0001:000A4960       VfsBase.FindVfsItemByNormalizedPath
  0001:000A47D0       VfsBase.GetThreadVfsDisabler
  0001:000A4BF8       VfsBase.GetVfsDirInfo
@@ -6212,51 +6214,52 @@ Detailed map of segments
  0003:0000236C       VfsBase.VfsTreeIsBuilt
  0001:000A5040       VfsBase._MapDir
  0004:00004E78       VfsBaseTest..2
- 0001:000AA9BC       VfsBaseTest..TestBase
- 0001:000AAFD0       VfsBaseTest.Finalization
- 0001:000AAB50       VfsBaseTest.TestBase.SetUp
- 0001:000AAB58       VfsBaseTest.TestBase.TearDown
- 0001:000AAB60       VfsBaseTest.TestBase.TestVirtualDirMapping
+ 0001:000AAAA4       VfsBaseTest..TestBase
+ 0001:000AB0F0       VfsBaseTest.Finalization
+ 0001:000AAC38       VfsBaseTest.TestBase.SetUp
+ 0001:000AAC48       VfsBaseTest.TestBase.TearDown
+ 0001:000AAC58       VfsBaseTest.TestBase.TestVirtualDirMapping
  0002:00000A70       VfsBaseTest.VfsBaseTest
- 0001:000A966C       VfsControl.GetCurrentDirW
- 0001:000A9724       VfsControl.RunVfs
- 0001:000A96C8       VfsControl.SetCurrentDirW
+ 0001:000A96C0       VfsControl.GetCurrentDirW
+ 0001:000A9790       VfsControl.RunVfs
+ 0001:000A972C       VfsControl.SetCurrentDirW
  0004:00004DA0       VfsDebug..2
- 0001:000A6908       VfsDebug..EAssertFailure
- 0001:000A69F8       VfsDebug.AssertHandler
- 0001:000A6BCC       VfsDebug.Finalization
+ 0001:000A695C       VfsDebug..EAssertFailure
+ 0001:000A6A4C       VfsDebug.AssertHandler
+ 0001:000A6C20       VfsDebug.Finalization
  0004:00004DA4       VfsDebug.LogCritSection
  0003:0000238C       VfsDebug.LoggingEnabled
  0004:00004DBC       VfsDebug.LoggingProc
- 0001:000A6964       VfsDebug.SetLoggingProc
+ 0001:000A69B8       VfsDebug.SetLoggingProc
  0002:000008CC       VfsDebug.VfsDebug
- 0001:000A69A0       VfsDebug.WriteLog
- 0001:000A69C0       VfsDebug.WriteLog_
+ 0001:000A69F4       VfsDebug.WriteLog
+ 0001:000A6A14       VfsDebug.WriteLog_
  0004:00004E50       VfsDebugTest..2
- 0001:000A9DB8       VfsDebugTest..TestDebug
- 0001:000A9F5C       VfsDebugTest.ClearLog
- 0001:000AA2E4       VfsDebugTest.Finalization
- 0001:000A9F68       VfsDebugTest.GetLog
+ 0001:000A9EA0       VfsDebugTest..TestDebug
+ 0001:000AA044       VfsDebugTest.ClearLog
+ 0001:000AA3CC       VfsDebugTest.Finalization
+ 0001:000AA050       VfsDebugTest.GetLog
  0004:00004E54       VfsDebugTest.LogContents
- 0001:000A9FFC       VfsDebugTest.TestDebug.TestAssertHandler
- 0001:000AA108       VfsDebugTest.TestDebug.TestLogging
+ 0001:000AA0E4       VfsDebugTest.TestDebug.TestAssertHandler
+ 0001:000AA1F0       VfsDebugTest.TestDebug.TestLogging
  0002:000009B4       VfsDebugTest.VfsDebugTest
- 0001:000A9F7C       VfsDebugTest.WriteLog
+ 0001:000AA064       VfsDebugTest.WriteLog
+ 0001:000A9818       VfsExport.MapDir
  0004:00004DE8       VfsHooks..1
- 0001:000A8680       VfsHooks.ConvertFileInfoStruct
- 0001:000A95BC       VfsHooks.Finalization
- 0001:000A7790       VfsHooks.GetFileObjectPath
- 0001:000A7774       VfsHooks.GetFilePathByHandle
+ 0001:000A86D4       VfsHooks.ConvertFileInfoStruct
+ 0001:000A9610       VfsHooks.Finalization
+ 0001:000A77E4       VfsHooks.GetFileObjectPath
+ 0001:000A77C8       VfsHooks.GetFilePathByHandle
  0004:00004DEC       VfsHooks.HooksCritSection
  0003:00002390       VfsHooks.HooksInstalled
- 0001:000A8514       VfsHooks.Hook_NtClose
- 0001:000A8118       VfsHooks.Hook_NtCreateFile
- 0001:000A8064       VfsHooks.Hook_NtOpenFile
- 0001:000A788C       VfsHooks.Hook_NtQueryAttributesFile
- 0001:000A8934       VfsHooks.Hook_NtQueryDirectoryFile
- 0001:000A7C60       VfsHooks.Hook_NtQueryFullAttributesFile
- 0001:000A90E8       VfsHooks.InstallHooks
- 0001:000A864C       VfsHooks.IsSupportedFileInformationClass
+ 0001:000A8568       VfsHooks.Hook_NtClose
+ 0001:000A816C       VfsHooks.Hook_NtCreateFile
+ 0001:000A80B8       VfsHooks.Hook_NtOpenFile
+ 0001:000A78E0       VfsHooks.Hook_NtQueryAttributesFile
+ 0001:000A8988       VfsHooks.Hook_NtQueryDirectoryFile
+ 0001:000A7CB4       VfsHooks.Hook_NtQueryFullAttributesFile
+ 0001:000A913C       VfsHooks.InstallHooks
+ 0001:000A86A0       VfsHooks.IsSupportedFileInformationClass
  0004:00004E14       VfsHooks.NativeNtClose
  0004:00004E10       VfsHooks.NativeNtCreateFile
  0004:00004E0C       VfsHooks.NativeNtOpenFile
@@ -6269,24 +6272,24 @@ Detailed map of segments
  0004:00004E1C       VfsHooks.NtQueryAttributesFilePatch
  0004:00004E44       VfsHooks.NtQueryDirectoryFilePatch
  0004:00004E24       VfsHooks.NtQueryFullAttributesFilePatch
- 0001:000A9568       VfsHooks.UninstallHooks
+ 0001:000A95BC       VfsHooks.UninstallHooks
  0002:00000924       VfsHooks.VfsHooks
  0004:00004E84       VfsIntegratedTest..2
- 0001:000ABA6C       VfsIntegratedTest..TestIntegrated
- 0001:000AD04C       VfsIntegratedTest.Finalization
- 0001:000ACC70       VfsIntegratedTest.GetDirListing
- 0001:000ACD4C       VfsIntegratedTest.GetDirListingLow
- 0001:000AC294       VfsIntegratedTest.GetFileSize
- 0001:000AC048       VfsIntegratedTest.HasValidAttrs
- 0001:000ABC64       VfsIntegratedTest.LogSomething
- 0001:000AC464       VfsIntegratedTest.OpenFile
- 0001:000ABD18       VfsIntegratedTest.TestIntegrated.GetRootDir
- 0001:000ABDD8       VfsIntegratedTest.TestIntegrated.SetUp
- 0001:000AC030       VfsIntegratedTest.TestIntegrated.TearDown
- 0001:000ACDEC       VfsIntegratedTest.TestIntegrated.TestDirectoryListing
- 0001:000AC484       VfsIntegratedTest.TestIntegrated.TestFilesOpenClose
- 0001:000AC0A8       VfsIntegratedTest.TestIntegrated.TestGetFileAttributes
- 0001:000AC2CC       VfsIntegratedTest.TestIntegrated.TestGetFileAttributesEx
+ 0001:000ABBA4       VfsIntegratedTest..TestIntegrated
+ 0001:000AD184       VfsIntegratedTest.Finalization
+ 0001:000ACDA8       VfsIntegratedTest.GetDirListing
+ 0001:000ACE84       VfsIntegratedTest.GetDirListingLow
+ 0001:000AC3CC       VfsIntegratedTest.GetFileSize
+ 0001:000AC180       VfsIntegratedTest.HasValidAttrs
+ 0001:000ABD9C       VfsIntegratedTest.LogSomething
+ 0001:000AC59C       VfsIntegratedTest.OpenFile
+ 0001:000ABE50       VfsIntegratedTest.TestIntegrated.GetRootDir
+ 0001:000ABF10       VfsIntegratedTest.TestIntegrated.SetUp
+ 0001:000AC168       VfsIntegratedTest.TestIntegrated.TearDown
+ 0001:000ACF24       VfsIntegratedTest.TestIntegrated.TestDirectoryListing
+ 0001:000AC5BC       VfsIntegratedTest.TestIntegrated.TestFilesOpenClose
+ 0001:000AC1E0       VfsIntegratedTest.TestIntegrated.TestGetFileAttributes
+ 0001:000AC404       VfsIntegratedTest.TestIntegrated.TestGetFileAttributesEx
  0002:00000B6C       VfsIntegratedTest.VfsIntegratedTest
  0001:000A4164       VfsMatching.CompilePattern
  0001:000A4584       VfsMatching.MatchPattern
@@ -6294,37 +6297,37 @@ Detailed map of segments
  0001:000A4270       VfsMatching.MatchSubpattern
  0001:000A4420       VfsMatching.Recover
  0004:00004E4C       VfsMatchingTest..2
- 0001:000A982C       VfsMatchingTest..TestMatching
- 0001:000A9D88       VfsMatchingTest.Finalization
- 0001:000A99C8       VfsMatchingTest.TestMatching.TestMatchPattern
+ 0001:000A9914       VfsMatchingTest..TestMatching
+ 0001:000A9E70       VfsMatchingTest.Finalization
+ 0001:000A9AB0       VfsMatchingTest.TestMatching.TestMatchPattern
  0002:00000960       VfsMatchingTest.VfsMatchingTest
  0004:00004DE0       VfsOpenFiles..2
- 0001:000A6E64       VfsOpenFiles..TOpenedFile
- 0001:000A7240       VfsOpenFiles.DeleteOpenedFileInfo
- 0001:000A726C       VfsOpenFiles.Finalization
- 0001:000A7184       VfsOpenFiles.GetOpenedFile
- 0001:000A71A4       VfsOpenFiles.GetOpenedFilePath
+ 0001:000A6EB8       VfsOpenFiles..TOpenedFile
+ 0001:000A7294       VfsOpenFiles.DeleteOpenedFileInfo
+ 0001:000A72C0       VfsOpenFiles.Finalization
+ 0001:000A71D8       VfsOpenFiles.GetOpenedFile
+ 0001:000A71F8       VfsOpenFiles.GetOpenedFilePath
  0004:00004DE4       VfsOpenFiles.OpenedFiles
  0004:00004DC8       VfsOpenFiles.OpenFilesCritSection
- 0001:000A71FC       VfsOpenFiles.SetOpenedFileInfo
- 0001:000A6ED0       VfsOpenFiles.TOpenedFile.Create
- 0001:000A6F24       VfsOpenFiles.TOpenedFile.Destroy
- 0001:000A6F54       VfsOpenFiles.TOpenedFile.FillDirListing
+ 0001:000A7250       VfsOpenFiles.SetOpenedFileInfo
+ 0001:000A6F24       VfsOpenFiles.TOpenedFile.Create
+ 0001:000A6F78       VfsOpenFiles.TOpenedFile.Destroy
+ 0001:000A6FA8       VfsOpenFiles.TOpenedFile.FillDirListing
  0002:00000904       VfsOpenFiles.VfsOpenFiles
  0004:00004E80       VfsOpenFilesTest..2
- 0001:000AB360       VfsOpenFilesTest..TestOpenFiles
- 0001:000ABA3C       VfsOpenFilesTest.Finalization
- 0001:000AB510       VfsOpenFilesTest.TestOpenFiles.GetCombinedDirListing
- 0001:000AB500       VfsOpenFilesTest.TestOpenFiles.SetUp
- 0001:000AB508       VfsOpenFilesTest.TestOpenFiles.TearDown
+ 0001:000AB480       VfsOpenFilesTest..TestOpenFiles
+ 0001:000ABB74       VfsOpenFilesTest.Finalization
+ 0001:000AB640       VfsOpenFilesTest.TestOpenFiles.GetCombinedDirListing
+ 0001:000AB620       VfsOpenFilesTest.TestOpenFiles.SetUp
+ 0001:000AB630       VfsOpenFilesTest.TestOpenFiles.TearDown
  0002:00000B18       VfsOpenFilesTest.VfsOpenFilesTest
- 0001:000A74FC       VfsPatching.SpliceWinApi
- 0001:000A7754       VfsPatching.TAppliedPatch.Rollback
- 0001:000A72C0       VfsPatching.WriteAtCode
- 0001:000A73DC       VfsPatching.WritePatchAtCode
- 0001:000AD07C       VfsTest.Finalization
+ 0001:000A7550       VfsPatching.SpliceWinApi
+ 0001:000A77A8       VfsPatching.TAppliedPatch.Rollback
+ 0001:000A7314       VfsPatching.WriteAtCode
+ 0001:000A7430       VfsPatching.WritePatchAtCode
+ 0001:000AD1B4       VfsTest.Finalization
  0002:00000BC0       VfsTest.VfsTest
- 0001:000A97A0       VfsTestHelper.InitConsole
+ 0001:000A9888       VfsTestHelper.InitConsole
  0001:000A0D98       VfsUtils..TDirListing
  0001:000A0EC4       VfsUtils..TDirListingItem
  0001:000A0D30       VfsUtils..TFileInfo
@@ -6362,10 +6365,10 @@ Detailed map of segments
  0001:000A1C3C       VfsUtils.TSysDirScanner.IterNext
  0001:000A0F3C       VfsUtils.WideStrToCaselessKey
  0004:00004E74       VfsUtilsTest..2
- 0001:000AA3EC       VfsUtilsTest..TestUtils
- 0001:000AA98C       VfsUtilsTest.Finalization
- 0001:000AA7C8       VfsUtilsTest.TestUtils.TestGetDirectoryListing
- 0001:000AA5A0       VfsUtilsTest.TestUtils.TestNativeDirScanning
+ 0001:000AA4D4       VfsUtilsTest..TestUtils
+ 0001:000AAA74       VfsUtilsTest.Finalization
+ 0001:000AA8B0       VfsUtilsTest.TestUtils.TestGetDirectoryListing
+ 0001:000AA688       VfsUtilsTest.TestUtils.TestNativeDirScanning
  0002:00000A1C       VfsUtilsTest.VfsUtilsTest
  0004:000027F8       Windows..3
  0001:00006C50       Windows.ActivateKeyboardLayout
@@ -6751,12 +6754,12 @@ Detailed map of segments
  0004:00004E58       WinUtils..2
  0003:00002398       WinUtils.ExeDirW
  0003:00002394       WinUtils.ExePathW
- 0001:000AA39C       WinUtils.Finalization
- 0001:000AA320       WinUtils.GetExePath
+ 0001:000AA484       WinUtils.Finalization
+ 0001:000AA408       WinUtils.GetExePath
  0004:00004E5C       WinUtils.StaticCritSection
  0002:00000A08       WinUtils.WinUtils
- 0001:000A5BFC       WinWrappers.FileOpen
- 0001:000A5C1C       WinWrappers.GetFileSize
+ 0001:000A5C50       WinWrappers.FileOpen
+ 0001:000A5C70       WinWrappers.GetFileSize
 
 
   Address             Publics by Value
@@ -12425,132 +12428,134 @@ Detailed map of segments
  0001:000A4E40       VfsBase.RedirectFile
  0001:000A5040       VfsBase._MapDir
  0001:000A52F8       VfsBase.MapDir
- 0001:000A53B8       VfsBase.Finalization
- 0001:000A53FC       DlgMesLng.Finalization
- 0001:000A5444       CLang.IsValidLangName
- 0001:000A5478       CLang.IsValidClientName
- 0001:000A5494       CLngPack..TLngPackReader
- 0001:000A54F0       CLngPack.TLngPackReader.Create
- 0001:000A556C       CLngPack.TLngPackReader.Destroy
- 0001:000A55A0       CFiles..TAbstractFile
- 0001:000A5608       CFiles.TAbstractFile.Read
- 0001:000A56C4       CFiles.TAbstractFile.ReadStr
- 0001:000A5708       CFiles.TAbstractFile.ReadAllToStr
- 0001:000A5800       Log..TLogger
- 0001:000A5874       Log..TMemLogger
- 0001:000A58EC       Log.TMemLogger.Create
- 0001:000A5944       Log.TMemLogger.Destroy
- 0001:000A5970       Log.TMemLogger.Write
- 0001:000A5A04       Log.TMemLogger.Read
- 0001:000A5A68       Log.TMemLogger.IsLocked
- 0001:000A5A88       Log.TMemLogger.Lock
- 0001:000A5AA4       Log.TMemLogger.Unlock
- 0001:000A5AC0       Log.TMemLogger.GetPos
- 0001:000A5AE8       Log.TMemLogger.Seek
- 0001:000A5B8C       Log.TMemLogger.GetCount
- 0001:000A5BB8       Log.Write
- 0001:000A5BCC       Log.Finalization
- 0001:000A5BFC       WinWrappers.FileOpen
- 0001:000A5C1C       WinWrappers.GetFileSize
- 0001:000A5C38       Files..TFile
- 0001:000A5CA8       Files.TFile.Destroy
- 0001:000A5CC8       Files.TFile.Open
- 0001:000A5FAC       Files.TFile.Close
- 0001:000A6080       Files.TFile.ReadUpTo
- 0001:000A6238       Files.TFile.WriteUpTo
- 0001:000A63EC       Files.TFile.Seek
- 0001:000A6578       Files.ReadFileContents
- 0001:000A663C       Lang.IsClientRegistered
- 0001:000A6654       Lang.RegisterClient
- 0001:000A6834       Lang.Finalization
- 0001:000A688C       DlgMes.MsgEx
- 0001:000A68B8       DlgMes.MsgError
- 0001:000A68CC       DlgMes.Finalization
- 0001:000A6908       VfsDebug..EAssertFailure
- 0001:000A6964       VfsDebug.SetLoggingProc
- 0001:000A69A0       VfsDebug.WriteLog
- 0001:000A69C0       VfsDebug.WriteLog_
- 0001:000A69F8       VfsDebug.AssertHandler
- 0001:000A6BCC       VfsDebug.Finalization
- 0001:000A6BFC       VfsApiDigger.FindOutRealSystemApiAddrs
- 0001:000A6D0C       VfsApiDigger.GetRealAddress
- 0001:000A6DF0       VfsApiDigger.GetRealProcAddress
- 0001:000A6E34       VfsApiDigger.Finalization
- 0001:000A6E64       VfsOpenFiles..TOpenedFile
- 0001:000A6ED0       VfsOpenFiles.TOpenedFile.Create
- 0001:000A6F24       VfsOpenFiles.TOpenedFile.Destroy
- 0001:000A6F54       VfsOpenFiles.TOpenedFile.FillDirListing
- 0001:000A7184       VfsOpenFiles.GetOpenedFile
- 0001:000A71A4       VfsOpenFiles.GetOpenedFilePath
- 0001:000A71FC       VfsOpenFiles.SetOpenedFileInfo
- 0001:000A7240       VfsOpenFiles.DeleteOpenedFileInfo
- 0001:000A726C       VfsOpenFiles.Finalization
- 0001:000A72C0       VfsPatching.WriteAtCode
- 0001:000A73DC       VfsPatching.WritePatchAtCode
- 0001:000A74FC       VfsPatching.SpliceWinApi
- 0001:000A7754       VfsPatching.TAppliedPatch.Rollback
- 0001:000A7774       VfsHooks.GetFilePathByHandle
- 0001:000A7790       VfsHooks.GetFileObjectPath
- 0001:000A788C       VfsHooks.Hook_NtQueryAttributesFile
- 0001:000A7C60       VfsHooks.Hook_NtQueryFullAttributesFile
- 0001:000A8064       VfsHooks.Hook_NtOpenFile
- 0001:000A8118       VfsHooks.Hook_NtCreateFile
- 0001:000A8514       VfsHooks.Hook_NtClose
- 0001:000A864C       VfsHooks.IsSupportedFileInformationClass
- 0001:000A8680       VfsHooks.ConvertFileInfoStruct
- 0001:000A8934       VfsHooks.Hook_NtQueryDirectoryFile
- 0001:000A90E8       VfsHooks.InstallHooks
- 0001:000A9568       VfsHooks.UninstallHooks
- 0001:000A95BC       VfsHooks.Finalization
- 0001:000A966C       VfsControl.GetCurrentDirW
- 0001:000A96C8       VfsControl.SetCurrentDirW
- 0001:000A9724       VfsControl.RunVfs
- 0001:000A97A0       VfsTestHelper.InitConsole
- 0001:000A982C       VfsMatchingTest..TestMatching
- 0001:000A99C8       VfsMatchingTest.TestMatching.TestMatchPattern
- 0001:000A9D88       VfsMatchingTest.Finalization
- 0001:000A9DB8       VfsDebugTest..TestDebug
- 0001:000A9F5C       VfsDebugTest.ClearLog
- 0001:000A9F68       VfsDebugTest.GetLog
- 0001:000A9F7C       VfsDebugTest.WriteLog
- 0001:000A9FFC       VfsDebugTest.TestDebug.TestAssertHandler
- 0001:000AA108       VfsDebugTest.TestDebug.TestLogging
- 0001:000AA2E4       VfsDebugTest.Finalization
- 0001:000AA320       WinUtils.GetExePath
- 0001:000AA39C       WinUtils.Finalization
- 0001:000AA3EC       VfsUtilsTest..TestUtils
- 0001:000AA5A0       VfsUtilsTest.TestUtils.TestNativeDirScanning
- 0001:000AA7C8       VfsUtilsTest.TestUtils.TestGetDirectoryListing
- 0001:000AA98C       VfsUtilsTest.Finalization
- 0001:000AA9BC       VfsBaseTest..TestBase
- 0001:000AAB50       VfsBaseTest.TestBase.SetUp
- 0001:000AAB58       VfsBaseTest.TestBase.TearDown
- 0001:000AAB60       VfsBaseTest.TestBase.TestVirtualDirMapping
- 0001:000AAFD0       VfsBaseTest.Finalization
- 0001:000AB000       VfsApiDiggerTest..TestApiDigger
- 0001:000AB1A4       VfsApiDiggerTest.TestApiDigger.DetermineRealApiAddress
- 0001:000AB330       VfsApiDiggerTest.Finalization
- 0001:000AB360       VfsOpenFilesTest..TestOpenFiles
- 0001:000AB500       VfsOpenFilesTest.TestOpenFiles.SetUp
- 0001:000AB508       VfsOpenFilesTest.TestOpenFiles.TearDown
- 0001:000AB510       VfsOpenFilesTest.TestOpenFiles.GetCombinedDirListing
- 0001:000ABA3C       VfsOpenFilesTest.Finalization
- 0001:000ABA6C       VfsIntegratedTest..TestIntegrated
- 0001:000ABC64       VfsIntegratedTest.LogSomething
- 0001:000ABD18       VfsIntegratedTest.TestIntegrated.GetRootDir
- 0001:000ABDD8       VfsIntegratedTest.TestIntegrated.SetUp
- 0001:000AC030       VfsIntegratedTest.TestIntegrated.TearDown
- 0001:000AC048       VfsIntegratedTest.HasValidAttrs
- 0001:000AC0A8       VfsIntegratedTest.TestIntegrated.TestGetFileAttributes
- 0001:000AC294       VfsIntegratedTest.GetFileSize
- 0001:000AC2CC       VfsIntegratedTest.TestIntegrated.TestGetFileAttributesEx
- 0001:000AC464       VfsIntegratedTest.OpenFile
- 0001:000AC484       VfsIntegratedTest.TestIntegrated.TestFilesOpenClose
- 0001:000ACC70       VfsIntegratedTest.GetDirListing
- 0001:000ACD4C       VfsIntegratedTest.GetDirListingLow
- 0001:000ACDEC       VfsIntegratedTest.TestIntegrated.TestDirectoryListing
- 0001:000AD04C       VfsIntegratedTest.Finalization
- 0001:000AD07C       VfsTest.Finalization
+ 0001:000A53B8       VfsBase.CallWithoutVfs
+ 0001:000A540C       VfsBase.Finalization
+ 0001:000A5450       DlgMesLng.Finalization
+ 0001:000A5498       CLang.IsValidLangName
+ 0001:000A54CC       CLang.IsValidClientName
+ 0001:000A54E8       CLngPack..TLngPackReader
+ 0001:000A5544       CLngPack.TLngPackReader.Create
+ 0001:000A55C0       CLngPack.TLngPackReader.Destroy
+ 0001:000A55F4       CFiles..TAbstractFile
+ 0001:000A565C       CFiles.TAbstractFile.Read
+ 0001:000A5718       CFiles.TAbstractFile.ReadStr
+ 0001:000A575C       CFiles.TAbstractFile.ReadAllToStr
+ 0001:000A5854       Log..TLogger
+ 0001:000A58C8       Log..TMemLogger
+ 0001:000A5940       Log.TMemLogger.Create
+ 0001:000A5998       Log.TMemLogger.Destroy
+ 0001:000A59C4       Log.TMemLogger.Write
+ 0001:000A5A58       Log.TMemLogger.Read
+ 0001:000A5ABC       Log.TMemLogger.IsLocked
+ 0001:000A5ADC       Log.TMemLogger.Lock
+ 0001:000A5AF8       Log.TMemLogger.Unlock
+ 0001:000A5B14       Log.TMemLogger.GetPos
+ 0001:000A5B3C       Log.TMemLogger.Seek
+ 0001:000A5BE0       Log.TMemLogger.GetCount
+ 0001:000A5C0C       Log.Write
+ 0001:000A5C20       Log.Finalization
+ 0001:000A5C50       WinWrappers.FileOpen
+ 0001:000A5C70       WinWrappers.GetFileSize
+ 0001:000A5C8C       Files..TFile
+ 0001:000A5CFC       Files.TFile.Destroy
+ 0001:000A5D1C       Files.TFile.Open
+ 0001:000A6000       Files.TFile.Close
+ 0001:000A60D4       Files.TFile.ReadUpTo
+ 0001:000A628C       Files.TFile.WriteUpTo
+ 0001:000A6440       Files.TFile.Seek
+ 0001:000A65CC       Files.ReadFileContents
+ 0001:000A6690       Lang.IsClientRegistered
+ 0001:000A66A8       Lang.RegisterClient
+ 0001:000A6888       Lang.Finalization
+ 0001:000A68E0       DlgMes.MsgEx
+ 0001:000A690C       DlgMes.MsgError
+ 0001:000A6920       DlgMes.Finalization
+ 0001:000A695C       VfsDebug..EAssertFailure
+ 0001:000A69B8       VfsDebug.SetLoggingProc
+ 0001:000A69F4       VfsDebug.WriteLog
+ 0001:000A6A14       VfsDebug.WriteLog_
+ 0001:000A6A4C       VfsDebug.AssertHandler
+ 0001:000A6C20       VfsDebug.Finalization
+ 0001:000A6C50       VfsApiDigger.FindOutRealSystemApiAddrs
+ 0001:000A6D60       VfsApiDigger.GetRealAddress
+ 0001:000A6E44       VfsApiDigger.GetRealProcAddress
+ 0001:000A6E88       VfsApiDigger.Finalization
+ 0001:000A6EB8       VfsOpenFiles..TOpenedFile
+ 0001:000A6F24       VfsOpenFiles.TOpenedFile.Create
+ 0001:000A6F78       VfsOpenFiles.TOpenedFile.Destroy
+ 0001:000A6FA8       VfsOpenFiles.TOpenedFile.FillDirListing
+ 0001:000A71D8       VfsOpenFiles.GetOpenedFile
+ 0001:000A71F8       VfsOpenFiles.GetOpenedFilePath
+ 0001:000A7250       VfsOpenFiles.SetOpenedFileInfo
+ 0001:000A7294       VfsOpenFiles.DeleteOpenedFileInfo
+ 0001:000A72C0       VfsOpenFiles.Finalization
+ 0001:000A7314       VfsPatching.WriteAtCode
+ 0001:000A7430       VfsPatching.WritePatchAtCode
+ 0001:000A7550       VfsPatching.SpliceWinApi
+ 0001:000A77A8       VfsPatching.TAppliedPatch.Rollback
+ 0001:000A77C8       VfsHooks.GetFilePathByHandle
+ 0001:000A77E4       VfsHooks.GetFileObjectPath
+ 0001:000A78E0       VfsHooks.Hook_NtQueryAttributesFile
+ 0001:000A7CB4       VfsHooks.Hook_NtQueryFullAttributesFile
+ 0001:000A80B8       VfsHooks.Hook_NtOpenFile
+ 0001:000A816C       VfsHooks.Hook_NtCreateFile
+ 0001:000A8568       VfsHooks.Hook_NtClose
+ 0001:000A86A0       VfsHooks.IsSupportedFileInformationClass
+ 0001:000A86D4       VfsHooks.ConvertFileInfoStruct
+ 0001:000A8988       VfsHooks.Hook_NtQueryDirectoryFile
+ 0001:000A913C       VfsHooks.InstallHooks
+ 0001:000A95BC       VfsHooks.UninstallHooks
+ 0001:000A9610       VfsHooks.Finalization
+ 0001:000A96C0       VfsControl.GetCurrentDirW
+ 0001:000A972C       VfsControl.SetCurrentDirW
+ 0001:000A9790       VfsControl.RunVfs
+ 0001:000A9818       VfsExport.MapDir
+ 0001:000A9888       VfsTestHelper.InitConsole
+ 0001:000A9914       VfsMatchingTest..TestMatching
+ 0001:000A9AB0       VfsMatchingTest.TestMatching.TestMatchPattern
+ 0001:000A9E70       VfsMatchingTest.Finalization
+ 0001:000A9EA0       VfsDebugTest..TestDebug
+ 0001:000AA044       VfsDebugTest.ClearLog
+ 0001:000AA050       VfsDebugTest.GetLog
+ 0001:000AA064       VfsDebugTest.WriteLog
+ 0001:000AA0E4       VfsDebugTest.TestDebug.TestAssertHandler
+ 0001:000AA1F0       VfsDebugTest.TestDebug.TestLogging
+ 0001:000AA3CC       VfsDebugTest.Finalization
+ 0001:000AA408       WinUtils.GetExePath
+ 0001:000AA484       WinUtils.Finalization
+ 0001:000AA4D4       VfsUtilsTest..TestUtils
+ 0001:000AA688       VfsUtilsTest.TestUtils.TestNativeDirScanning
+ 0001:000AA8B0       VfsUtilsTest.TestUtils.TestGetDirectoryListing
+ 0001:000AAA74       VfsUtilsTest.Finalization
+ 0001:000AAAA4       VfsBaseTest..TestBase
+ 0001:000AAC38       VfsBaseTest.TestBase.SetUp
+ 0001:000AAC48       VfsBaseTest.TestBase.TearDown
+ 0001:000AAC58       VfsBaseTest.TestBase.TestVirtualDirMapping
+ 0001:000AB0F0       VfsBaseTest.Finalization
+ 0001:000AB120       VfsApiDiggerTest..TestApiDigger
+ 0001:000AB2C4       VfsApiDiggerTest.TestApiDigger.DetermineRealApiAddress
+ 0001:000AB450       VfsApiDiggerTest.Finalization
+ 0001:000AB480       VfsOpenFilesTest..TestOpenFiles
+ 0001:000AB620       VfsOpenFilesTest.TestOpenFiles.SetUp
+ 0001:000AB630       VfsOpenFilesTest.TestOpenFiles.TearDown
+ 0001:000AB640       VfsOpenFilesTest.TestOpenFiles.GetCombinedDirListing
+ 0001:000ABB74       VfsOpenFilesTest.Finalization
+ 0001:000ABBA4       VfsIntegratedTest..TestIntegrated
+ 0001:000ABD9C       VfsIntegratedTest.LogSomething
+ 0001:000ABE50       VfsIntegratedTest.TestIntegrated.GetRootDir
+ 0001:000ABF10       VfsIntegratedTest.TestIntegrated.SetUp
+ 0001:000AC168       VfsIntegratedTest.TestIntegrated.TearDown
+ 0001:000AC180       VfsIntegratedTest.HasValidAttrs
+ 0001:000AC1E0       VfsIntegratedTest.TestIntegrated.TestGetFileAttributes
+ 0001:000AC3CC       VfsIntegratedTest.GetFileSize
+ 0001:000AC404       VfsIntegratedTest.TestIntegrated.TestGetFileAttributesEx
+ 0001:000AC59C       VfsIntegratedTest.OpenFile
+ 0001:000AC5BC       VfsIntegratedTest.TestIntegrated.TestFilesOpenClose
+ 0001:000ACDA8       VfsIntegratedTest.GetDirListing
+ 0001:000ACE84       VfsIntegratedTest.GetDirListingLow
+ 0001:000ACF24       VfsIntegratedTest.TestIntegrated.TestDirectoryListing
+ 0001:000AD184       VfsIntegratedTest.Finalization
+ 0001:000AD1B4       VfsTest.Finalization
  0002:00000000       System.System
  0002:00000098       Windows.Windows
  0002:000000AC       SysUtils.SysUtils
@@ -13882,6 +13887,8 @@ Line numbers for VfsBase(VfsBase.pas) segment .text
    510 0001:000A5266   516 0001:000A526B   517 0001:000A5271   520 0001:000A5277
    521 0001:000A527F   524 0001:000A52F8   526 0001:000A531E   528 0001:000A5328
    530 0001:000A5343   531 0001:000A5349   534 0001:000A5381   536 0001:000A538B
+   539 0001:000A53B8   540 0001:000A53BE   541 0001:000A53C6   542 0001:000A53D4
+   543 0001:000A53DC   545 0001:000A53F3   548 0001:000A5403
 
 Line numbers for VfsBase(VfsBase.pas) segment .itext
 
@@ -13893,9 +13900,9 @@ Line numbers for DlgMesLng(DlgMesLng.pas) segment .itext
 
 Line numbers for CLang(CLang.pas) segment .text
 
-    61 0001:000A5444    62 0001:000A5447    63 0001:000A5452    65 0001:000A5458
-    67 0001:000A545F    68 0001:000A546B    66 0001:000A546C    70 0001:000A5476
-    77 0001:000A5478    78 0001:000A5492   161 0001:000A5493
+    61 0001:000A5498    62 0001:000A549B    63 0001:000A54A6    65 0001:000A54AC
+    67 0001:000A54B3    68 0001:000A54BF    66 0001:000A54C0    70 0001:000A54CA
+    77 0001:000A54CC    78 0001:000A54E6   161 0001:000A54E7
 
 Line numbers for CBinString(CBinString.pas) segment .text
 
@@ -13911,45 +13918,45 @@ Line numbers for CLngUnit(CLngUnit.pas) segment .text
 
 Line numbers for CLngPack(CLngPack.pas) segment .text
 
-    73 0001:000A54F0    74 0001:000A5508    75 0001:000A550C    76 0001:000A550E
-    77 0001:000A5523    78 0001:000A552C    79 0001:000A5537    80 0001:000A5545
-    75 0001:000A5546    81 0001:000A554B    87 0001:000A556C    88 0001:000A5579
-    89 0001:000A557B    90 0001:000A5587    88 0001:000A5588    91 0001:000A558D
-   277 0001:000A559E
+    73 0001:000A5544    74 0001:000A555C    75 0001:000A5560    76 0001:000A5562
+    77 0001:000A5577    78 0001:000A5580    79 0001:000A558B    80 0001:000A5599
+    75 0001:000A559A    81 0001:000A559F    87 0001:000A55C0    88 0001:000A55CD
+    89 0001:000A55CF    90 0001:000A55DB    88 0001:000A55DC    91 0001:000A55E1
+   277 0001:000A55F2
 
 Line numbers for CFiles(CFiles.pas) segment .text
 
-   126 0001:000A5608   127 0001:000A5616   128 0001:000A562E   134 0001:000A5632
-   131 0001:000A5636   137 0001:000A565B   138 0001:000A5660   154 0001:000A56C4
-   155 0001:000A56D9   156 0001:000A56E2   158 0001:000A56F0   159 0001:000A56F6
-   161 0001:000A56FD   210 0001:000A5708   211 0001:000A5722   212 0001:000A572B
-   214 0001:000A5748   215 0001:000A574D   216 0001:000A5757   222 0001:000A575B
-   224 0001:000A575E   225 0001:000A5762   226 0001:000A5764   219 0001:000A576E
-   230 0001:000A5799   232 0001:000A57A3   233 0001:000A57AD   237 0001:000A57B7
-   238 0001:000A57BD   240 0001:000A57C5   347 0001:000A57D0
+   126 0001:000A565C   127 0001:000A566A   128 0001:000A5682   134 0001:000A5686
+   131 0001:000A568A   137 0001:000A56AF   138 0001:000A56B4   154 0001:000A5718
+   155 0001:000A572D   156 0001:000A5736   158 0001:000A5744   159 0001:000A574A
+   161 0001:000A5751   210 0001:000A575C   211 0001:000A5776   212 0001:000A577F
+   214 0001:000A579C   215 0001:000A57A1   216 0001:000A57AB   222 0001:000A57AF
+   224 0001:000A57B2   225 0001:000A57B6   226 0001:000A57B8   219 0001:000A57C2
+   230 0001:000A57ED   232 0001:000A57F7   233 0001:000A5801   237 0001:000A580B
+   238 0001:000A5811   240 0001:000A5819   347 0001:000A5824
 
 Line numbers for Log(Log.pas) segment .text
 
-    88 0001:000A58EC    89 0001:000A58FE    90 0001:000A5907    91 0001:000A590F
-    92 0001:000A591E    93 0001:000A5923    94 0001:000A5927    97 0001:000A5944
-    98 0001:000A594F    99 0001:000A5957   100 0001:000A595F   106 0001:000A5970
-   109 0001:000A5981   110 0001:000A5984   112 0001:000A598B   114 0001:000A5994
-   115 0001:000A599A   117 0001:000A59A1   118 0001:000A59B3   119 0001:000A59BB
-   120 0001:000A59C6   121 0001:000A59D1   122 0001:000A59DC   124 0001:000A59E6
-   127 0001:000A59ED   129 0001:000A59F4   132 0001:000A5A04   133 0001:000A5A1E
-   134 0001:000A5A21   136 0001:000A5A28   138 0001:000A5A34   139 0001:000A5A38
-   140 0001:000A5A53   143 0001:000A5A56   145 0001:000A5A5D   148 0001:000A5A68
-   149 0001:000A5A6C   150 0001:000A5A6F   152 0001:000A5A76   154 0001:000A5A7A
-   156 0001:000A5A81   159 0001:000A5A88   160 0001:000A5A8C   161 0001:000A5A8F
-   163 0001:000A5A96   165 0001:000A5A9A   167 0001:000A5AA1   170 0001:000A5AA4
-   171 0001:000A5AA8   172 0001:000A5AAB   174 0001:000A5AB2   176 0001:000A5AB6
-   178 0001:000A5ABD   181 0001:000A5AC0   182 0001:000A5AC8   183 0001:000A5ACB
-   185 0001:000A5AD2   186 0001:000A5AD4   188 0001:000A5AD9   190 0001:000A5AE0
-   193 0001:000A5AE8   194 0001:000A5AF0   195 0001:000A5B08   196 0001:000A5B0B
-   198 0001:000A5B12   200 0001:000A5B1B   201 0001:000A5B1F   204 0001:000A5B22
-   206 0001:000A5B29   209 0001:000A5B8C   210 0001:000A5B94   211 0001:000A5B97
-   213 0001:000A5B9E   214 0001:000A5BA0   216 0001:000A5BA8   218 0001:000A5BAF
-   221 0001:000A5BB8   222 0001:000A5BB9   223 0001:000A5BC7
+    88 0001:000A5940    89 0001:000A5952    90 0001:000A595B    91 0001:000A5963
+    92 0001:000A5972    93 0001:000A5977    94 0001:000A597B    97 0001:000A5998
+    98 0001:000A59A3    99 0001:000A59AB   100 0001:000A59B3   106 0001:000A59C4
+   109 0001:000A59D5   110 0001:000A59D8   112 0001:000A59DF   114 0001:000A59E8
+   115 0001:000A59EE   117 0001:000A59F5   118 0001:000A5A07   119 0001:000A5A0F
+   120 0001:000A5A1A   121 0001:000A5A25   122 0001:000A5A30   124 0001:000A5A3A
+   127 0001:000A5A41   129 0001:000A5A48   132 0001:000A5A58   133 0001:000A5A72
+   134 0001:000A5A75   136 0001:000A5A7C   138 0001:000A5A88   139 0001:000A5A8C
+   140 0001:000A5AA7   143 0001:000A5AAA   145 0001:000A5AB1   148 0001:000A5ABC
+   149 0001:000A5AC0   150 0001:000A5AC3   152 0001:000A5ACA   154 0001:000A5ACE
+   156 0001:000A5AD5   159 0001:000A5ADC   160 0001:000A5AE0   161 0001:000A5AE3
+   163 0001:000A5AEA   165 0001:000A5AEE   167 0001:000A5AF5   170 0001:000A5AF8
+   171 0001:000A5AFC   172 0001:000A5AFF   174 0001:000A5B06   176 0001:000A5B0A
+   178 0001:000A5B11   181 0001:000A5B14   182 0001:000A5B1C   183 0001:000A5B1F
+   185 0001:000A5B26   186 0001:000A5B28   188 0001:000A5B2D   190 0001:000A5B34
+   193 0001:000A5B3C   194 0001:000A5B44   195 0001:000A5B5C   196 0001:000A5B5F
+   198 0001:000A5B66   200 0001:000A5B6F   201 0001:000A5B73   204 0001:000A5B76
+   206 0001:000A5B7D   209 0001:000A5BE0   210 0001:000A5BE8   211 0001:000A5BEB
+   213 0001:000A5BF2   214 0001:000A5BF4   216 0001:000A5BFC   218 0001:000A5C03
+   221 0001:000A5C0C   222 0001:000A5C0D   223 0001:000A5C1B
 
 Line numbers for Log(Log.pas) segment .itext
 
@@ -13957,41 +13964,41 @@ Line numbers for Log(Log.pas) segment .itext
 
 Line numbers for WinWrappers(WinWrappers.pas) segment .text
 
-    38 0001:000A5BFC    39 0001:000A5C05    40 0001:000A5C10    41 0001:000A5C16
-    44 0001:000A5C1C    45 0001:000A5C25    46 0001:000A5C2E    47 0001:000A5C34
-   111 0001:000A5C38
+    38 0001:000A5C50    39 0001:000A5C59    40 0001:000A5C64    41 0001:000A5C6A
+    44 0001:000A5C70    45 0001:000A5C79    46 0001:000A5C82    47 0001:000A5C88
+   111 0001:000A5C8C
 
 Line numbers for Files(Files.pas) segment .text
 
-   244 0001:000A5CA8   245 0001:000A5CB3   246 0001:000A5CBA   254 0001:000A5CC8
-   255 0001:000A5CF1   256 0001:000A5D0B   257 0001:000A5D12   258 0001:000A5D19
-   259 0001:000A5D2B   260 0001:000A5D32   261 0001:000A5D39   263 0001:000A5D40
-   265 0001:000A5D42   266 0001:000A5D50   267 0001:000A5D54   269 0001:000A5D80
-   270 0001:000A5D90   271 0001:000A5D94   274 0001:000A5DBE   275 0001:000A5DC6
-   276 0001:000A5DCD   277 0001:000A5DD1   284 0001:000A5E27   285 0001:000A5E2E
-   286 0001:000A5E34   287 0001:000A5E39   288 0001:000A5E42   289 0001:000A5E4C
-   290 0001:000A5E50   294 0001:000A5E54   295 0001:000A5E5E   297 0001:000A5E67
-   300 0001:000A5FAC   301 0001:000A5FC2   302 0001:000A5FD5   304 0001:000A6001
-   305 0001:000A6005   306 0001:000A600D   327 0001:000A6080   328 0001:000A60A6
-   329 0001:000A60C9   330 0001:000A60E1   331 0001:000A60E5   332 0001:000A60F8
-   333 0001:000A6101   334 0001:000A6105   336 0001:000A613F   337 0001:000A6147
-   339 0001:000A6153   342 0001:000A6238   343 0001:000A6262   344 0001:000A6285
-   346 0001:000A6297   347 0001:000A629B   348 0001:000A62AB   350 0001:000A62B1
-   351 0001:000A62B5   354 0001:000A62EF   355 0001:000A62F4   356 0001:000A62F9
-   358 0001:000A6305   364 0001:000A63EC   365 0001:000A6408   366 0001:000A6420
-   367 0001:000A6427   368 0001:000A642B   369 0001:000A6437   371 0001:000A643D
-   372 0001:000A6441   373 0001:000A6444   376 0001:000A6449   377 0001:000A644D
-   380 0001:000A6486   382 0001:000A6492   452 0001:000A6578   453 0001:000A658A
-   455 0001:000A6599   459 0001:000A65C6   460 0001:000A65CE   758 0001:000A65D5
+   244 0001:000A5CFC   245 0001:000A5D07   246 0001:000A5D0E   254 0001:000A5D1C
+   255 0001:000A5D45   256 0001:000A5D5F   257 0001:000A5D66   258 0001:000A5D6D
+   259 0001:000A5D7F   260 0001:000A5D86   261 0001:000A5D8D   263 0001:000A5D94
+   265 0001:000A5D96   266 0001:000A5DA4   267 0001:000A5DA8   269 0001:000A5DD4
+   270 0001:000A5DE4   271 0001:000A5DE8   274 0001:000A5E12   275 0001:000A5E1A
+   276 0001:000A5E21   277 0001:000A5E25   284 0001:000A5E7B   285 0001:000A5E82
+   286 0001:000A5E88   287 0001:000A5E8D   288 0001:000A5E96   289 0001:000A5EA0
+   290 0001:000A5EA4   294 0001:000A5EA8   295 0001:000A5EB2   297 0001:000A5EBB
+   300 0001:000A6000   301 0001:000A6016   302 0001:000A6029   304 0001:000A6055
+   305 0001:000A6059   306 0001:000A6061   327 0001:000A60D4   328 0001:000A60FA
+   329 0001:000A611D   330 0001:000A6135   331 0001:000A6139   332 0001:000A614C
+   333 0001:000A6155   334 0001:000A6159   336 0001:000A6193   337 0001:000A619B
+   339 0001:000A61A7   342 0001:000A628C   343 0001:000A62B6   344 0001:000A62D9
+   346 0001:000A62EB   347 0001:000A62EF   348 0001:000A62FF   350 0001:000A6305
+   351 0001:000A6309   354 0001:000A6343   355 0001:000A6348   356 0001:000A634D
+   358 0001:000A6359   364 0001:000A6440   365 0001:000A645C   366 0001:000A6474
+   367 0001:000A647B   368 0001:000A647F   369 0001:000A648B   371 0001:000A6491
+   372 0001:000A6495   373 0001:000A6498   376 0001:000A649D   377 0001:000A64A1
+   380 0001:000A64DA   382 0001:000A64E6   452 0001:000A65CC   453 0001:000A65DE
+   455 0001:000A65ED   459 0001:000A661A   460 0001:000A6622   758 0001:000A6629
 
 Line numbers for Lang(Lang.pas) segment .text
 
-   123 0001:000A663C   124 0001:000A663F   125 0001:000A664F   164 0001:000A6654
-   165 0001:000A6683   166 0001:000A6699   167 0001:000A66B9   168 0001:000A66D9
-   169 0001:000A66F8   170 0001:000A6721   171 0001:000A673B   174 0001:000A6755
-   175 0001:000A6767   176 0001:000A6771   177 0001:000A677B   178 0001:000A6785
-   179 0001:000A678C   180 0001:000A678F   181 0001:000A6795   182 0001:000A679B
-   183 0001:000A67AA
+   123 0001:000A6690   124 0001:000A6693   125 0001:000A66A3   164 0001:000A66A8
+   165 0001:000A66D7   166 0001:000A66ED   167 0001:000A670D   168 0001:000A672D
+   169 0001:000A674C   170 0001:000A6775   171 0001:000A678F   174 0001:000A67A9
+   175 0001:000A67BB   176 0001:000A67C5   177 0001:000A67CF   178 0001:000A67D9
+   179 0001:000A67E0   180 0001:000A67E3   181 0001:000A67E9   182 0001:000A67EF
+   183 0001:000A67FE
 
 Line numbers for Lang(Lang.pas) segment .itext
 
@@ -14000,8 +14007,8 @@ Line numbers for Lang(Lang.pas) segment .itext
 
 Line numbers for DlgMes(DlgMes.pas) segment .text
 
-    62 0001:000A688C    63 0001:000A6895    64 0001:000A68B1    78 0001:000A68B8
-    79 0001:000A68C8
+    62 0001:000A68E0    63 0001:000A68E9    64 0001:000A6905    78 0001:000A690C
+    79 0001:000A691C
 
 Line numbers for DlgMes(DlgMes.pas) segment .itext
 
@@ -14009,12 +14016,12 @@ Line numbers for DlgMes(DlgMes.pas) segment .itext
 
 Line numbers for VfsDebug(VfsDebug.pas) segment .text
 
-    40 0001:000A6964    42 0001:000A6968    43 0001:000A6972    44 0001:000A6978
-    45 0001:000A6980    46 0001:000A698E    48 0001:000A6998    51 0001:000A69A0
-    52 0001:000A69A6    53 0001:000A69BB    56 0001:000A69C0    57 0001:000A69C6
-    59 0001:000A69CF    61 0001:000A69D9    62 0001:000A69E2    65 0001:000A69EA
-    68 0001:000A69F4    74 0001:000A69F8    75 0001:000A6A24    87 0001:000A6A93
-    89 0001:000A6AA0    91 0001:000A6AA8    92 0001:000A6ABD
+    40 0001:000A69B8    42 0001:000A69BC    43 0001:000A69C6    44 0001:000A69CC
+    45 0001:000A69D4    46 0001:000A69E2    48 0001:000A69EC    51 0001:000A69F4
+    52 0001:000A69FA    53 0001:000A6A0F    56 0001:000A6A14    57 0001:000A6A1A
+    59 0001:000A6A23    61 0001:000A6A2D    62 0001:000A6A36    65 0001:000A6A3E
+    68 0001:000A6A48    74 0001:000A6A4C    75 0001:000A6A78    87 0001:000A6AE7
+    89 0001:000A6AF4    91 0001:000A6AFC    92 0001:000A6B11
 
 Line numbers for VfsDebug(VfsDebug.pas) segment .itext
 
@@ -14022,42 +14029,38 @@ Line numbers for VfsDebug(VfsDebug.pas) segment .itext
 
 Line numbers for VfsApiDigger(VfsApiDigger.pas) segment .text
 
-    65 0001:000A6BFC    72 0001:000A6C18    73 0001:000A6C27    74 0001:000A6C2C
-    75 0001:000A6C3A    77 0001:000A6C4B    78 0001:000A6C55    79 0001:000A6C61
-    82 0001:000A6C70    83 0001:000A6C7B    86 0001:000A6C84    87 0001:000A6C8B
-    89 0001:000A6C96    92 0001:000A6C9A    93 0001:000A6CA0    96 0001:000A6CC1
-    91 0001:000A6CC2    99 0001:000A6CCC    85 0001:000A6CD0   103 0001:000A6CD8
-    72 0001:000A6CDC   104 0001:000A6CE5   113 0001:000A6D0C   114 0001:000A6D12
-   116 0001:000A6D2A   120 0001:000A6D2C   121 0001:000A6D35   123 0001:000A6D3C
-   124 0001:000A6D48   126 0001:000A6D57   127 0001:000A6D5C   129 0001:000A6D68
-   130 0001:000A6D74   136 0001:000A6D83   118 0001:000A6D84   138 0001:000A6D89
-   144 0001:000A6DF0   145 0001:000A6DF6   146 0001:000A6E04   149 0001:000A6E06
-   150 0001:000A6E0A   153 0001:000A6E13   154 0001:000A6E17   157 0001:000A6E25
-   158 0001:000A6E29   160 0001:000A6E2E
+    65 0001:000A6C50    72 0001:000A6C6C    73 0001:000A6C7B    74 0001:000A6C80
+    75 0001:000A6C8E    77 0001:000A6C9F    78 0001:000A6CA9    79 0001:000A6CB5
+    82 0001:000A6CC4    83 0001:000A6CCF    86 0001:000A6CD8    87 0001:000A6CDF
+    89 0001:000A6CEA    92 0001:000A6CEE    93 0001:000A6CF4    96 0001:000A6D15
+    91 0001:000A6D16    99 0001:000A6D20    85 0001:000A6D24   103 0001:000A6D2C
+    72 0001:000A6D30   104 0001:000A6D39   113 0001:000A6D60   114 0001:000A6D66
+   116 0001:000A6D7E   120 0001:000A6D80   121 0001:000A6D89   123 0001:000A6D90
+   124 0001:000A6D9C   126 0001:000A6DAB   127 0001:000A6DB0   129 0001:000A6DBC
+   130 0001:000A6DC8   136 0001:000A6DD7   118 0001:000A6DD8   138 0001:000A6DDD
+   144 0001:000A6E44   145 0001:000A6E4A   146 0001:000A6E58   149 0001:000A6E5A
+   150 0001:000A6E5E   153 0001:000A6E67   154 0001:000A6E6B   157 0001:000A6E79
+   158 0001:000A6E7D   160 0001:000A6E82
 
 Line numbers for VfsApiDigger(VfsApiDigger.pas) segment .itext
 
    162 0002:000008EC   163 0002:000008F5   164 0002:00000901
 
-Line numbers for VfsExport(VfsExport.pas) segment .text
-
-    20 0001:00000000
-
 Line numbers for VfsOpenFiles(VfsOpenFiles.pas) segment .text
 
-    69 0001:000A6ED0    70 0001:000A6EEB    71 0001:000A6EF4    72 0001:000A6F02
-    75 0001:000A6F24    76 0001:000A6F35    77 0001:000A6F40    88 0001:000A6F54
-    89 0001:000A6FA1    91 0001:000A6FA6    95 0001:000A6FB3    96 0001:000A6FC5
-    97 0001:000A6FE3    99 0001:000A6FEF   101 0001:000A6FF7   100 0001:000A701B
-   104 0001:000A702D   108 0001:000A7038   110 0001:000A7046   111 0001:000A704E
-   112 0001:000A7056   113 0001:000A706E   117 0001:000A7076   118 0001:000A7094
-   119 0001:000A70A5   122 0001:000A70C0   123 0001:000A70FC   127 0001:000A7117
-   128 0001:000A711F   131 0001:000A7184   132 0001:000A718D   133 0001:000A719D
-   139 0001:000A71A4   140 0001:000A71B0   141 0001:000A71B5   144 0001:000A71BD
-   146 0001:000A71C7   148 0001:000A71D7   149 0001:000A71DD   152 0001:000A71EB
-   154 0001:000A71F5   157 0001:000A71FC   159 0001:000A7208   160 0001:000A7212
-   161 0001:000A7227   164 0001:000A7231   165 0001:000A7239   168 0001:000A7240
-   170 0001:000A7247   171 0001:000A7251   172 0001:000A725E   174 0001:000A7268
+    69 0001:000A6F24    70 0001:000A6F3F    71 0001:000A6F48    72 0001:000A6F56
+    75 0001:000A6F78    76 0001:000A6F89    77 0001:000A6F94    88 0001:000A6FA8
+    89 0001:000A6FF5    91 0001:000A6FFA    95 0001:000A7007    96 0001:000A7019
+    97 0001:000A7037    99 0001:000A7043   101 0001:000A704B   100 0001:000A706F
+   104 0001:000A7081   108 0001:000A708C   110 0001:000A709A   111 0001:000A70A2
+   112 0001:000A70AA   113 0001:000A70C2   117 0001:000A70CA   118 0001:000A70E8
+   119 0001:000A70F9   122 0001:000A7114   123 0001:000A7150   127 0001:000A716B
+   128 0001:000A7173   131 0001:000A71D8   132 0001:000A71E1   133 0001:000A71F1
+   139 0001:000A71F8   140 0001:000A7204   141 0001:000A7209   144 0001:000A7211
+   146 0001:000A721B   148 0001:000A722B   149 0001:000A7231   152 0001:000A723F
+   154 0001:000A7249   157 0001:000A7250   159 0001:000A725C   160 0001:000A7266
+   161 0001:000A727B   164 0001:000A7285   165 0001:000A728D   168 0001:000A7294
+   170 0001:000A729B   171 0001:000A72A5   172 0001:000A72B2   174 0001:000A72BC
 
 Line numbers for VfsOpenFiles(VfsOpenFiles.pas) segment .itext
 
@@ -14065,91 +14068,91 @@ Line numbers for VfsOpenFiles(VfsOpenFiles.pas) segment .itext
 
 Line numbers for VfsPatching(VfsPatching.pas) segment .text
 
-    41 0001:000A72C0    42 0001:000A72D0    43 0001:000A72F2    44 0001:000A7313
-    46 0001:000A7318    47 0001:000A731C    48 0001:000A732A    50 0001:000A733D
-    51 0001:000A7341    52 0001:000A734D    55 0001:000A736B    58 0001:000A7372
-    65 0001:000A73DC    66 0001:000A73F6    67 0001:000A740E    69 0001:000A742C
-    71 0001:000A742E    72 0001:000A7434    73 0001:000A744E    74 0001:000A745A
-    76 0001:000A746E    89 0001:000A74FC    90 0001:000A7522    91 0001:000A753A
-    92 0001:000A7552    99 0001:000A7567   100 0001:000A7574   101 0001:000A7581
-   102 0001:000A75B8   105 0001:000A75C2   108 0001:000A75CE   111 0001:000A75E9
-   114 0001:000A75EF   115 0001:000A75FD   116 0001:000A7603   117 0001:000A762B
-   118 0001:000A7633   122 0001:000A7641   123 0001:000A764E   126 0001:000A7658
-   129 0001:000A765E   130 0001:000A766C   132 0001:000A7678   133 0001:000A767E
-   134 0001:000A7683   135 0001:000A76A3   138 0001:000A76B6   140 0001:000A76C0
-   141 0001:000A76C8   144 0001:000A7754   145 0001:000A7757   146 0001:000A775D
-   148 0001:000A776F   150 0001:000A779F
+    41 0001:000A7314    42 0001:000A7324    43 0001:000A7346    44 0001:000A7367
+    46 0001:000A736C    47 0001:000A7370    48 0001:000A737E    50 0001:000A7391
+    51 0001:000A7395    52 0001:000A73A1    55 0001:000A73BF    58 0001:000A73C6
+    65 0001:000A7430    66 0001:000A744A    67 0001:000A7462    69 0001:000A7480
+    71 0001:000A7482    72 0001:000A7488    73 0001:000A74A2    74 0001:000A74AE
+    76 0001:000A74C2    89 0001:000A7550    90 0001:000A7576    91 0001:000A758E
+    92 0001:000A75A6    99 0001:000A75BB   100 0001:000A75C8   101 0001:000A75D5
+   102 0001:000A760C   105 0001:000A7616   108 0001:000A7622   111 0001:000A763D
+   114 0001:000A7643   115 0001:000A7651   116 0001:000A7657   117 0001:000A767F
+   118 0001:000A7687   122 0001:000A7695   123 0001:000A76A2   126 0001:000A76AC
+   129 0001:000A76B2   130 0001:000A76C0   132 0001:000A76CC   133 0001:000A76D2
+   134 0001:000A76D7   135 0001:000A76F7   138 0001:000A770A   140 0001:000A7714
+   141 0001:000A771C   144 0001:000A77A8   145 0001:000A77AB   146 0001:000A77B1
+   148 0001:000A77C3   150 0001:000A77F3
 
 Line numbers for VfsHooks(VfsHooks.pas) segment .text
 
-    49 0001:000A7774    50 0001:000A7780    51 0001:000A778B    59 0001:000A7790
-    60 0001:000A77AE    61 0001:000A77BC    63 0001:000A77C4    64 0001:000A77D4
-    65 0001:000A77DD    68 0001:000A77F3    69 0001:000A77FC    71 0001:000A780A
-    72 0001:000A7816    73 0001:000A7829    75 0001:000A7843    79 0001:000A7853
-    82 0001:000A785E    92 0001:000A788C    93 0001:000A78E2    94 0001:000A78EC
-    97 0001:000A794F    98 0001:000A795E    99 0001:000A7965   100 0001:000A7970
-   102 0001:000A7978   103 0001:000A7984   107 0001:000A79A9   108 0001:000A79B5
-   109 0001:000A79D4   110 0001:000A79E8   111 0001:000A79FA   112 0001:000A7A09
-   113 0001:000A7A18   114 0001:000A7A21   116 0001:000A7A28   121 0001:000A7A31
-   123 0001:000A7A3C   124 0001:000A7A48   125 0001:000A7A51   128 0001:000A7A61
-   129 0001:000A7A66   130 0001:000A7A6A   133 0001:000A7A75   136 0001:000A7A83
-   137 0001:000A7A91   139 0001:000A7B22   149 0001:000A7C60   150 0001:000A7CB6
-   151 0001:000A7CC0   154 0001:000A7D23   155 0001:000A7D32   156 0001:000A7D39
-   157 0001:000A7D44   159 0001:000A7D4C   160 0001:000A7D58   164 0001:000A7D7D
-   165 0001:000A7D8D   166 0001:000A7DAC   167 0001:000A7DC0   168 0001:000A7DD2
-   169 0001:000A7DE1   170 0001:000A7DF0   171 0001:000A7DFF   172 0001:000A7E0E
-   173 0001:000A7E17   174 0001:000A7E1F   176 0001:000A7E26   181 0001:000A7E2F
-   183 0001:000A7E3A   184 0001:000A7E46   185 0001:000A7E4F   188 0001:000A7E5F
-   189 0001:000A7E64   190 0001:000A7E68   193 0001:000A7E73   196 0001:000A7E81
-   197 0001:000A7E8F   199 0001:000A7F20   203 0001:000A8064   204 0001:000A807B
-   205 0001:000A8085   208 0001:000A80AB   209 0001:000A80D5   219 0001:000A8118
-   220 0001:000A814E   221 0001:000A8158   224 0001:000A81A7   225 0001:000A81B6
-   226 0001:000A81BD   227 0001:000A81C8   229 0001:000A81D0   230 0001:000A81E8
-   233 0001:000A8203   234 0001:000A820F   235 0001:000A821C   236 0001:000A8222
-   239 0001:000A822F   240 0001:000A823B   241 0001:000A8244   244 0001:000A8254
-   245 0001:000A8259   246 0001:000A825D   250 0001:000A8268   252 0001:000A8272
-   254 0001:000A82A4   255 0001:000A82B6   258 0001:000A82E4   261 0001:000A82EE
-   262 0001:000A82FC   263 0001:000A8314   265 0001:000A836E   268 0001:000A83B1
-   271 0001:000A8514   272 0001:000A8530   273 0001:000A853A   277 0001:000A8564
-   279 0001:000A856E   281 0001:000A8578   282 0001:000A857E   285 0001:000A8586
-   288 0001:000A8590   289 0001:000A859A   291 0001:000A85C4   294 0001:000A864C
-   295 0001:000A8655   296 0001:000A8679   310 0001:000A8680   311 0001:000A86A6
-   312 0001:000A86C0   313 0001:000A86FF   315 0001:000A8704   316 0001:000A870B
-   317 0001:000A8716   319 0001:000A8722   320 0001:000A8730   321 0001:000A8734
-   324 0001:000A8739   326 0001:000A873D   327 0001:000A8745   329 0001:000A8749
-   334 0001:000A8753   335 0001:000A8767   338 0001:000A8775   341 0001:000A8785
-   344 0001:000A87C4   345 0001:000A880E   347 0001:000A8817   349 0001:000A882F
-   350 0001:000A883A   380 0001:000A8934   381 0001:000A8951   382 0001:000A8956
-   383 0001:000A895B   384 0001:000A8960   385 0001:000A8965   388 0001:000A896A
-   389 0001:000A8970   390 0001:000A8978   393 0001:000A897E   394 0001:000A8988
-   397 0001:000A89F6   399 0001:000A8A00   400 0001:000A8A0B   402 0001:000A8A13
-   403 0001:000A8A35   404 0001:000A8A3F   405 0001:000A8ABD   407 0001:000A8AF4
-   408 0001:000A8AFC   410 0001:000A8B01   411 0001:000A8B07   414 0001:000A8B12
-   416 0001:000A8B2E   419 0001:000A8B43   420 0001:000A8B49   422 0001:000A8B52
-   426 0001:000A8B6D   427 0001:000A8B73   429 0001:000A8B7E   430 0001:000A8B84
-   435 0001:000A8B8B   436 0001:000A8B91   438 0001:000A8BA1   439 0001:000A8BA7
-   440 0001:000A8BB6   442 0001:000A8BBF   448 0001:000A8BC6   449 0001:000A8BD0
-   450 0001:000A8BDA   453 0001:000A8C28   454 0001:000A8C2E   458 0001:000A8C3A
-   459 0001:000A8C52   461 0001:000A8C60   463 0001:000A8C6E   464 0001:000A8C74
-   466 0001:000A8C7A   469 0001:000A8C7E   471 0001:000A8C9E   472 0001:000A8CAC
-   473 0001:000A8D19   476 0001:000A8D4D   477 0001:000A8D53   478 0001:000A8D5A
-   481 0001:000A8D62   482 0001:000A8D68   484 0001:000A8D76   485 0001:000A8D7C
-   487 0001:000A8D85   488 0001:000A8D8B   489 0001:000A8D91   490 0001:000A8D98
-   492 0001:000A8DA3   494 0001:000A8DB3   495 0001:000A8DB9   496 0001:000A8DBF
-   498 0001:000A8DD0   502 0001:000A8DD9   503 0001:000A8DE5   506 0001:000A8DF0
-   508 0001:000A8DF6   509 0001:000A8DFC   456 0001:000A8E01   514 0001:000A8E1D
-   516 0001:000A8E25   520 0001:000A8E2F   521 0001:000A8E39   523 0001:000A8E98
-   531 0001:000A90E8   533 0001:000A90EE   535 0001:000A90F8   536 0001:000A9105
-   539 0001:000A910C   541 0001:000A9124   542 0001:000A912A   543 0001:000A9133
-   545 0001:000A9144   550 0001:000A9153   551 0001:000A915D   554 0001:000A916D
-   555 0001:000A917A   557 0001:000A9194   558 0001:000A91A3   565 0001:000A91C4
-   566 0001:000A91D3   573 0001:000A91F4   574 0001:000A9203   581 0001:000A9224
-   582 0001:000A9233   589 0001:000A9254   590 0001:000A9263   597 0001:000A9284
-   598 0001:000A9293   605 0001:000A92B1   607 0001:000A92BB   612 0001:000A9568
-   614 0001:000A9572   615 0001:000A957C   616 0001:000A9586   617 0001:000A9590
-   618 0001:000A959A   619 0001:000A95A4   621 0001:000A95AE   623 0001:000A95B8
-   628 0001:000A95BC   629 0001:000A95D5   630 0001:000A95DF   631 0001:000A95E4
-   632 0001:000A95E9   634 0001:000A95F3
+    49 0001:000A77C8    50 0001:000A77D4    51 0001:000A77DF    59 0001:000A77E4
+    60 0001:000A7802    61 0001:000A7810    63 0001:000A7818    64 0001:000A7828
+    65 0001:000A7831    68 0001:000A7847    69 0001:000A7850    71 0001:000A785E
+    72 0001:000A786A    73 0001:000A787D    75 0001:000A7897    79 0001:000A78A7
+    82 0001:000A78B2    92 0001:000A78E0    93 0001:000A7936    94 0001:000A7940
+    97 0001:000A79A3    98 0001:000A79B2    99 0001:000A79B9   100 0001:000A79C4
+   102 0001:000A79CC   103 0001:000A79D8   107 0001:000A79FD   108 0001:000A7A09
+   109 0001:000A7A28   110 0001:000A7A3C   111 0001:000A7A4E   112 0001:000A7A5D
+   113 0001:000A7A6C   114 0001:000A7A75   116 0001:000A7A7C   121 0001:000A7A85
+   123 0001:000A7A90   124 0001:000A7A9C   125 0001:000A7AA5   128 0001:000A7AB5
+   129 0001:000A7ABA   130 0001:000A7ABE   133 0001:000A7AC9   136 0001:000A7AD7
+   137 0001:000A7AE5   139 0001:000A7B76   149 0001:000A7CB4   150 0001:000A7D0A
+   151 0001:000A7D14   154 0001:000A7D77   155 0001:000A7D86   156 0001:000A7D8D
+   157 0001:000A7D98   159 0001:000A7DA0   160 0001:000A7DAC   164 0001:000A7DD1
+   165 0001:000A7DE1   166 0001:000A7E00   167 0001:000A7E14   168 0001:000A7E26
+   169 0001:000A7E35   170 0001:000A7E44   171 0001:000A7E53   172 0001:000A7E62
+   173 0001:000A7E6B   174 0001:000A7E73   176 0001:000A7E7A   181 0001:000A7E83
+   183 0001:000A7E8E   184 0001:000A7E9A   185 0001:000A7EA3   188 0001:000A7EB3
+   189 0001:000A7EB8   190 0001:000A7EBC   193 0001:000A7EC7   196 0001:000A7ED5
+   197 0001:000A7EE3   199 0001:000A7F74   203 0001:000A80B8   204 0001:000A80CF
+   205 0001:000A80D9   208 0001:000A80FF   209 0001:000A8129   219 0001:000A816C
+   220 0001:000A81A2   221 0001:000A81AC   224 0001:000A81FB   225 0001:000A820A
+   226 0001:000A8211   227 0001:000A821C   229 0001:000A8224   230 0001:000A823C
+   233 0001:000A8257   234 0001:000A8263   235 0001:000A8270   236 0001:000A8276
+   239 0001:000A8283   240 0001:000A828F   241 0001:000A8298   244 0001:000A82A8
+   245 0001:000A82AD   246 0001:000A82B1   250 0001:000A82BC   252 0001:000A82C6
+   254 0001:000A82F8   255 0001:000A830A   258 0001:000A8338   261 0001:000A8342
+   262 0001:000A8350   263 0001:000A8368   265 0001:000A83C2   268 0001:000A8405
+   271 0001:000A8568   272 0001:000A8584   273 0001:000A858E   277 0001:000A85B8
+   279 0001:000A85C2   281 0001:000A85CC   282 0001:000A85D2   285 0001:000A85DA
+   288 0001:000A85E4   289 0001:000A85EE   291 0001:000A8618   294 0001:000A86A0
+   295 0001:000A86A9   296 0001:000A86CD   310 0001:000A86D4   311 0001:000A86FA
+   312 0001:000A8714   313 0001:000A8753   315 0001:000A8758   316 0001:000A875F
+   317 0001:000A876A   319 0001:000A8776   320 0001:000A8784   321 0001:000A8788
+   324 0001:000A878D   326 0001:000A8791   327 0001:000A8799   329 0001:000A879D
+   334 0001:000A87A7   335 0001:000A87BB   338 0001:000A87C9   341 0001:000A87D9
+   344 0001:000A8818   345 0001:000A8862   347 0001:000A886B   349 0001:000A8883
+   350 0001:000A888E   380 0001:000A8988   381 0001:000A89A5   382 0001:000A89AA
+   383 0001:000A89AF   384 0001:000A89B4   385 0001:000A89B9   388 0001:000A89BE
+   389 0001:000A89C4   390 0001:000A89CC   393 0001:000A89D2   394 0001:000A89DC
+   397 0001:000A8A4A   399 0001:000A8A54   400 0001:000A8A5F   402 0001:000A8A67
+   403 0001:000A8A89   404 0001:000A8A93   405 0001:000A8B11   407 0001:000A8B48
+   408 0001:000A8B50   410 0001:000A8B55   411 0001:000A8B5B   414 0001:000A8B66
+   416 0001:000A8B82   419 0001:000A8B97   420 0001:000A8B9D   422 0001:000A8BA6
+   426 0001:000A8BC1   427 0001:000A8BC7   429 0001:000A8BD2   430 0001:000A8BD8
+   435 0001:000A8BDF   436 0001:000A8BE5   438 0001:000A8BF5   439 0001:000A8BFB
+   440 0001:000A8C0A   442 0001:000A8C13   448 0001:000A8C1A   449 0001:000A8C24
+   450 0001:000A8C2E   453 0001:000A8C7C   454 0001:000A8C82   458 0001:000A8C8E
+   459 0001:000A8CA6   461 0001:000A8CB4   463 0001:000A8CC2   464 0001:000A8CC8
+   466 0001:000A8CCE   469 0001:000A8CD2   471 0001:000A8CF2   472 0001:000A8D00
+   473 0001:000A8D6D   476 0001:000A8DA1   477 0001:000A8DA7   478 0001:000A8DAE
+   481 0001:000A8DB6   482 0001:000A8DBC   484 0001:000A8DCA   485 0001:000A8DD0
+   487 0001:000A8DD9   488 0001:000A8DDF   489 0001:000A8DE5   490 0001:000A8DEC
+   492 0001:000A8DF7   494 0001:000A8E07   495 0001:000A8E0D   496 0001:000A8E13
+   498 0001:000A8E24   502 0001:000A8E2D   503 0001:000A8E39   506 0001:000A8E44
+   508 0001:000A8E4A   509 0001:000A8E50   456 0001:000A8E55   514 0001:000A8E71
+   516 0001:000A8E79   520 0001:000A8E83   521 0001:000A8E8D   523 0001:000A8EEC
+   531 0001:000A913C   533 0001:000A9142   535 0001:000A914C   536 0001:000A9159
+   539 0001:000A9160   541 0001:000A9178   542 0001:000A917E   543 0001:000A9187
+   545 0001:000A9198   550 0001:000A91A7   551 0001:000A91B1   554 0001:000A91C1
+   555 0001:000A91CE   557 0001:000A91E8   558 0001:000A91F7   565 0001:000A9218
+   566 0001:000A9227   573 0001:000A9248   574 0001:000A9257   581 0001:000A9278
+   582 0001:000A9287   589 0001:000A92A8   590 0001:000A92B7   597 0001:000A92D8
+   598 0001:000A92E7   605 0001:000A9305   607 0001:000A930F   612 0001:000A95BC
+   614 0001:000A95C6   615 0001:000A95D0   616 0001:000A95DA   617 0001:000A95E4
+   618 0001:000A95EE   619 0001:000A95F8   621 0001:000A9602   623 0001:000A960C
+   628 0001:000A9610   629 0001:000A9629   630 0001:000A9633   631 0001:000A9638
+   632 0001:000A963D   634 0001:000A9647
 
 Line numbers for VfsHooks(VfsHooks.pas) segment .itext
 
@@ -14157,27 +14160,31 @@ Line numbers for VfsHooks(VfsHooks.pas) segment .itext
 
 Line numbers for VfsControl(VfsControl.pas) segment .text
 
-    27 0001:000A966C    28 0001:000A968A    29 0001:000A9691    31 0001:000A969E
-    32 0001:000A96A2    33 0001:000A96AB    35 0001:000A96BF    41 0001:000A96C8
-    42 0001:000A96DE    43 0001:000A96EA    44 0001:000A96FE    50 0001:000A9724
-    52 0001:000A973A    54 0001:000A9744    56 0001:000A974D    57 0001:000A9751
-    60 0001:000A9756    62 0001:000A975E    63 0001:000A976A    67 0001:000A9772
-    69 0001:000A977C    71 0001:000A97CD
+    27 0001:000A96C0    28 0001:000A96DC    29 0001:000A96E4    31 0001:000A96F8
+    32 0001:000A96FE    33 0001:000A9709    35 0001:000A9725    41 0001:000A972C
+    42 0001:000A9748    43 0001:000A9755    44 0001:000A976C    50 0001:000A9790
+    52 0001:000A97A9    54 0001:000A97B3    56 0001:000A97BE    57 0001:000A97C4
+    60 0001:000A97C9    62 0001:000A97D1    63 0001:000A97DD    67 0001:000A97E5
+    69 0001:000A97EF    71 0001:000A9843
+
+Line numbers for VfsExport(VfsExport.pas) segment .text
+
+    25 0001:000A9818    26 0001:000A982F    27 0001:000A985C    32 0001:000A98B5
 
 Line numbers for VfsTestHelper(VfsTestHelper.pas) segment .text
 
-    27 0001:000A97A0    28 0001:000A97A5    29 0001:000A97AA    30 0001:000A97B5
-    31 0001:000A97C0    32 0001:000A97C9    33 0001:000A97D2    34 0001:000A97D9
-    35 0001:000A97E0    36 0001:000A97E7    37 0001:000A97EE    38 0001:000A97F8
-    39 0001:000A97FE    40 0001:000A9805    41 0001:000A980C    42 0001:000A9813
-    43 0001:000A981C    44 0001:000A9824    46 0001:000A9858
+    27 0001:000A9888    28 0001:000A988D    29 0001:000A9892    30 0001:000A989D
+    31 0001:000A98A8    32 0001:000A98B1    33 0001:000A98BA    34 0001:000A98C1
+    35 0001:000A98C8    36 0001:000A98CF    37 0001:000A98D6    38 0001:000A98E0
+    39 0001:000A98E6    40 0001:000A98ED    41 0001:000A98F4    42 0001:000A98FB
+    43 0001:000A9904    44 0001:000A990C    46 0001:000A9940
 
 Line numbers for VfsMatchingTest(VfsMatchingTest.pas) segment .text
 
-    19 0001:000A99C8    20 0001:000A99D0    21 0001:000A99EE    22 0001:000A9A0C
-    23 0001:000A9A2A    24 0001:000A9A48    25 0001:000A9A66    26 0001:000A9A7E
-    27 0001:000A9A9C    28 0001:000A9ABA    29 0001:000A9AD5    30 0001:000A9AF3
-    31 0001:000A9B11
+    19 0001:000A9AB0    20 0001:000A9AB8    21 0001:000A9AD6    22 0001:000A9AF4
+    23 0001:000A9B12    24 0001:000A9B30    25 0001:000A9B4E    26 0001:000A9B66
+    27 0001:000A9B84    28 0001:000A9BA2    29 0001:000A9BBD    30 0001:000A9BDB
+    31 0001:000A9BF9
 
 Line numbers for VfsMatchingTest(VfsMatchingTest.pas) segment .itext
 
@@ -14185,14 +14192,14 @@ Line numbers for VfsMatchingTest(VfsMatchingTest.pas) segment .itext
 
 Line numbers for VfsDebugTest(VfsDebugTest.pas) segment .text
 
-    25 0001:000A9F5C    26 0001:000A9F66    29 0001:000A9F68    30 0001:000A9F6B
-    31 0001:000A9F78    34 0001:000A9F7C    35 0001:000A9F91    36 0001:000A9FC7
-    42 0001:000A9FFC    43 0001:000AA006    45 0001:000AA008    46 0001:000AA016
-    48 0001:000AA045    51 0001:000AA04C    52 0001:000AA05B    58 0001:000AA108
-    59 0001:000AA123    61 0001:000AA12A    62 0001:000AA138    63 0001:000AA13D
-    64 0001:000AA14B    65 0001:000AA15A    66 0001:000AA17E    68 0001:000AA187
-    69 0001:000AA18C    70 0001:000AA193    71 0001:000AA1A2    72 0001:000AA1BD
-    74 0001:000AA1D3    75 0001:000AA1D9    78 0001:000AA1EA
+    25 0001:000AA044    26 0001:000AA04E    29 0001:000AA050    30 0001:000AA053
+    31 0001:000AA060    34 0001:000AA064    35 0001:000AA079    36 0001:000AA0AF
+    42 0001:000AA0E4    43 0001:000AA0EE    45 0001:000AA0F0    46 0001:000AA0FE
+    48 0001:000AA12D    51 0001:000AA134    52 0001:000AA143    58 0001:000AA1F0
+    59 0001:000AA20B    61 0001:000AA212    62 0001:000AA220    63 0001:000AA225
+    64 0001:000AA233    65 0001:000AA242    66 0001:000AA266    68 0001:000AA26F
+    69 0001:000AA274    70 0001:000AA27B    71 0001:000AA28A    72 0001:000AA2A5
+    74 0001:000AA2BB    75 0001:000AA2C1    78 0001:000AA2D2
 
 Line numbers for VfsDebugTest(VfsDebugTest.pas) segment .itext
 
@@ -14200,10 +14207,10 @@ Line numbers for VfsDebugTest(VfsDebugTest.pas) segment .itext
 
 Line numbers for WinUtils(WinUtils.pas) segment .text
 
-   218 0001:000AA320   220 0001:000AA323   222 0001:000AA32D   223 0001:000AA33B
-   224 0001:000AA34A   226 0001:000AA367   227 0001:000AA36B   229 0001:000AA378
-   233 0001:000AA382   235 0001:000AA38F   237 0001:000AA399   242 0001:000AA39C
-   243 0001:000AA3BF
+   218 0001:000AA408   220 0001:000AA40B   222 0001:000AA415   223 0001:000AA423
+   224 0001:000AA432   226 0001:000AA44F   227 0001:000AA453   229 0001:000AA460
+   233 0001:000AA46A   235 0001:000AA477   237 0001:000AA481   242 0001:000AA484
+   243 0001:000AA4A7
 
 Line numbers for WinUtils(WinUtils.pas) segment .itext
 
@@ -14211,12 +14218,12 @@ Line numbers for WinUtils(WinUtils.pas) segment .itext
 
 Line numbers for VfsUtilsTest(VfsUtilsTest.pas) segment .text
 
-    28 0001:000AA5A0    29 0001:000AA5F5    31 0001:000AA601    33 0001:000AA63B
-    35 0001:000AA65E    34 0001:000AA67A    39 0001:000AA68C    40 0001:000AA694
-    41 0001:000AA6A4    43 0001:000AA6D6    44 0001:000AA6DE    52 0001:000AA7C8
-    53 0001:000AA7E9    54 0001:000AA7F8    56 0001:000AA804    57 0001:000AA832
-    59 0001:000AA84F    60 0001:000AA86E    62 0001:000AA8B0    63 0001:000AA8B8
-    64 0001:000AA8C0
+    28 0001:000AA688    29 0001:000AA6DD    31 0001:000AA6E9    33 0001:000AA723
+    35 0001:000AA746    34 0001:000AA762    39 0001:000AA774    40 0001:000AA77C
+    41 0001:000AA78C    43 0001:000AA7BE    44 0001:000AA7C6    52 0001:000AA8B0
+    53 0001:000AA8D1    54 0001:000AA8E0    56 0001:000AA8EC    57 0001:000AA91A
+    59 0001:000AA937    60 0001:000AA956    62 0001:000AA998    63 0001:000AA9A0
+    64 0001:000AA9A8
 
 Line numbers for VfsUtilsTest(VfsUtilsTest.pas) segment .itext
 
@@ -14224,13 +14231,14 @@ Line numbers for VfsUtilsTest(VfsUtilsTest.pas) segment .itext
 
 Line numbers for VfsBaseTest(VfsBaseTest.pas) segment .text
 
-    25 0001:000AAB50    26 0001:000AAB55    30 0001:000AAB58    31 0001:000AAB5D
-    41 0001:000AAB60    42 0001:000AAB91    43 0001:000AABA0    45 0001:000AABA5
-    46 0001:000AABD9    47 0001:000AAC22    48 0001:000AAC6B    50 0001:000AAC72
-    51 0001:000AAC77    52 0001:000AAC9C    53 0001:000AACA4    55 0001:000AACEF
-    56 0001:000AACF6    57 0001:000AAD1B    58 0001:000AAD23    60 0001:000AAD77
-    62 0001:000AAD7F    63 0001:000AAD8F    65 0001:000AAD9A    66 0001:000AADAC
-    62 0001:000AADD0    70 0001:000AADD3    71 0001:000AADDB
+    24 0001:000AAC38    25 0001:000AAC3F    26 0001:000AAC44    29 0001:000AAC48
+    30 0001:000AAC4F    31 0001:000AAC54    41 0001:000AAC58    42 0001:000AAC8A
+    43 0001:000AAC99    45 0001:000AAC9E    46 0001:000AACDE    47 0001:000AAD27
+    48 0001:000AAD70    50 0001:000AAD77    51 0001:000AAD7C    52 0001:000AADA4
+    53 0001:000AADAC    55 0001:000AADF8    56 0001:000AADFF    57 0001:000AAE27
+    58 0001:000AAE2F    60 0001:000AAE84    62 0001:000AAE8C    63 0001:000AAEA4
+    65 0001:000AAEAF    66 0001:000AAEC1    68 0001:000AAEE6    62 0001:000AAEE9
+    70 0001:000AAEEE    71 0001:000AAEF6
 
 Line numbers for VfsBaseTest(VfsBaseTest.pas) segment .itext
 
@@ -14238,9 +14246,9 @@ Line numbers for VfsBaseTest(VfsBaseTest.pas) segment .itext
 
 Line numbers for VfsApiDiggerTest(VfsApiDiggerTest.pas) segment .text
 
-    31 0001:000AB1A4    32 0001:000AB1C3    33 0001:000AB1CF    35 0001:000AB1DB
-    36 0001:000AB1E3    37 0001:000AB1F0    39 0001:000AB1FD    40 0001:000AB205
-    41 0001:000AB212    42 0001:000AB220    45 0001:000AB25B
+    31 0001:000AB2C4    32 0001:000AB2E3    33 0001:000AB2EF    35 0001:000AB2FB
+    36 0001:000AB303    37 0001:000AB310    39 0001:000AB31D    40 0001:000AB325
+    41 0001:000AB332    42 0001:000AB340    45 0001:000AB37B
 
 Line numbers for VfsApiDiggerTest(VfsApiDiggerTest.pas) segment .itext
 
@@ -14248,13 +14256,14 @@ Line numbers for VfsApiDiggerTest(VfsApiDiggerTest.pas) segment .itext
 
 Line numbers for VfsOpenFilesTest(VfsOpenFilesTest.pas) segment .text
 
-    26 0001:000AB500    27 0001:000AB505    31 0001:000AB508    32 0001:000AB50D
-    45 0001:000AB510    46 0001:000AB536    48 0001:000AB53A    49 0001:000AB568
-    50 0001:000AB59F    51 0001:000AB5D6    53 0001:000AB5DD    54 0001:000AB605
-    55 0001:000AB61C    56 0001:000AB628    57 0001:000AB63D    58 0001:000AB682
-    60 0001:000AB689    61 0001:000AB6AB    62 0001:000AB6B7    63 0001:000AB6CC
-    64 0001:000AB706    66 0001:000AB70D    67 0001:000AB72F    68 0001:000AB73B
-    69 0001:000AB750    70 0001:000AB78A    72 0001:000AB791    73 0001:000AB798
+    25 0001:000AB620    26 0001:000AB627    27 0001:000AB62C    30 0001:000AB630
+    31 0001:000AB637    32 0001:000AB63C    45 0001:000AB640    46 0001:000AB661
+    48 0001:000AB666    49 0001:000AB694    50 0001:000AB6CB    51 0001:000AB702
+    53 0001:000AB709    54 0001:000AB731    55 0001:000AB749    56 0001:000AB756
+    57 0001:000AB76D    58 0001:000AB7B4    60 0001:000AB7BC    61 0001:000AB7DF
+    62 0001:000AB7EC    63 0001:000AB803    64 0001:000AB83F    66 0001:000AB847
+    67 0001:000AB86A    68 0001:000AB877    69 0001:000AB88E    70 0001:000AB8CA
+    72 0001:000AB8D2    73 0001:000AB8DA
 
 Line numbers for VfsOpenFilesTest(VfsOpenFilesTest.pas) segment .itext
 
@@ -14274,35 +14283,35 @@ Line numbers for ConsoleAPI(ConsoleApi.pas) segment .text
 
 Line numbers for VfsIntegratedTest(VfsIntegratedTest.pas) segment .text
 
-    33 0001:000ABC64    34 0001:000ABC79    35 0001:000ABCCB    38 0001:000ABD18
-    39 0001:000ABD38    40 0001:000ABD86    46 0001:000ABDD8    47 0001:000ABDF9
-    48 0001:000ABE04    49 0001:000ABE09    50 0001:000ABE40    51 0001:000ABE77
-    52 0001:000ABEAE    53 0001:000ABEE5    54 0001:000ABF1C    55 0001:000ABF26
-    56 0001:000ABF2D    59 0001:000AC030    60 0001:000AC037    61 0001:000AC03C
-    62 0001:000AC043    72 0001:000AC048    73 0001:000AC057    74 0001:000AC068
-    76 0001:000AC070    77 0001:000AC076    78 0001:000AC07C    81 0001:000AC089
-    82 0001:000AC095    85 0001:000AC09F    87 0001:000AC0A8    88 0001:000AC0C6
-    89 0001:000AC0D1    90 0001:000AC101    91 0001:000AC131    92 0001:000AC161
-    93 0001:000AC191    94 0001:000AC1C1   104 0001:000AC294   105 0001:000AC29D
-   107 0001:000AC2A4   108 0001:000AC2BC   110 0001:000AC2C2   112 0001:000AC2CC
-   113 0001:000AC2E9   114 0001:000AC2F4   115 0001:000AC320   116 0001:000AC34E
-   117 0001:000AC37C   118 0001:000AC3AA   128 0001:000AC464   129 0001:000AC46D
-   130 0001:000AC47D   132 0001:000AC484   133 0001:000AC4A5   134 0001:000AC4AD
-   136 0001:000AC4B8   137 0001:000AC4C6   139 0001:000AC4DD   141 0001:000AC509
-   142 0001:000AC526   143 0001:000AC53A   144 0001:000AC575   145 0001:000AC57E
-   147 0001:000AC59B   148 0001:000AC5AA   149 0001:000AC5BE   150 0001:000AC5F9
-   151 0001:000AC602   153 0001:000AC61F   154 0001:000AC646   155 0001:000AC655
-   156 0001:000AC669   157 0001:000AC6A4   158 0001:000AC6AD   160 0001:000AC6CA
-   161 0001:000AC6ED   163 0001:000AC70C   165 0001:000AC71C   185 0001:000ACC70
-   186 0001:000ACC98   188 0001:000ACCA4   190 0001:000ACCBC   191 0001:000ACCC2
-   194 0001:000ACCE3   193 0001:000ACD02   197 0001:000ACD16   199 0001:000ACD1F
-   205 0001:000ACD4C   206 0001:000ACD72   208 0001:000ACD7E   210 0001:000ACD8E
-   209 0001:000ACDA4   213 0001:000ACDB5   215 0001:000ACDEC   216 0001:000ACE0E
-   217 0001:000ACE13   219 0001:000ACE22   220 0001:000ACE2A   222 0001:000ACE35
-   223 0001:000ACE43   224 0001:000ACE60   225 0001:000ACE70   226 0001:000ACE82
-   228 0001:000ACE8A   229 0001:000ACEA7   230 0001:000ACEB7   231 0001:000ACEC9
-   233 0001:000ACED1   234 0001:000ACEEE   235 0001:000ACEFE   236 0001:000ACF10
-   238 0001:000ACF25   239 0001:000ACF2D   240 0001:000ACF35   242 0001:000ACF45
+    33 0001:000ABD9C    34 0001:000ABDB1    35 0001:000ABE03    38 0001:000ABE50
+    39 0001:000ABE70    40 0001:000ABEBE    46 0001:000ABF10    47 0001:000ABF31
+    48 0001:000ABF3C    49 0001:000ABF41    50 0001:000ABF78    51 0001:000ABFAF
+    52 0001:000ABFE6    53 0001:000AC01D    54 0001:000AC054    55 0001:000AC05E
+    56 0001:000AC065    59 0001:000AC168    60 0001:000AC16F    61 0001:000AC174
+    62 0001:000AC17B    72 0001:000AC180    73 0001:000AC18F    74 0001:000AC1A0
+    76 0001:000AC1A8    77 0001:000AC1AE    78 0001:000AC1B4    81 0001:000AC1C1
+    82 0001:000AC1CD    85 0001:000AC1D7    87 0001:000AC1E0    88 0001:000AC1FE
+    89 0001:000AC209    90 0001:000AC239    91 0001:000AC269    92 0001:000AC299
+    93 0001:000AC2C9    94 0001:000AC2F9   104 0001:000AC3CC   105 0001:000AC3D5
+   107 0001:000AC3DC   108 0001:000AC3F4   110 0001:000AC3FA   112 0001:000AC404
+   113 0001:000AC421   114 0001:000AC42C   115 0001:000AC458   116 0001:000AC486
+   117 0001:000AC4B4   118 0001:000AC4E2   128 0001:000AC59C   129 0001:000AC5A5
+   130 0001:000AC5B5   132 0001:000AC5BC   133 0001:000AC5DD   134 0001:000AC5E5
+   136 0001:000AC5F0   137 0001:000AC5FE   139 0001:000AC615   141 0001:000AC641
+   142 0001:000AC65E   143 0001:000AC672   144 0001:000AC6AD   145 0001:000AC6B6
+   147 0001:000AC6D3   148 0001:000AC6E2   149 0001:000AC6F6   150 0001:000AC731
+   151 0001:000AC73A   153 0001:000AC757   154 0001:000AC77E   155 0001:000AC78D
+   156 0001:000AC7A1   157 0001:000AC7DC   158 0001:000AC7E5   160 0001:000AC802
+   161 0001:000AC825   163 0001:000AC844   165 0001:000AC854   185 0001:000ACDA8
+   186 0001:000ACDD0   188 0001:000ACDDC   190 0001:000ACDF4   191 0001:000ACDFA
+   194 0001:000ACE1B   193 0001:000ACE3A   197 0001:000ACE4E   199 0001:000ACE57
+   205 0001:000ACE84   206 0001:000ACEAA   208 0001:000ACEB6   210 0001:000ACEC6
+   209 0001:000ACEDC   213 0001:000ACEED   215 0001:000ACF24   216 0001:000ACF46
+   217 0001:000ACF4B   219 0001:000ACF5A   220 0001:000ACF62   222 0001:000ACF6D
+   223 0001:000ACF7B   224 0001:000ACF98   225 0001:000ACFA8   226 0001:000ACFBA
+   228 0001:000ACFC2   229 0001:000ACFDF   230 0001:000ACFEF   231 0001:000AD001
+   233 0001:000AD009   234 0001:000AD026   235 0001:000AD036   236 0001:000AD048
+   238 0001:000AD05D   239 0001:000AD065   240 0001:000AD06D   242 0001:000AD07D
 
 Line numbers for VfsIntegratedTest(VfsIntegratedTest.pas) segment .itext
 
