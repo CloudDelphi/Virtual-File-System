@@ -5,7 +5,7 @@ unit VfsBaseTest;
 uses
   SysUtils, TestFramework,
   Utils, WinUtils,
-  VfsUtils, VfsBase;
+  VfsUtils, VfsBase, VfsTestHelper;
 
 type
   TestBase = class (TTestCase)
@@ -34,7 +34,7 @@ procedure TestBase.TestVirtualDirMapping;
 var
   DirListing: TDirListing;
   DirInfo:    TNativeFileInfo;
-  RootDir:    string;
+  RootDir:    WideString;
   FileInfo:   TFileInfo;
   i:          integer;
 
@@ -42,20 +42,20 @@ begin
   DirListing := TDirListing.Create;
   FileInfo   := nil;
   // * * * * * //
-  RootDir := SysUtils.ExtractFileDir(WinUtils.GetExePath) + '\Tests\Fs';
-  VfsBase.MapDir(RootDir, RootDir + '\Mods\B', DONT_OVERWRITE_EXISTING);
-  VfsBase.MapDir(RootDir, RootDir + '\Mods\A', DONT_OVERWRITE_EXISTING);
+  RootDir := VfsTestHelper.GetTestsRootDir;
+  VfsBase.MapDir(RootDir, VfsUtils.MakePath([RootDir, 'Mods\B']), DONT_OVERWRITE_EXISTING);
+  VfsBase.MapDir(RootDir, VfsUtils.MakePath([RootDir, 'Mods\A']), DONT_OVERWRITE_EXISTING);
   VfsBase.RunVfs(SORT_FIFO);
 
   VfsBase.PauseVfs;
   VfsBase.GetVfsDirInfo(RootDir, '*', DirInfo, DirListing);
   DirListing.Rewind;
-  Check(DirListing.GetDebugDump() = '', 'Virtual directory listing must be empty when VFS is paused. Got: ' + DirListing.GetDebugDump());
+  CheckEquals('', DirListing.GetDebugDump(), 'Virtual directory listing must be empty when VFS is paused');
 
   VfsBase.RunVfs(SORT_FIFO);
   VfsBase.GetVfsDirInfo(RootDir, '*', DirInfo, DirListing);
   DirListing.Rewind;
-  Check(DirListing.GetDebugDump() = 'vcredist.bmp'#13#10'eula.1028.txt', 'Invalid virtual directoring listing. Got: ' + DirListing.GetDebugDump());
+  CheckEquals('vcredist.bmp'#13#10'eula.1028.txt', DirListing.GetDebugDump(), 'Invalid virtual directoring listing');
 
   DirListing.Rewind;
   
@@ -63,7 +63,7 @@ begin
     DirListing.GetNextItem(FileInfo);
 
     if FileInfo.Data.FileName = 'vcredist.bmp' then begin
-      Check(FileInfo.Data.GetFileSize() = 5686, 'File from A mod must not override same file from B mod');
+      CheckEquals(5686, FileInfo.Data.GetFileSize(), 'File from A mod must not override same file from B mod');
     end;
   end;
   // * * * * * //

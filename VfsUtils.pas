@@ -123,6 +123,13 @@ function ToNtAbsPath (const Path: WideString; {n} HadTrailingDelim: pboolean = n
 (* Return true if path is valid absolute path to root drive like '\??\X:' with any/zero number of trailing slashes *)
 function IsNtRootDriveAbsPath (const Path: WideString): boolean;
 
+(* Adds backslash to path end, unless there is already existing one *)
+function AddBackslash (const Path: WideString): WideString;
+
+(* Joins multiple path parts into single path. Backslashes are trimmed from each part and finally empty parts are ignored.
+   Each part must be valid path part like '\DirName\\\' or 'C:' *)
+function MakePath (const Parts: array of WideString): WideString;
+
 (* Removes optional leading \??\ prefix from path *)
 function StripNtAbsPathPrefix (const Path: WideString): WideString;
 
@@ -205,7 +212,7 @@ end; // .function ExpandPath
 
 function NormalizeAbsPath (const Path: WideString; {n} HadTrailingDelim: pboolean = nil): WideString;
 begin
-  result := StrLib.ExcludeTrailingDelimW(Path, HadTrailingDelim);
+  result := StrLib.ExcludeTrailingBackslashW(Path, HadTrailingDelim);
 
   if (Length(result) = 2) and (result[1] = ':') then begin
     result := result + '\';
@@ -258,6 +265,68 @@ begin
     result := Copy(Path, 4 + 1);
   end;
 end;
+
+function AddBackslash (const Path: WideString): WideString;
+begin
+  if (Path = '') or (Path[Length(Path)] <> '\') then begin
+    result := Path + '\';
+  end else begin
+    result := Path;
+  end;
+end;
+
+function MakePath (const Parts: array of WideString): WideString;
+var
+{n} CurrChar: PWideChar;
+    Part:     WideString;
+    PartLen:  integer;
+    ResLen:   integer;
+    i:        integer;
+
+begin
+  CurrChar := nil;
+  // * * * * * //
+  ResLen := 0;
+  
+  // Calculate estimated final string length, assume extra '\' for each non-empty part
+  for i := 0 to High(Parts) do begin
+    if Parts[i] <> '' then begin
+      Inc(ResLen, Length(Parts[i]) + 1);
+    end;
+  end;
+
+  SetLength(result, ResLen);
+  CurrChar := PWideChar(result);
+
+  for i := 0 to High(Parts) do begin
+    PartLen := Length(Parts[i]);
+
+    if PartLen > 0 then begin
+      Part := StrLib.TrimBackslashesW(Parts[i]);
+      
+      if Part <> '' then begin
+        // Add '\' glue for non-first part
+        if i = 0 then begin
+          Dec(ResLen);
+        end else begin
+          CurrChar^ := '\';
+          Inc(CurrChar);
+        end;
+        
+        Dec(ResLen, PartLen - Length(Part));
+        PartLen := Length(Part);
+        
+        Utils.CopyMem(PartLen * sizeof(WideChar), PWideChar(Part), CurrChar);
+        Inc(CurrChar, PartLen);
+      end else begin
+        Dec(ResLen, PartLen + 1);
+      end;
+    end;
+  end; // .for
+
+  // Trim garbage at final string end
+  SetLength(result, ResLen);
+end; // .function MakePath
 
 function SaveAndRet (Res: integer; out ResCopy): integer;
 begin

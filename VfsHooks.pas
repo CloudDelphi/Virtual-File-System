@@ -100,7 +100,7 @@ begin
   RedirectedPath          := '';
 
   if ExpandedPath <> '' then begin
-    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingDelimW(ExpandedPath, @HadTrailingDelim), @FileInfo);
+    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingBackslashW(ExpandedPath, @HadTrailingDelim), @FileInfo);
   end;
 
   // Return cached VFS file info
@@ -157,7 +157,7 @@ begin
   RedirectedPath          := '';
 
   if ExpandedPath <> '' then begin
-    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingDelimW(ExpandedPath, @HadTrailingDelim), @FileInfo);
+    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingBackslashW(ExpandedPath, @HadTrailingDelim), @FileInfo);
   end;
 
   // Return cached VFS file info
@@ -227,7 +227,7 @@ begin
   RedirectedPath          := '';
 
   if (ExpandedPath <> '') and ((DesiredAccess and WinNative.DELETE) = 0) and (CreateDisposition = WinNative.FILE_OPEN) then begin
-    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingDelimW(ExpandedPath, @HadTrailingDelim));
+    RedirectedPath := VfsBase.GetVfsItemRealPath(StrLib.ExcludeTrailingBackslashW(ExpandedPath, @HadTrailingDelim));
   end;
 
   if RedirectedPath = '' then begin

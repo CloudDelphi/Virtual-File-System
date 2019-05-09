@@ -15,7 +15,6 @@ uses
   Windows, SysUtils,
   Utils, Concur, DataLib, StrLib,
   VfsUtils, VfsBase, VfsMatching;
-
 type
   (* Import *)
   TVfsItem = VfsBase.TVfsItem;
@@ -119,7 +118,7 @@ begin
       Self.DirListing.AddItem(@DirInfo, '.');
     end;
 
-    if VfsMatching.MatchPattern('..', Mask) and VfsUtils.GetFileInfo(Self.AbsPath + '\..', ParentDirInfo) then begin
+    if VfsMatching.MatchPattern('..', Mask) and VfsUtils.GetFileInfo(VfsUtils.AddBackslash(Self.AbsPath) + '..', ParentDirInfo) then begin
       Self.DirListing.AddItem(@ParentDirInfo, '..');
     end;
   end;

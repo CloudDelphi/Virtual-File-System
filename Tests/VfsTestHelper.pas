@@ -8,10 +8,13 @@ unit VfsTestHelper;
 
 uses
   SysUtils, Windows,
-  Utils;
+  Utils, WinUtils, StrLib;
 
 (* Initializes debug console *)
 procedure InitConsole;
+
+(* Returns absolute path to directory with test contents *)
+function GetTestsRootDir: WideString;
 
 
 (***)  implementation  (***)
@@ -42,5 +45,23 @@ begin
   SetConsoleWindowInfo(hOut, true, Rect);
   SetConsoleTextAttribute(hOut, (0 shl 4) or $0F);
 end; // .procedure InitConsole;
+
+function GetTestsRootDir: WideString;
+var
+  Caret: PWideChar;
+
+begin
+  result := WinUtils.GetExePath;
+  {!} Assert(result <> '', 'Failed to get full path to current executable file');
+  
+  result := StrLib.ExtractDirPathW(WinUtils.GetExePath);
+  {!} Assert(result <> '', 'Failed to extract executable file directory path');
+
+  if result[Length(result)] <> '\' then begin
+    result := result + '\Tests\Fs';
+  end else begin
+    result := result + 'Tests\Fs';
+  end;
+end; // .function GetTestsRootDir
 
 end.

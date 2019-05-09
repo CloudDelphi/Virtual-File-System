@@ -105,7 +105,7 @@ function IsVfsActive: boolean;
 function GetVfsItemRealPath (const AbsVirtPath: WideString; {n} FileInfo: PNativeFileInfo = nil): WideString;
 
 (* Returns virtual directory info. Adds virtual entries to specified directory listing container *)
-function GetVfsDirInfo (const AbsVirtPath, Mask: WideString; {OUT} var DirInfo: TNativeFileInfo; DirListing: TDirListing): boolean;
+function GetVfsDirInfo (const NormalizedVirtPath, Mask: WideString; {OUT} var DirInfo: TNativeFileInfo; DirListing: TDirListing): boolean;
 
 (* Maps real directory contents to virtual path. Target must exist for success *)
 function MapDir (const VirtPath, RealPath: WideString; OverwriteExisting: boolean; Flags: integer = 0): boolean;
@@ -356,7 +356,7 @@ begin
   end; // .if
 end; // .function GetVfsItemRealPath
 
-function GetVfsDirInfo (const AbsVirtPath, Mask: WideString; {OUT} var DirInfo: TNativeFileInfo; DirListing: TDirListing): boolean;
+function GetVfsDirInfo (const NormalizedVirtPath, Mask: WideString; {OUT} var DirInfo: TNativeFileInfo; DirListing: TDirListing): boolean;
 var
 {n} VfsItem:        TVfsItem;
     NormalizedMask: WideString;
@@ -370,7 +370,7 @@ begin
   result := EnterVfs;
 
   if result then begin
-    result := FindVfsItemByNormalizedPath(AbsVirtPath, VfsItem) and VfsItem.IsDir;
+    result := FindVfsItemByNormalizedPath(NormalizedVirtPath, VfsItem) and VfsItem.IsDir;
 
     if result then begin
       DirInfo := VfsItem.Info;
@@ -488,8 +488,8 @@ begin
   Success    := DirVfsItem <> nil;
 
   if Success then begin
-    VirtPathPrefix := AbsVirtPath + '\';
-    RealPathPrefix := AbsRealPath + '\';
+    VirtPathPrefix := AddBackslash(AbsVirtPath);
+    RealPathPrefix := AddBackslash(AbsRealPath);
 
     if DirVfsItem.Children = nil then begin
       DirVfsItem.Children := DataLib.NewList(not Utils.OWNS_ITEMS);

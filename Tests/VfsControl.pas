@@ -8,7 +8,7 @@ unit VfsControl;
 
 uses
   Windows, SysUtils,
-  Utils,
+  Utils, WinUtils,
   VfsBase, VfsUtils, VfsHooks;
 
 
@@ -18,30 +18,6 @@ function RunVfs (DirListingOrder: VfsBase.TDirListingSortType): boolean; stdcall
 
 (***)  implementation  (***)
 
-
-function GetCurrentDirW: WideString;
-var
-  Buf:    array [0..32767 - 1] of WideChar;
-  ResLen: integer;
-
-begin
-  result := '';
-  ResLen := Windows.GetCurrentDirectoryW(sizeof(Buf), @Buf);
-
-  if ResLen > 0 then begin
-    SetLength(result, ResLen);
-    Utils.CopyMem(ResLen * sizeof(WideChar), @Buf, PWideChar(result));
-  end;
-end;
-
-function SetCurrentDirW (const DirPath: WideString): boolean;
-var
-  AbsPath: WideString;
-
-begin
-  AbsPath := VfsUtils.NormalizePath(DirPath);
-  result  := Windows.SetCurrentDirectoryW(PWideChar(AbsPath));
-end;
 
 function RunVfs (DirListingOrder: VfsBase.TDirListingSortType): boolean; stdcall;
 var
@@ -57,10 +33,10 @@ begin
       VfsHooks.InstallHooks;
 
       // Try to ensure, that current directory handle is tracked by VfsOpenFiles
-      CurrDir := GetCurrentDirW;
+      CurrDir := WinUtils.GetCurrentDirW;
 
       if CurrDir <> '' then begin
-        SetCurrentDirW(CurrDir);
+        WinUtils.SetCurrentDirW(CurrDir);
       end;
     end;
 

@@ -5,7 +5,8 @@ unit VfsOpenFilesTest;
 uses
   Windows, SysUtils, TestFramework,
   Utils, WinUtils, DataLib,
-  VfsBase, VfsUtils, VfsOpenFiles;
+  VfsBase, VfsUtils, VfsOpenFiles,
+  VfsTestHelper;
 
 type
   TestOpenFiles = class (TTestCase)
@@ -40,17 +41,17 @@ const
 var
 {O} OpenedFile: VfsOpenFiles.TOpenedFile;
     DirPath:    WideString;
-    RootDir:    string;
+    RootDir:    WideString;
 
 begin
   OpenedFile := nil;
   // * * * * * //
-  RootDir := SysUtils.ExtractFileDir(WinUtils.GetExePath) + '\Tests\Fs';
-  VfsBase.MapDir(RootDir, RootDir + '\Mods\FullyVirtual', DONT_OVERWRITE_EXISTING);
-  VfsBase.MapDir(RootDir, RootDir + '\Mods\B', DONT_OVERWRITE_EXISTING);
+  RootDir := VfsTestHelper.GetTestsRootDir;
+  VfsBase.MapDir(RootDir, VfsUtils.MakePath([RootDir, '\Mods\FullyVirtual']), DONT_OVERWRITE_EXISTING);
+  VfsBase.MapDir(RootDir, VfsUtils.MakePath([RootDir, '\Mods\B']), DONT_OVERWRITE_EXISTING);
   VfsBase.RunVfs(SORT_FIFO);
 
-  DirPath    := VfsUtils.NormalizePath(RootDir + '\Hobbots');
+  DirPath    := VfsUtils.NormalizePath(VfsUtils.MakePath([RootDir, '\Hobbots']));
   OpenedFile := VfsOpenFiles.TOpenedFile.Create(777, DirPath);
   OpenedFile.FillDirListing('*');
   Check(OpenedFile.DirListing <> nil, 'Directory listing must be assigned');
@@ -60,13 +61,13 @@ begin
   OpenedFile := VfsOpenFiles.TOpenedFile.Create(888, RootDir);
   OpenedFile.FillDirListing('*');
   Check(OpenedFile.DirListing <> nil, 'Directory listing must be assigned');
-  CheckEquals(VALID_COMBINED_LISTING, OpenedFile.DirListing.GetDebugDump(), 'Invalid combined listing for directory "' + RootDir + '"');
+  CheckEquals(VALID_COMBINED_LISTING, OpenedFile.DirListing.GetDebugDump(), 'Invalid combined listing for directory "' + VfsUtils.MakePath([RootDir, '"']));
   FreeAndNil(OpenedFile);
 
   OpenedFile := VfsOpenFiles.TOpenedFile.Create(999, RootDir);
   OpenedFile.FillDirListing('*.????');
   Check(OpenedFile.DirListing <> nil, 'Directory listing must be assigned');
-  CheckEquals(VALID_COMBINED_MASKED_LISTING, OpenedFile.DirListing.GetDebugDump(), 'Invalid combined masked listing for directory "' + RootDir + '"');
+  CheckEquals(VALID_COMBINED_MASKED_LISTING, OpenedFile.DirListing.GetDebugDump(), 'Invalid combined masked listing for directory "' + VfsUtils.MakePath([RootDir, '"']));
   FreeAndNil(OpenedFile);
   // * * * * * //
   SysUtils.FreeAndNil(OpenedFile);
