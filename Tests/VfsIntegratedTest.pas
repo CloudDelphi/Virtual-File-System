@@ -61,7 +61,7 @@ end;
 procedure TestIntegrated.TearDown;
 begin
   VfsBase.ResetVfs();
-  //VfsDebug.SetLoggingProc(nil);
+  VfsDebug.SetLoggingProc(nil);
 end;
 
 procedure TestIntegrated.TestGetFileAttributes;
@@ -143,6 +143,7 @@ begin
   try
     VfsDebug.WriteLog('TestFilesOpenClose', 'Started');
     Check(WinUtils.SetCurrentDirW(RootDir), 'Setting current directory to real path must succeed. Path: ' + RootDir);
+    CheckEquals(RootDir, WinUtils.GetCurrentDirW(), 'GetCurrentDirW must return virtual path, not redirected one');
     
     Check(OpenFile(VfsUtils.MakePath([RootDir, 'non-existing.non'])) <= 0, 'Opening non-existing file must fail');
 

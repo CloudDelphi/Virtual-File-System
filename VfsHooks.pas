@@ -86,6 +86,7 @@ var
   ExpandedPath:      WideString;
   RedirectedPath:    WideString;
   ReplacedObjAttrs:  WinNative.TObjectAttributes;
+  ReplacedPath:      WinNative.UNICODE_STRING;
   FileInfo:          TNativeFileInfo;
   HadTrailingDelim_: array [0..3] of byte; // Fix Delphi bug: HadTrailingDelim causes stack 4-bytes misalignment
   HadTrailingDelim:  boolean absolute HadTrailingDelim_;
@@ -128,6 +129,7 @@ begin
 
       ReplacedObjAttrs.RootDirectory := 0;
       ReplacedObjAttrs.Attributes    := ReplacedObjAttrs.Attributes or WinNative.OBJ_CASE_INSENSITIVE;
+      ReplacedObjAttrs.ObjectName    := @ReplacedPath;
       ReplacedObjAttrs.ObjectName.AssignExistingStr(RedirectedPath);
     end;
     
@@ -144,6 +146,7 @@ var
   ExpandedPath:      WideString;
   RedirectedPath:    WideString;
   ReplacedObjAttrs:  WinNative.TObjectAttributes;
+  ReplacedPath:      WinNative.UNICODE_STRING;
   FileInfo:          TNativeFileInfo;
   HadTrailingDelim_: array [0..3] of byte; // Fix Delphi bug: HadTrailingDelim causes stack 4-bytes misalignment
   HadTrailingDelim:  boolean absolute HadTrailingDelim_;
@@ -189,6 +192,7 @@ begin
 
       ReplacedObjAttrs.RootDirectory := 0;
       ReplacedObjAttrs.Attributes    := ReplacedObjAttrs.Attributes or WinNative.OBJ_CASE_INSENSITIVE;
+      ReplacedObjAttrs.ObjectName    := @ReplacedPath;
       ReplacedObjAttrs.ObjectName.AssignExistingStr(RedirectedPath);
     end;
     
@@ -216,6 +220,7 @@ var
   ExpandedPath:      WideString;
   RedirectedPath:    WideString;
   ReplacedObjAttrs:  WinNative.TObjectAttributes;
+  ReplacedPath:      WinNative.UNICODE_STRING;
   HadTrailingDelim_: array [0..3] of byte; // Fix Delphi bug: HadTrailingDelim causes stack 4-bytes misalignment
   HadTrailingDelim:  boolean absolute HadTrailingDelim_;
 
@@ -246,6 +251,7 @@ begin
 
     ReplacedObjAttrs.RootDirectory := 0;
     ReplacedObjAttrs.Attributes    := ReplacedObjAttrs.Attributes or WinNative.OBJ_CASE_INSENSITIVE;
+    ReplacedObjAttrs.ObjectName    := @ReplacedPath;
     ReplacedObjAttrs.ObjectName.AssignExistingStr(RedirectedPath);
   end;
 

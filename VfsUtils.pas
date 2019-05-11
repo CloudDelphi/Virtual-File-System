@@ -8,8 +8,9 @@ unit VfsUtils;
 
 uses
   SysUtils, Math, Windows,
-  Utils, WinNative, Alg, TypeWrappers, Lists, DataLib,
-  StrLib;
+  Utils, WinNative, Alg, TypeWrappers,
+  Lists, DataLib, StrLib,
+  VfsMatching;
 
 type
   (* Import *)
@@ -146,7 +147,9 @@ function SysScanDir (const hDir: Windows.THandle; const Mask: WideString): ISysD
 function SysScanDir (const DirPath, Mask: WideString): ISysDirScanner; overload;
 
 (* Scans specified directory and adds sorted entries to directory listing. Optionally exclude names from Exclude dictionary.
-   Excluded items must be preprocessed via WideStringToCaselessKey routine *)
+   Excluded items must be preprocessed via WideStringToCaselessKey routine.
+   Applies filtering by mask to fix possible invalid native functions behavior, found at least on Win XP when
+   tests were run on network drive *)
 procedure GetDirectoryListing (const SearchPath, FileMask: WideString; {Un} Exclude: TDict {OF CaselessKey => not NIL}; DirListing: TDirListing);
 
 (***)  implementation  (***)
@@ -634,19 +637,20 @@ end;
 
 procedure GetDirectoryListing (const SearchPath, FileMask: WideString; {Un} Exclude: TDict {OF CaselessKey => not NIL}; DirListing: TDirListing);
 var
-{O} Items: {O} TList {OF TDirListingItem};
-{O} Item:  {O} TDirListingItem;
-    i:     integer;
+{O} Items:        {O} TList {OF TDirListingItem};
+{O} Item:         {O} TDirListingItem;
+    CompiledMask: Utils.TArrayOfByte;
+    i:            integer;
 
 begin
   {!} Assert(DirListing <> nil);
-  // * * * * * //
-  Items := DataLib.NewList(Utils.OWNS_ITEMS);
-  Item  := TDirListingItem.Create;
+  Items        := DataLib.NewList(Utils.OWNS_ITEMS);
+  Item         := TDirListingItem.Create;
+  CompiledMask := VfsMatching.CompilePattern(FileMask);
   // * * * * * //
   with VfsUtils.SysScanDir(SearchPath, FileMask) do begin
     while IterNext(Item.Info.FileName, @Item.Info.Base) do begin     
-      if (Exclude = nil) or (Exclude[WideStrToCaselessKey(Item.Info.FileName)] = nil) then begin
+      if VfsMatching.MatchPattern(Item.Info.FileName, pointer(CompiledMask)) and ((Exclude = nil) or (Exclude[WideStrToCaselessKey(Item.Info.FileName)] = nil)) then begin
         Item.SearchName := StrLib.WideLowerCase(Item.Info.FileName);
         Items.Add(Item); Item := nil;
         Item := TDirListingItem.Create;

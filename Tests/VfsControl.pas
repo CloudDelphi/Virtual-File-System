@@ -10,7 +10,7 @@ uses
   Windows, SysUtils,
   Utils, WinUtils, TypeWrappers, DataLib,
   Files, StrLib,
-  VfsBase, VfsUtils, VfsHooks, DlgMes;
+  VfsBase, VfsUtils, VfsHooks, DlgMes {FIXME DELETEME};
 
 type
   (* Import *)
@@ -72,68 +72,85 @@ begin
   result := (i > StrLen) and (ModName <> '') and (ModName <> '.') and (ModName <> '..');
 end;
 
-function LoadModList (const ModListFilePath: WideString): {O} DataLib.TList {of (O) TWideString};
-var
-  AbsFilePath:  WideString;
-  FileContents: string;
-  Lines:        Utils.TArrayOfStr;
-  ModNameUtf8:  string;
-  ModName:      WideString;
-  i:            integer;
-
-begin
-  result := DataLib.NewList(Utils.OWNS_ITEMS);
-  // * * * * * //
-  AbsFilePath := VfsUtils.NormalizePath(ModListFilePath);
-
-  if (AbsFilePath <> '') and (Files.ReadFileContents(AbsFilePath, FileContents)) then begin
-    Lines := StrLib.Explode(FileContents, #10);
-
-    for i := 0 to High(Lines) do begin
-      ModNameUtf8 := Lines[i];
-      ModName     := StrLib.Utf8ToWide(ModNameUtf8);
-
-      if ValidateModName(ModName) then begin
-        result.Add(TWideString.Create(ModName));
-      end;
-    end;
-  end;
-end; // .function LoadModList
-
-// function MapModsDir (const RootDir, ModsDir: WideString; Flags: integer = 0);
+// function LoadModList (const ModListFilePath: WideString; {O} var {out} ModList: DataLib.TList {of (O) TWideString}): boolean;
 // var
-//   AbsRootDir: WideString;
-//   AbsModsDir: WideString;
-//   FileInfo:   VfsUtils.TNativeFileInfo;
-//   ModName:    WideString;
+//   AbsFilePath:  WideString;
+//   FileHandle:   integer;
+//   FileContents: string;
+//   Lines:        Utils.TArrayOfStr;
+//   ModNameUtf8:  string;
+//   ModName:      WideString;
+//   i:            integer;
 
+//   // FIXME ModList is not result
 
 // begin
-//   AbsRootDir := VfsUtils.NormalizePath(RootDir);
-//   AbsModsDir := VfsUtils.NormalizePath(ModsDir);
-//   result     := (AbsRootDir <> '') and (AbsModsDir <> '') and VfsUtils.GetFileInfo(AbsRootDir, FileInfo);
-//   result     := result and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes);
-//   result     := result and VfsUtils.GetFileInfo(AbsModsDir, FileInfo);
-//   result     := result and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes);
-  
-//   if result then begin
-//     with VfsUtils.SysScanDir(AbsModsDir, '*') do begin
-//       while IterNext(ModName, @FileInfo.Base) do begin
-//         if (ModName <> '.') and (ModName <> '..') and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes) then begin
-          
-//         end;
+//   result := DataLib.NewList(Utils.OWNS_ITEMS);
+//   // * * * * * //
+//   AbsFilePath := VfsUtils.NormalizePath(ModListFilePath);
+//   FileHandle  := Windows.CreateFileW(PWideChar(AbsFilePath), Windows.GENERIC_READ, Windows.FILE_SHARE_READ, nil, Windows.OPEN_EXISTING, 0, nil);
+//   // Make available UNICODE path
+//   // Make UTF8 BOM support EF BB BF
+
+//   if (AbsFilePath <> '') and (Files.ReadFileContents(AbsFilePath, FileContents)) then begin
+//     Lines := StrLib.Explode(FileContents, #10);
+
+//     for i := 0 to High(Lines) do begin
+//       ModNameUtf8 := Lines[i];
+//       ModName     := StrLib.TrimW(StrLib.Utf8ToWide(ModNameUtf8, StrLib.FAIL_ON_ERROR));
+
+//       if ValidateModName(ModName) then begin
+//         result.Add(TWideString.Create(ModName));
 //       end;
 //     end;
 //   end;
-// end;
+// end; // .function LoadModList
+
+function MapModsFromList_ (const RootDir, ModsDir: WideString; ModList: TList {of (O) TWideString}; Flags: integer = 0): boolean;
+var
+  AbsRootDir:        WideString;
+  AbsModsDir:        WideString;
+  FileInfo:          VfsUtils.TNativeFileInfo;
+  ModName:           WideString;
+  ModPathPrefix:     WideString;
+  NumFailedMappings: integer;
+  i:                 integer;
+
+begin
+  {!} Assert(ModList <> nil);
+  // * * * * * //
+  AbsRootDir := VfsUtils.NormalizePath(RootDir);
+  AbsModsDir := VfsUtils.NormalizePath(ModsDir);
+  result     := (AbsRootDir <> '') and (AbsModsDir <> '') and VfsUtils.GetFileInfo(AbsRootDir, FileInfo);
+  result     := result and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes);
+  result     := result and VfsUtils.GetFileInfo(AbsModsDir, FileInfo);
+  result     := result and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes);
+  
+  if result then begin
+    ModPathPrefix     := VfsUtils.AddBackslash(AbsModsDir);
+    NumFailedMappings := 0;
+
+    for i := ModList.Count - 1 downto 0 do begin
+      ModName := TWideString(ModList[i]).Value;
+
+      if not VfsBase.MapDir(AbsRootDir, ModPathPrefix + ModName, not VfsBase.OVERWRITE_EXISTING, Flags) then begin
+        Inc(NumFailedMappings);
+      end;
+    end;
+
+    result := (NumFailedMappings = 0) or (NumFailedMappings < ModList.Count);
+  end; // .if
+end; // .function MapModsFromList
+
+function MapModsFromList (const RootDir, ModsDir, ModListFile: WideString; Flags: integer = 0): boolean;
+begin
+  
+end;
 
 var
 L: TList;
 i: integer;
 
 begin
-  // L := LoadModList('D:\Heroes 3\Mods\list.txt');
-  // for i := 0 to L.Count- 1 do begin
-  //   VarDump([TWideString(L[i]).Value]);
-  // end;
+
 end.

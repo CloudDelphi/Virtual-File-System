@@ -194,6 +194,21 @@ begin
   VfsCritSection.Leave;
 end;
 
+function EnterVfsConfig: boolean;
+begin
+  VfsCritSection.Enter;
+  result := not VfsIsRunning and not VfsTreeIsBuilt;
+
+  if not result then begin
+    VfsCritSection.Leave;
+  end;
+end;
+
+procedure LeaveVfsConfig;
+begin
+  VfsCritSection.Leave;
+end;
+
 function CompareVfsItemsByPriorityDescAndNameAsc (Item1, Item2: integer): integer;
 begin
   result := TVfsItem(Item2).Priority - TVfsItem(Item1).Priority;
@@ -525,16 +540,11 @@ end; // .function _MapDir
 
 function MapDir (const VirtPath, RealPath: WideString; OverwriteExisting: boolean; Flags: integer = 0): boolean;
 begin
-  with VfsCritSection do begin
-    Enter;
-    
-    result := not VfsIsRunning and not VfsTreeIsBuilt;
+  result := EnterVfsConfig;
 
-    if result then begin
-      result := _MapDir(NormalizePath(VirtPath), NormalizePath(RealPath), nil, OverwriteExisting, AUTO_PRIORITY) <> nil;
-    end;
-    
-    Leave;
+  if result then begin
+    result := _MapDir(NormalizePath(VirtPath), NormalizePath(RealPath), nil, OverwriteExisting, AUTO_PRIORITY) <> nil;
+    LeaveVfsConfig;
   end;
 end;
 

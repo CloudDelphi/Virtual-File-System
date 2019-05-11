@@ -108,8 +108,12 @@ begin
 
   with VfsBase.GetThreadVfsDisabler do begin
     DisableVfsForThread;
-    VfsUtils.GetDirectoryListing(Self.AbsPath, Mask, ExcludedItems, Self.DirListing);
-    RestoreVfsForThread;
+
+    try
+      VfsUtils.GetDirectoryListing(Self.AbsPath, Mask, ExcludedItems, Self.DirListing);
+    finally
+      RestoreVfsForThread;
+    end;
   end;
 
   // No real items added, maybe there is a need to add '.' and/or '..' manually
