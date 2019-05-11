@@ -96,7 +96,7 @@ begin
   ExcludedItems   := DataLib.NewDict(not Utils.OWNS_ITEMS, DataLib.CASE_SENSITIVE);
 
   if VfsItemFound then begin
-    while DirListing.GetNextItem(DirItem) do begin
+    while Self.DirListing.GetNextItem(DirItem) do begin
       ExcludedItems[WideStrToCaselessKey(DirItem.Data.FileName)] := Ptr(1);
     end;
 

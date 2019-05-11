@@ -61,7 +61,7 @@ end;
 procedure TestIntegrated.TearDown;
 begin
   VfsBase.ResetVfs();
-  VfsDebug.SetLoggingProc(nil);
+  //VfsDebug.SetLoggingProc(nil);
 end;
 
 procedure TestIntegrated.TestGetFileAttributes;
@@ -88,12 +88,14 @@ var
   end; // .function HasValidAttrs
 
 begin
+  VfsDebug.WriteLog('TestGetFileAttributes', 'Started');
   RootDir := VfsTestHelper.GetTestsRootDir;
-  Check(not HasValidAttrs(VfsUtils.MakePath([RootDir, '\non-existing.non'])), '{1}');
-  Check(HasValidAttrs(VfsUtils.MakePath([RootDir, '\Hobbots\mms.cfg']), 0, Windows.FILE_ATTRIBUTE_DIRECTORY), '{2}');
-  Check(HasValidAttrs(VfsUtils.MakePath([RootDir, '\503.html']), 0, Windows.FILE_ATTRIBUTE_DIRECTORY), '{3}');
-  Check(HasValidAttrs(VfsUtils.MakePath([RootDir, '\Hobbots\']), Windows.FILE_ATTRIBUTE_DIRECTORY), '{4}');
-  Check(HasValidAttrs(VfsUtils.MakePath([RootDir, '\Mods']), Windows.FILE_ATTRIBUTE_DIRECTORY), '{5}');
+  Check(not HasValidAttrs(VfsUtils.MakePath([RootDir, 'non-existing.non'])), '{1}');
+  Check(HasValidAttrs(VfsUtils.MakePath([RootDir, 'Hobbots\mms.cfg']), 0, Windows.FILE_ATTRIBUTE_DIRECTORY), '{2}');
+  Check(HasValidAttrs(VfsUtils.MakePath([RootDir, '503.html']), 0, Windows.FILE_ATTRIBUTE_DIRECTORY), '{3}');
+  Check(HasValidAttrs(VfsUtils.MakePath([RootDir, 'Hobbots\']), Windows.FILE_ATTRIBUTE_DIRECTORY), '{4}');
+  Check(HasValidAttrs(VfsUtils.MakePath([RootDir, 'Mods']), Windows.FILE_ATTRIBUTE_DIRECTORY), '{5}');
+  VfsDebug.WriteLog('TestGetFileAttributes', 'Ended');
 end; // .procedure TestIntegrated.TestGetFileAttributes;
 
 procedure TestIntegrated.TestGetFileAttributesEx;
@@ -113,11 +115,13 @@ var
   end;
 
 begin
+  VfsDebug.WriteLog('TestGetFileAttributesEx', 'Started');
   RootDir := VfsTestHelper.GetTestsRootDir;
-  CheckEquals(-1, GetFileSize(VfsUtils.MakePath([RootDir, '\non-existing.non'])), '{1}');
-  CheckEquals(42, GetFileSize(VfsUtils.MakePath([RootDir, '\Hobbots\mms.cfg'])), '{2}');
-  CheckEquals(22, GetFileSize(VfsUtils.MakePath([RootDir, '\503.html'])), '{3}');
-  CheckEquals(318, GetFileSize(VfsUtils.MakePath([RootDir, '\default'])), '{4}');
+  CheckEquals(-1, GetFileSize(VfsUtils.MakePath([RootDir, 'non-existing.non'])), '{1}');
+  CheckEquals(42, GetFileSize(VfsUtils.MakePath([RootDir, 'Hobbots\mms.cfg'])), '{2}');
+  CheckEquals(22, GetFileSize(VfsUtils.MakePath([RootDir, '503.html'])), '{3}');
+  CheckEquals(318, GetFileSize(VfsUtils.MakePath([RootDir, 'default'])), '{4}');
+  VfsDebug.WriteLog('TestGetFileAttributesEx', 'Ended');
 end; // .procedure TestIntegrated.TestGetFileAttributesEx;
 
 procedure TestIntegrated.TestFilesOpenClose;
@@ -137,6 +141,7 @@ begin
   RootDir := VfsTestHelper.GetTestsRootDir;
 
   try
+    VfsDebug.WriteLog('TestFilesOpenClose', 'Started');
     Check(WinUtils.SetCurrentDirW(RootDir), 'Setting current directory to real path must succeed. Path: ' + RootDir);
     
     Check(OpenFile(VfsUtils.MakePath([RootDir, 'non-existing.non'])) <= 0, 'Opening non-existing file must fail');
@@ -165,6 +170,8 @@ begin
   finally
     WinUtils.SetCurrentDirW(CurrDir);
   end; // .try
+
+  VfsDebug.WriteLog('TestFilesOpenClose', 'Ended');
 end; // .procedure TestIntegrated.TestFilesOpenClose;
 
 procedure TestIntegrated.TestDirectoryListing;
@@ -223,6 +230,7 @@ begin
   RootDir := VfsTestHelper.GetTestsRootDir;
 
   try
+    VfsDebug.WriteLog('TestDirectoryListing', 'Started');
     FileList    := GetDirListing(VfsUtils.MakePath([RootDir, '*']));
     DirContents := FileList.ToText(#13#10);
     CheckEquals(VALID_ROOT_DIR_LISTING, DirContents);
@@ -242,6 +250,8 @@ begin
     SysUtils.FreeAndNil(FileList);
     SysUtils.FreeAndNil(DirListing);
   end; // .try
+
+  VfsDebug.WriteLog('TestDirectoryListing', 'Ended');
 end; // .procedure TestIntegrated.TestDirectoryListing;
 
 begin

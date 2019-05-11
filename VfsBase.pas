@@ -331,7 +331,10 @@ end;
 function IsVfsActive: boolean;
 begin
   result := EnterVfs;
-  LeaveVfs;
+
+  if result then begin
+    LeaveVfs;
+  end;
 end;
 
 (* Returns real path for vfs item by its absolute virtual path or empty string. Optionally returns file info structure *)

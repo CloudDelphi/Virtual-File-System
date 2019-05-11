@@ -1,1 +1,10 @@
 UTF-8 Logging
+
+Editor/Development mode:
+Separate thread with FindFirstChangeNotificationA/FindNextChangeNotification on mods root dir + WaitForSingleObject
++ ResetVfs + BlockVfs + MapDir for each cached mapped directory + RunVfs.
+We will need some API like RefreshVfs.
+
+Add ANSI versions of exported API.
+
+Write VfsImport.pas nad vfs_import.c

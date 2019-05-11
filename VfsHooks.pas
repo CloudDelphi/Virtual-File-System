@@ -83,11 +83,12 @@ end; // .function GetFileObjectPath
 
 function Hook_NtQueryAttributesFile (OrigFunc: WinNative.TNtQueryAttributesFile; ObjectAttributes: POBJECT_ATTRIBUTES; FileInformation: PFILE_BASIC_INFORMATION): NTSTATUS; stdcall;
 var
-  ExpandedPath:     WideString;
-  RedirectedPath:   WideString;
-  ReplacedObjAttrs: WinNative.TObjectAttributes;
-  FileInfo:         TNativeFileInfo;
-  HadTrailingDelim: boolean;
+  ExpandedPath:      WideString;
+  RedirectedPath:    WideString;
+  ReplacedObjAttrs:  WinNative.TObjectAttributes;
+  FileInfo:          TNativeFileInfo;
+  HadTrailingDelim_: array [0..3] of byte; // Fix Delphi bug: HadTrailingDelim causes stack 4-bytes misalignment
+  HadTrailingDelim:  boolean absolute HadTrailingDelim_;
 
 begin
   if VfsDebug.LoggingEnabled then begin
@@ -140,11 +141,12 @@ end; // .function Hook_NtQueryAttributesFile
 
 function Hook_NtQueryFullAttributesFile (OrigFunc: WinNative.TNtQueryFullAttributesFile; ObjectAttributes: POBJECT_ATTRIBUTES; FileInformation: PFILE_NETWORK_OPEN_INFORMATION): NTSTATUS; stdcall;
 var
-  ExpandedPath:     WideString;
-  RedirectedPath:   WideString;
-  ReplacedObjAttrs: WinNative.TObjectAttributes;
-  FileInfo:         TNativeFileInfo;
-  HadTrailingDelim: boolean;
+  ExpandedPath:      WideString;
+  RedirectedPath:    WideString;
+  ReplacedObjAttrs:  WinNative.TObjectAttributes;
+  FileInfo:          TNativeFileInfo;
+  HadTrailingDelim_: array [0..3] of byte; // Fix Delphi bug: HadTrailingDelim causes stack 4-bytes misalignment
+  HadTrailingDelim:  boolean absolute HadTrailingDelim_;
 
 begin
   if VfsDebug.LoggingEnabled then begin
@@ -211,10 +213,11 @@ end;
 function Hook_NtCreateFile (OrigFunc: WinNative.TNtCreateFile; FileHandle: PHANDLE; DesiredAccess: ACCESS_MASK; ObjectAttributes: POBJECT_ATTRIBUTES; IoStatusBlock: PIO_STATUS_BLOCK;
                             AllocationSize: PLARGE_INTEGER; FileAttributes: ULONG; ShareAccess: ULONG; CreateDisposition: ULONG; CreateOptions: ULONG; EaBuffer: PVOID; EaLength: ULONG): NTSTATUS; stdcall;
 var
-  ExpandedPath:     WideString;
-  RedirectedPath:   WideString;
-  ReplacedObjAttrs: WinNative.TObjectAttributes;
-  HadTrailingDelim: boolean;
+  ExpandedPath:      WideString;
+  RedirectedPath:    WideString;
+  ReplacedObjAttrs:  WinNative.TObjectAttributes;
+  HadTrailingDelim_: array [0..3] of byte; // Fix Delphi bug: HadTrailingDelim causes stack 4-bytes misalignment
+  HadTrailingDelim:  boolean absolute HadTrailingDelim_;
 
 begin
   if VfsDebug.LoggingEnabled then begin
