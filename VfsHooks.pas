@@ -633,6 +633,7 @@ begin
 end;
 
 initialization
+  System.IsMultiThread := true;
   HooksCritSection.Init;
 finalization
   with VfsBase.VfsCritSection do begin

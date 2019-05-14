@@ -3,7 +3,7 @@ library Vfs;
   Author: Alexander Shostak aka Berserker aka EtherniDee.
 *)
 
-uses Windows;
+uses VfsExport;
 
 begin
   System.IsMultiThread := true;

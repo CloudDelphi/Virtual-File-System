@@ -93,13 +93,18 @@ function GetThreadVfsDisabler: TThreadVfsDisabler;
 function RunVfs (DirListingOrder: TDirListingSortType): boolean;
 
 (* Temporarily pauses VFS, but does not reset existing mappings *)
-function PauseVfs: boolean; stdcall;
+function PauseVfs: LONGBOOL; stdcall;
 
 (* Stops VFS and clears all mappings *)
-function ResetVfs: boolean; stdcall;
+function ResetVfs: LONGBOOL; stdcall;
 
 (* Returns true if VFS is active globally and for current thread *)
 function IsVfsActive: boolean;
+
+function  EnterVfs: boolean;
+procedure LeaveVfs;
+function  EnterVfsConfig: boolean;
+procedure LeaveVfsConfig;
 
 (* Returns real path for VFS item by its absolute virtual path or empty string. Optionally returns file info structure *)
 function GetVfsItemRealPath (const AbsVirtPath: WideString; {n} FileInfo: PNativeFileInfo = nil): WideString;
@@ -315,7 +320,7 @@ begin
   end; // .if
 end; // .function RunVfs
 
-function PauseVfs: boolean; stdcall;
+function PauseVfs: LONGBOOL; stdcall;
 begin
   result := not DisableVfsForThisThread;
 
@@ -328,7 +333,7 @@ begin
   end;
 end;
 
-function ResetVfs: boolean; stdcall;
+function ResetVfs: LONGBOOL; stdcall;
 begin
   result := not DisableVfsForThisThread;
 
