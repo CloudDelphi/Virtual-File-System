@@ -7,7 +7,7 @@ unit VfsPatching;
 (***)  interface  (***)
 
 uses
-  Windows, SysUtils, Utils, PatchForge;
+  Windows, SysUtils, Utils, PatchForge, Concur;
 
 type
   PAppliedPatch = ^TAppliedPatch;
@@ -17,6 +17,7 @@ type
 
     procedure Rollback;
   end;
+
 
 (* Replaces original STDCALL function with the new one with the same prototype and one extra argument.
    The argument is callable pointer, used to execute original function. The pointer is passed as THE FIRST
@@ -32,6 +33,36 @@ type
   TPatchMaker  = PatchForge.TPatchMaker;
   TPatchHelper = PatchForge.TPatchHelper;
 
+const
+  PERSISTENT_MEM_CAPACITY = 100 * 1024;
+
+var
+  PersistentMemCritSection: Concur.TCritSection;
+  PersistentMem:            array [0..PERSISTENT_MEM_CAPACITY - 1] of byte;
+  PersistentMemPos:         integer;
+
+
+procedure AllocPersistentMem (var Addr; Size: integer);
+begin
+  {!} Assert(@Addr <> nil);
+  {!} Assert(Size >= 0);
+
+  with PersistentMemCritSection do begin
+    Enter;
+    pointer(Addr) := nil;
+
+    try
+      if PersistentMemPos + Size > High(PersistentMem) then begin
+        raise EOutOfMemory.Create('Failed to allocate another persistent memory block of size ' + SysUtils.IntToStr(Size));
+      end;
+
+      pointer(Addr) := @PersistentMem[PersistentMemPos];
+      Inc(PersistentMemPos, Size);
+    finally
+      Leave;
+    end;
+  end; // .with
+end; // .procedure AllocPersistentMem
 
 (* Writes arbitrary data to any write-protected section *)
 function WriteAtCode (NumBytes: integer; {n} Src, {n} Dst: pointer): boolean;
@@ -119,7 +150,7 @@ begin
   // === END generating SpliceBridge ===
 
   // Persist splice bridge
-  GetMem(SpliceBridge, p.Size);
+  AllocPersistentMem(SpliceBridge, p.Size);
   WritePatchAtCode(p.PatchMaker, SpliceBridge);
 
   // Turn result from offset to absolute address
@@ -147,4 +178,6 @@ begin
   end;
 end;
 
+begin
+  PersistentMemCritSection.Init;
 end.

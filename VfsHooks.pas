@@ -607,7 +607,8 @@ begin
       NativeNtQueryDirectoryFile := VfsPatching.SpliceWinApi
       (
         VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtQueryDirectoryFile'),
-        @Hook_NtQueryDirectoryFile
+        @Hook_NtQueryDirectoryFile,
+        @NtQueryDirectoryFilePatch
       );
     end; // .if
 
