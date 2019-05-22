@@ -8,9 +8,8 @@ unit VfsControl;
 
 uses
   Windows, SysUtils,
-  Utils, WinUtils, TypeWrappers, DataLib,
-  Files, StrLib,
-  VfsBase, VfsUtils, VfsHooks, DlgMes {FIXME DELETEME};
+  Utils, WinUtils, TypeWrappers, DataLib, Files, StrLib,
+  VfsBase, VfsUtils, VfsHooks, VfsWatching, DlgMes, FilesEx {FIXME DELETEME};
 
 type
   (* Import *)
@@ -23,9 +22,10 @@ function RunVfs (DirListingOrder: VfsBase.TDirListingSortType): LONGBOOL; stdcal
 (* Loads mod list from file and maps each mod directory to specified root directory.
    File with mod list is treated as (BOM or BOM-less) UTF-8 plain text file, where each mod name is separated
    from another one via Line Feed (#10) character. Each mod named is trimmed, converted to UCS16 and validated before
-   adding to list. Invalid or empty mods will be skipped.
+   adding to list. Invalid or empty mods will be skipped. Mods are mapped in reverse order, as compared to their order in file.
    Returns true if root and mods directory existed and file with mod list was loaded successfully *)
 function MapModsFromList (const RootDir, ModsDir, ModListFile: WideString; Flags: integer = 0): boolean;
+
 
 (***)  implementation  (***)
 
@@ -83,18 +83,15 @@ const
   UTF8_BOM = #$EF#$BB#$BF;
 
 var
-{O} OpenedFile:   Files.TFile;
-    AbsFilePath:  WideString;
-    FileHandle:   integer;
-    FileContents: string;
-    Lines:        Utils.TArrayOfStr;
-    ModNameUtf8:  string;
-    ModName:      WideString;
-    i:            integer;
+  AbsFilePath:  WideString;
+  FileHandle:   integer;
+  FileContents: string;
+  Lines:        Utils.TArrayOfStr;
+  ModNameUtf8:  string;
+  ModName:      WideString;
+  i:            integer;
 
 begin
-  OpenedFile := Files.TFile.Create;
-  // * * * * * //
   AbsFilePath := VfsUtils.NormalizePath(ModListFilePath);
   FileHandle  := integer(Windows.INVALID_HANDLE_VALUE);
   result      := AbsFilePath <> '';
@@ -129,8 +126,6 @@ begin
 
     Windows.CloseHandle(FileHandle);
   end; // .if
-  // * * * * * //
-  SysUtils.FreeAndNil(OpenedFile);
 end; // .function LoadModList
 
 function MapModsFromList_ (const RootDir, ModsDir: WideString; ModList: TModList; Flags: integer = 0): boolean;
@@ -181,4 +176,18 @@ begin
   SysUtils.FreeAndNil(ModList);
 end; // .function MapModsFromList
 
+var s: string;
+begin
+  // MapModsFromList('D:\Heroes 3', 'D:\heroes 3\Mods', 'd:\heroes 3\mods\list.txt');
+  // RunVfs(SORT_FIFO);
+  // ReadFileContents('D:\heroes 3\data\s\__T.erm', s);
+  // s := copy(s, 1, 100);
+  // VarDump([s]);
+  // VfsBase.PauseVfs;
+  // VfsBase.RefreshVfs;
+  // VfsBase.RunVfs(SORT_FIFO);
+  // ReadFileContents('D:\heroes 3\data\s\__T.erm', s);
+  // s := copy(s, 1, 100);
+  // VarDump([s]);
+  // exit;
 end.

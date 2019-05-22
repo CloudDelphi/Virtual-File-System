@@ -76,6 +76,7 @@ type
     PrevDisableVfsForThisThread: boolean;
 
     procedure DisableVfsForThread;
+    procedure EnableVfsForThread;
     procedure RestoreVfsForThread;
   end;
 
@@ -97,6 +98,13 @@ function PauseVfs: LONGBOOL; stdcall;
 
 (* Stops VFS and clears all mappings *)
 function ResetVfs: LONGBOOL; stdcall;
+
+(* If VFS is running or paused, pauses VFS, clears cache and fully reaplies all mappings in the same order and
+   with the same arguments, as MapDir routines were called earlier. Restores VFS state afterwards *)
+function RefreshVfs: LONGBOOL; stdcall;
+
+(* Refreshes VFS item attributes info for given mapped file. File must exist to succeed *)
+function RefreshMappedFile (const FilePath: WideString): boolean;
 
 (* Returns true if VFS is active globally and for current thread *)
 function IsVfsActive: boolean;
@@ -122,16 +130,36 @@ function CallWithoutVfs (Func: TSingleArgExternalFunc; Arg: pointer = nil): inte
 (***)  implementation  (***)
 
 
+type
+  (* Applied and remembered mapping. Used to refresh or report VFS *)
+  TMapping = class
+    AbsVirtPath:       WideString;
+    AbsRealPath:       WideString;
+    OverwriteExisting: boolean;
+    Flags:             integer;
+
+    class function Make (const AbsVirtPath, AbsRealPath: WideString; OverwriteExisting: boolean; Flags: integer): TMapping;
+  end;
+
 var
 (*
   Global map of case-insensitive normalized path to file/directory => corresponding TVfsItem.
   Access is controlled via critical section and global/thread switchers.
   Represents the whole cached virtual file system contents.
 *)
-{O} VfsItems: {O} TDict {OF TVfsItem};
+{O} VfsItems: {O} TDict {of TVfsItem};
+
+(* Map of real (mapped) file path => VFS item. Used to update VFS info whenever mapped files are changed *)
+{O} MappedFiles: {U} TDict {of TVfsItem};
+
+(* List of all applied mappings *)
+{O} Mappings: {O} TList {of TMapping};
   
   (* Global VFS state indicator. If false, all VFS search operations must fail *)
   VfsIsRunning: boolean = false;
+
+  (* Directory listing ordering, chosen on first VFS run. Updated on any first run after reset *)
+  VfsDirListingOrder: TDirListingSortType;
 
   (* If true, VFS file/directory hierarchy is built and no mapping is allowed untill full reset *)
   VfsTreeIsBuilt: boolean = false;
@@ -143,6 +171,7 @@ var
 // All threadvar variables are automatically zeroed during finalization, thus zero must be the safest default value
 threadvar
   DisableVfsForThisThread: boolean;
+
 
 function TVfsItem.IsDir: boolean;
 begin
@@ -169,6 +198,12 @@ procedure TThreadVfsDisabler.DisableVfsForThread;
 begin
   Self.PrevDisableVfsForThisThread := DisableVfsForThisThread;
   DisableVfsForThisThread          := true;
+end;
+
+procedure TThreadVfsDisabler.EnableVfsForThread;
+begin
+  Self.PrevDisableVfsForThisThread := DisableVfsForThisThread;
+  DisableVfsForThisThread          := false;
 end;
 
 procedure TThreadVfsDisabler.RestoreVfsForThread;
@@ -297,6 +332,15 @@ begin
   end;
 end; // .procedure BuildVfsItemsTree
 
+class function TMapping.Make (const AbsVirtPath, AbsRealPath: WideString; OverwriteExisting: boolean; Flags: integer): {O} TMapping;
+begin
+  result                   := TMapping.Create;
+  result.AbsVirtPath       := AbsVirtPath;
+  result.AbsRealPath       := AbsRealPath;
+  result.OverwriteExisting := OverwriteExisting;
+  result.Flags             := Flags;
+end;
+
 function RunVfs (DirListingOrder: TDirListingSortType): boolean;
 begin
   result := not DisableVfsForThisThread;
@@ -307,6 +351,7 @@ begin
 
       if not VfsIsRunning then begin
         if not VfsTreeIsBuilt then begin
+          VfsDirListingOrder := DirListingOrder;
           BuildVfsItemsTree();
           SortVfsDirListings(DirListingOrder);
           VfsTreeIsBuilt := true;
@@ -340,7 +385,9 @@ begin
   if result then begin
     with VfsCritSection do begin
       Enter;
-      VfsItems.Clear();
+      VfsItems.Clear;
+      MappedFiles.Clear;
+      Mappings.Clear;
       VfsIsRunning   := false;
       VfsTreeIsBuilt := false;
       Leave;
@@ -472,6 +519,7 @@ begin
       VfsItem.RealPath := AbsRealPath;
       VfsItem.Priority := Priority;
       VfsItem.Attrs    := 0;
+      MappedFiles[WideStrToCaselessKey(AbsRealPath)] := VfsItem;
     end; // .if
   end; // .if
 
@@ -480,7 +528,7 @@ begin
   end;
 end; // .function RedirectFile
 
-function _MapDir (const AbsVirtPath, AbsRealPath: WideString; {n} FileInfoPtr: WinNative.PFILE_ID_BOTH_DIR_INFORMATION; OverwriteExisting: boolean; Priority: integer): {Un} TVfsItem;
+function _MapDir (const AbsVirtPath, AbsRealPath: WideString; {n} FileInfoPtr: WinNative.PFILE_ID_BOTH_DIR_INFORMATION; OverwriteExisting: boolean; Flags, Priority: integer): {Un} TVfsItem;
 var
 {O}  Subdirs:        {O} TList {OF TFileInfo};
 {U}  SubdirInfo:     TFileInfo;
@@ -532,7 +580,7 @@ begin
 
     for i := 0 to Subdirs.Count - 1 do begin
       SubdirInfo := TFileInfo(Subdirs[i]);
-      _MapDir(VirtPathPrefix + SubdirInfo.Data.FileName, RealPathPrefix + SubdirInfo.Data.FileName, @SubdirInfo.Data, OverwriteExisting, Priority);
+      _MapDir(VirtPathPrefix + SubdirInfo.Data.FileName, RealPathPrefix + SubdirInfo.Data.FileName, @SubdirInfo.Data, OverwriteExisting, Flags, Priority);
     end;
   end; // .if
 
@@ -544,14 +592,26 @@ begin
 end; // .function _MapDir
 
 function MapDir (const VirtPath, RealPath: WideString; OverwriteExisting: boolean; Flags: integer = 0): boolean;
+var
+  AbsVirtPath: WideString;
+  AbsRealPath: WideString;
+
 begin
   result := EnterVfsConfig;
 
   if result then begin
-    result := _MapDir(NormalizePath(VirtPath), NormalizePath(RealPath), nil, OverwriteExisting, AUTO_PRIORITY) <> nil;
+    AbsVirtPath := VfsUtils.NormalizePath(VirtPath);
+    AbsRealPath := VfsUtils.NormalizePath(RealPath);
+    result      := (AbsVirtPath <> '') and (AbsRealPath <> '');
+
+    if result then begin
+      Mappings.Add(TMapping.Make(AbsVirtPath, AbsRealPath, OverwriteExisting, Flags));
+      result := _MapDir(AbsVirtPath, AbsRealPath, nil, OverwriteExisting, Flags, AUTO_PRIORITY) <> nil;
+    end;
+
     LeaveVfsConfig;
   end;
-end;
+end; // .function MapDir
 
 function CallWithoutVfs (Func: TSingleArgExternalFunc; Arg: pointer = nil): integer; stdcall;
 begin
@@ -565,7 +625,84 @@ begin
   end;
 end; // .function CallWithoutVfs
 
+function RefreshVfs: LONGBOOL; stdcall;
+var
+  VfsWasRunning: boolean;
+  i:             integer;
+
+begin
+  result := not DisableVfsForThisThread;
+
+  if result then begin
+    with VfsCritSection do begin
+      Enter;
+      result := VfsTreeIsBuilt;
+
+      if result then begin
+        VfsItems.Clear;
+        MappedFiles.Clear;
+        VfsWasRunning  := VfsIsRunning;
+        VfsIsRunning   := false;
+        VfsTreeIsBuilt := false;
+
+        for i := 0 to Mappings.Count - 1 do begin
+          with TMapping(Mappings[i]) do begin
+            MapDir(AbsVirtPath, AbsRealPath, OverwriteExisting, Flags);
+          end;
+        end;
+
+        if VfsWasRunning then begin
+          BuildVfsItemsTree();
+          SortVfsDirListings(VfsDirListingOrder);
+          VfsTreeIsBuilt := true;
+          VfsIsRunning   := true;
+        end;
+      end;
+
+      Leave;
+    end; // .with
+  end; // .if
+end; // .function RefreshVfs
+
+function RefreshMappedFile (const FilePath: WideString): boolean;
+var
+{U} VfsItem:       TVfsItem;
+    AbsRealPath:   WideString;
+    FileInfo:      TNativeFileInfo;
+    VfsWasRunning: boolean;
+
+begin
+  VfsItem := nil;
+  // * * * * * //
+  result := not DisableVfsForThisThread;
+
+  if result then begin
+    with VfsCritSection do begin
+      Enter;
+      result := VfsTreeIsBuilt;
+
+      if result then begin
+        VfsWasRunning := VfsIsRunning;
+        VfsIsRunning  := false;
+        AbsRealPath   := NormalizePath(FilePath);
+        VfsItem       := TVfsItem(MappedFiles[WideStrToCaselessKey(AbsRealPath)]);
+        result        := (VfsItem <> nil) and GetFileInfo(AbsRealPath, FileInfo);
+
+        if result then begin
+          CopyFileInfoWithoutNames(FileInfo.Base, VfsItem.Info.Base);
+        end;
+
+        VfsIsRunning := VfsWasRunning;
+      end;
+
+      Leave;
+    end; // .with
+  end; // .if
+end; // .function RefreshMappedFile
+
 begin
   VfsCritSection.Init;
-  VfsItems := DataLib.NewDict(Utils.OWNS_ITEMS, DataLib.CASE_SENSITIVE);
+  VfsItems    := DataLib.NewDict(Utils.OWNS_ITEMS, DataLib.CASE_SENSITIVE);
+  MappedFiles := DataLib.NewDict(not Utils.OWNS_ITEMS, DataLib.CASE_SENSITIVE);
+  Mappings    := DataLib.NewList(Utils.OWNS_ITEMS);
 end.

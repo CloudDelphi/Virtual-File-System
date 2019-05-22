@@ -16,6 +16,7 @@ exports
   VfsControl.RunVfs,
   VfsBase.PauseVfs,
   VfsBase.ResetVfs,
+  VfsBase.RefreshVfs,
   VfsBase.CallWithoutVfs;
 
 
