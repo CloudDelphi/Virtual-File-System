@@ -11,7 +11,8 @@ uses
   Utils, WinNative, Concur,
   StrLib, Alg,
   VfsBase, VfsUtils, VfsPatching,
-  VfsDebug, VfsApiDigger, VfsOpenFiles;
+  VfsDebug, VfsApiDigger, VfsOpenFiles,
+  {FIXME DELETEME} DlgMes;
 
 
 (* Installs VFS hooks, if not already installed, in a thread-safe manner *)
@@ -278,9 +279,9 @@ end; // .function Hook_NtCreateFile
 
 function Hook_NtClose (OrigFunc: WinNative.TNtClose; hData: HANDLE): NTSTATUS; stdcall;
 begin
-  if VfsDebug.LoggingEnabled then begin
-    WriteLog('[ENTER] NtClose', Format('Handle: %x', [integer(hData)]));
-  end;
+  // if VfsDebug.LoggingEnabled then begin
+  //   WriteLog('[ENTER] NtClose', Format('Handle: %x', [integer(hData)]));
+  // end;
 
   with VfsOpenFiles.OpenFilesCritSection do begin
     Enter;
@@ -294,9 +295,9 @@ begin
     Leave;
   end;
   
-  if VfsDebug.LoggingEnabled then begin
-    WriteLog('[LEAVE] NtClose', Format('Status: %x', [integer(result)]));
-  end;
+  // if VfsDebug.LoggingEnabled then begin
+  //   WriteLog('[LEAVE] NtClose', Format('Status: %x', [integer(result)]));
+  // end;  
 end; // .function Hook_NtClose
 
 function IsSupportedFileInformationClass (FileInformationClass: integer): boolean;
@@ -358,6 +359,9 @@ begin
   BytesWritten := StructBaseSize + FileNameBufSize;
 end; // .function ConvertFileInfoStruct
 
+const
+  MASK_ALL_FILES: WideString = '*'#0;
+
 function Hook_NtQueryDirectoryFile (OrigFunc: WinNative.TNtQueryDirectoryFile; FileHandle: HANDLE; Event: HANDLE; ApcRoutine: pointer; ApcContext: PVOID; Io: PIO_STATUS_BLOCK; Buffer: PVOID;
                                     BufLength: ULONG; InfoClass: integer (* FILE_INFORMATION_CLASS *); SingleEntry: BOOLEAN; {n} Mask: PUNICODE_STRING; RestartScan: BOOLEAN): NTSTATUS; stdcall;
 const
@@ -373,7 +377,7 @@ type
 var
 {Un} OpenedFile:             TOpenedFile;
 {Un} FileInfo:               TFileInfo;
-{n}  BufCurret:              pointer;
+{n}  BufCaret:               pointer;
 {n}  PrevEntry:              PPrevEntry;
      BufSize:                integer;
      BufSizeLeft:            integer;
@@ -389,16 +393,11 @@ var
 begin
   OpenedFile := nil;
   FileInfo   := nil;
-  BufCurret  := nil;
+  BufCaret   := nil;
   PrevEntry  := nil;
-  BufSize    := 0;
+  BufSize    := BufLength;
   // * * * * * //
   with VfsOpenFiles.OpenFilesCritSection do begin
-    if Mask = nil then begin
-      EmptyMask.Reset;
-      Mask := @EmptyMask;
-    end;
-
     if VfsDebug.LoggingEnabled then begin
       WriteLog('[ENTER] NtQueryDirectoryFile', Format('Handle: %x. InfoClass: %s. Mask: %s. SingleEntry: %d', [Int(FileHandle), WinNative.FileInformationClassToStr(InfoClass), string(Mask.ToWideStr()), ord(SingleEntry)]));
     end;
@@ -408,48 +407,56 @@ begin
     OpenedFile  := VfsOpenFiles.GetOpenedFile(FileHandle);
     VfsIsActive := VfsBase.IsVfsActive;
 
-    if (OpenedFile = nil) or (Event <> 0) or (ApcRoutine <> nil) or (ApcContext <> nil) or (not VfsIsActive) then begin
+    if RestartScan then begin
+      SysUtils.FreeAndNil(OpenedFile.DirListing);
+    end;
+
+    if (OpenedFile = nil) or (not IsSupportedFileInformationClass(InfoClass) and (OpenedFile.DirListing = nil)) or (Event <> 0) or (ApcRoutine <> nil) or (ApcContext <> nil) or (not VfsIsActive) then begin
       Leave;
       WriteLog('[INNER] NtQueryDirectoryFile', Format('Calling native NtQueryDirectoryFile. OpenedFileRec: %x, VfsIsOn: %d, Event: %d. ApcRoutine: %d. ApcContext: %d', [Int(OpenedFile), ord(VfsIsActive), Int(Event), Int(ApcRoutine), Int(ApcContext)]));
       result := OrigFunc(FileHandle, Event, ApcRoutine, ApcContext, Io, Buffer, BufLength, InfoClass, SingleEntry, Mask, RestartScan);
     end else begin
       int(Io.Information) := 0;
       result              := STATUS_SUCCESS;
+      Proceed             := true;
 
-      if RestartScan then begin
-        SysUtils.FreeAndNil(OpenedFile.DirListing);
+      // Disallow nil buffer
+      if Proceed and (Buffer = nil) then begin
+        Proceed := false;
+        result  := STATUS_ACCESS_VIOLATION;
       end;
 
-      OpenedFile.FillDirListing(Mask.ToWideStr());
-
-      Proceed := (Buffer <> nil) and (BufLength > 0);
-
-      // Validate buffer
-      if not Proceed then begin
-        result := STATUS_INVALID_BUFFER_SIZE;
-      end else begin
-        BufSize := Utils.IfThen(int(BufLength) > 0, int(BufLength), High(int));
+      // Validate buffer size
+      if Proceed and (int(BufLength) < WinNative.GetFileInformationClassSize(InfoClass)) then begin
+        Proceed := false;
+        result  := STATUS_INFO_LENGTH_MISMATCH;
       end;
-
+  
       // Validate information class
-      if Proceed then begin
-        Proceed := IsSupportedFileInformationClass(InfoClass);
+      if Proceed and not IsSupportedFileInformationClass(InfoClass) then begin
+        Proceed := false;
+        result  := STATUS_INVALID_INFO_CLASS;
+      end;
 
-        if not Proceed then begin
-          result := STATUS_INVALID_INFO_CLASS;
+      // Fill internal listing
+      if OpenedFile.DirListing = nil then begin
+        // NIL mask must treated as *
+        if Mask = nil then begin
+          EmptyMask.AssignExistingStr(MASK_ALL_FILES);
+          Mask := @EmptyMask;
         end;
+
+        OpenedFile.FillDirListing(Mask.ToWideStr());
       end;
 
       // Signal of scanning end, if necessary
-      if Proceed then begin
-        Proceed := not OpenedFile.DirListing.IsEnd;
+      if Proceed and OpenedFile.DirListing.IsEnd then begin
+        Proceed := false;
 
-        if not Proceed then begin
-          if OpenedFile.DirListing.Count > 0 then begin
-            result := STATUS_NO_MORE_FILES;
-          end else begin
-            result := STATUS_NO_SUCH_FILE;
-          end;
+        if OpenedFile.DirListing.Count > 0 then begin
+          result := STATUS_NO_MORE_FILES;
+        end else begin
+          result := STATUS_NO_SUCH_FILE;
         end;
       end;
 
@@ -459,13 +466,13 @@ begin
           WriteLog('[INNER] NtQueryDirectoryFile', Format('Writing entries for buffer of size %d. Single entry: %d', [BufSize, ord(SingleEntry)]));
         end;
 
-        BufCurret    := Buffer;
+        BufCaret     := Buffer;
         BytesWritten := 1;
 
         while (BytesWritten > 0) and OpenedFile.DirListing.GetNextItem(FileInfo) do begin
           // Align next record to 8-bytes boundary from Buffer start
-          BufCurret   := pointer(int(Buffer) + Alg.IntRoundToBoundary(int(Io.Information), ENTRIES_ALIGNMENT));
-          BufSizeLeft := BufSize - (int(BufCurret) - int(Buffer));
+          BufCaret    := pointer(int(Buffer) + Alg.IntRoundToBoundary(int(Io.Information), ENTRIES_ALIGNMENT));
+          BufSizeLeft := BufSize - (int(BufCaret) - int(Buffer));
 
           IsFirstEntry := OpenedFile.DirListing.FileInd = 1;
 
@@ -475,14 +482,14 @@ begin
             TruncatedNamesStrategy := DONT_TRUNCATE_NAMES;
           end;
 
-          StructConvertResult := ConvertFileInfoStruct(@FileInfo.Data, FILE_INFORMATION_CLASS(byte(InfoClass)), BufCurret, BufSizeLeft, TruncatedNamesStrategy, BytesWritten);
+          StructConvertResult := ConvertFileInfoStruct(@FileInfo.Data, FILE_INFORMATION_CLASS(byte(InfoClass)), BufCaret, BufSizeLeft, TruncatedNamesStrategy, BytesWritten);
 
           if VfsDebug.LoggingEnabled then begin
             EntryName := Copy(FileInfo.Data.FileName, 1, Min(BytesWritten - WinNative.GetFileInformationClassSize(InfoClass), FileInfo.Data.Base.FileNameLength) div 2);
             WriteLog('[INNER] NtQueryDirectoryFile', 'Written entry: ' + EntryName);
           end;
 
-          with PFILE_ID_BOTH_DIR_INFORMATION(BufCurret)^ do begin
+          with PFILE_ID_BOTH_DIR_INFORMATION(BufCaret)^ do begin
             NextEntryOffset := 0;
             FileIndex       := 0;
           end;
@@ -491,8 +498,9 @@ begin
             OpenedFile.DirListing.SeekRel(-1);
 
             if IsFirstEntry then begin
-              result := STATUS_BUFFER_TOO_SMALL;
-            end;
+              result := STATUS_INFO_LENGTH_MISMATCH;
+              VarDump([BufLength, WinNative.GetFileInformationClassSize(InfoClass), BytesWritten, '---', Buffer, BufCaret, BufSize]);
+            end;            
           end else if StructConvertResult = TRUNCATED_NAME then begin
             if IsFirstEntry then begin
               result := STATUS_BUFFER_OVERFLOW;
@@ -502,17 +510,17 @@ begin
             end;
           end else if StructConvertResult = COPIED_ALL then begin
             if PrevEntry <> nil then begin
-              int(Io.Information) := int(BufCurret) - int(Buffer) + BytesWritten;
+              int(Io.Information) := int(BufCaret) - int(Buffer) + BytesWritten;
             end else begin
               int(Io.Information) := BytesWritten;
             end;
           end; // .else
 
           if (BytesWritten > 0) and (PrevEntry <> nil) then begin
-            PrevEntry.NextEntryOffset := cardinal(int(BufCurret) - int(PrevEntry));
+            PrevEntry.NextEntryOffset := cardinal(int(BufCaret) - int(PrevEntry));
           end;
 
-          PrevEntry := BufCurret;
+          PrevEntry := BufCaret;
 
           if SingleEntry then begin
             BytesWritten := 0;

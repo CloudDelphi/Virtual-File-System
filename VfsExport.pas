@@ -43,11 +43,46 @@ begin
   result := VfsControl.MapModsFromList(WideString(RootDir), WideString(ModsDir), WideString(ModListFile), Flags);
 end;
 
+procedure ConsoleLoggingProc (Operation, Message: pchar); stdcall;
+begin
+  WriteLn('>> ', string(Operation), ': ', string(Message), #13#10);
+end;
+
+(* Allocates console and install logger, writing messages to console *)
+procedure InstallConsoleLogger; stdcall;
+var
+  Rect:    TSmallRect;
+  BufSize: TCoord;
+  hIn:     THandle;
+  hOut:    THandle;
+
+begin
+  AllocConsole;
+  SetConsoleCP(GetACP);
+  SetConsoleOutputCP(GetACP);
+  hIn                       := GetStdHandle(STD_INPUT_HANDLE);
+  hOut                      := GetStdHandle(STD_OUTPUT_HANDLE);
+  pinteger(@System.Input)^  := hIn;
+  pinteger(@System.Output)^ := hOut;
+  BufSize.x                 := 120;
+  BufSize.y                 := 1000;
+  SetConsoleScreenBufferSize(hOut, BufSize);
+  Rect.Left                 := 0;
+  Rect.Top                  := 0;
+  Rect.Right                := 120 - 1;
+  Rect.Bottom               := 50 - 1;
+  SetConsoleWindowInfo(hOut, true, Rect);
+  SetConsoleTextAttribute(hOut, (0 shl 4) or $0F);
+
+  VfsDebug.SetLoggingProc(@ConsoleLoggingProc);
+end; // .procedure InitConsole;
+
 exports
   MapDir,
   MapDirA,
   MapModsFromList,
-  MapModsFromListA;
+  MapModsFromListA,
+  InstallConsoleLogger;
 
 // var s: string;
 // begin

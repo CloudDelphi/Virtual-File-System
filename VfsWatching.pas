@@ -348,8 +348,8 @@ var
   DirChange: TDirChange;
 
 begin
-  WatcherCritSection.Init;
-  RunWatcher(GetCurrentDir + '\Tests\', 250);
+  // WatcherCritSection.Init;
+  // RunWatcher(GetCurrentDir + '\Tests\', 250);
 
   // with ReadDirChanges('D:') do begin
   //   while IterNext(DirChange, 0) do begin
