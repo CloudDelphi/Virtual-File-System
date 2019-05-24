@@ -31,12 +31,11 @@ const
 type 
   TDirChangeAction = (NOTIFY_FILE_ADDED, NOTIFY_FILE_REMOVED, NOTIFY_FILE_MODIFIED, NOTIFY_FILE_RENAMED_FROM_NAME, NOTIFY_FILE_RENAMED_TO_NAME,
                       NOTIFY_STOP_EVENT, NOTIFY_TIMEOUT, NOTIFY_TOO_MANY_CHANGES, NOTIFY_UNKNOWN_ACTION);
-  TDirChangeFilter = set of TDirChangeAction;
 
 const
-  NOTIFY_ALL    = [NOTIFY_FILE_ADDED, NOTIFY_FILE_REMOVED, NOTIFY_FILE_MODIFIED, NOTIFY_FILE_RENAMED_FROM_NAME, NOTIFY_FILE_RENAMED_TO_NAME];
-  NO_STOP_EVENT = 0;
-  INFINITE      = Windows.INFINITE;
+  NOTIFY_ESSENTIAL = FILE_NOTIFY_CHANGE_FILE_NAME or FILE_NOTIFY_CHANGE_DIR_NAME or FILE_NOTIFY_CHANGE_ATTRIBUTES or FILE_NOTIFY_CHANGE_SIZE or FILE_NOTIFY_CHANGE_CREATION;
+  NO_STOP_EVENT    = 0;
+  INFINITE         = Windows.INFINITE;
 
 type
   (* Directory change record *)
@@ -48,7 +47,7 @@ type
   end;
 
   IDirChangesIterator = interface
-    function IterNext ({out} var DirChange: TDirChange; StopEvent: THandle = 0; Timeout: integer = integer(Windows.INFINITE); NotifyFilter: TDirChangeFilter = NOTIFY_ALL): boolean;
+    function IterNext ({out} var DirChange: TDirChange; StopEvent: THandle = 0; Timeout: integer = integer(Windows.INFINITE); NotifyFilter: cardinal = NOTIFY_ESSENTIAL): boolean;
   end;
 
   TDirChangesIterator = class (Utils.TManagedObject, IDirChangesIterator)
@@ -68,7 +67,7 @@ type
     constructor Create (const DirPath: WideString); overload;
     destructor Destroy; override;
     
-    function IterNext ({out} var DirChange: TDirChange; StopEvent: THandle = 0; Timeout: integer = integer(Windows.INFINITE); NotifyFilter: TDirChangeFilter = NOTIFY_ALL): boolean;
+    function IterNext ({out} var DirChange: TDirChange; StopEvent: THandle = 0; Timeout: integer = integer(Windows.INFINITE); NotifyFilter: cardinal = NOTIFY_ESSENTIAL): boolean;
   end; // .class TDirChangesIterator
 
 var
@@ -131,18 +130,7 @@ begin
   end;
 end;
 
-function DirChangeFilterToNative (Filter: TDirChangeFilter): integer;
-begin
-  result := 0;
-
-  if NOTIFY_FILE_ADDED             in Filter then result := result or Windows.FILE_ACTION_ADDED;
-  if NOTIFY_FILE_REMOVED           in Filter then result := result or Windows.FILE_ACTION_REMOVED;
-  if NOTIFY_FILE_MODIFIED          in Filter then result := result or Windows.FILE_ACTION_MODIFIED;
-  if NOTIFY_FILE_RENAMED_FROM_NAME in Filter then result := result or Windows.FILE_ACTION_RENAMED_OLD_NAME;
-  if NOTIFY_FILE_RENAMED_TO_NAME   in Filter then result := result or Windows.FILE_ACTION_RENAMED_NEW_NAME;
-end;
-
-function TDirChangesIterator.IterNext ({out} var DirChange: TDirChange; StopEvent: THandle = 0; Timeout: integer = integer(Windows.INFINITE); NotifyFilter: TDirChangeFilter = NOTIFY_ALL): boolean;
+function TDirChangesIterator.IterNext ({out} var DirChange: TDirChange; StopEvent: THandle = 0; Timeout: integer = integer(Windows.INFINITE); NotifyFilter: cardinal = NOTIFY_ESSENTIAL): boolean;
 const
   WATCH_SUBTREE   = true;
   WAIT_OVERLAPPED = true;
@@ -187,7 +175,7 @@ begin
     
     Self.fBufSize := 0;
     Self.fBufPos  := 0;
-    result        := Windows.ReadDirectoryChangesW(Self.fDirHandle, @Self.fBuf, sizeof(Self.fBuf), WATCH_SUBTREE, DirChangeFilterToNative(NotifyFilter), @Dummy, @AsyncRes, nil);
+    result        := Windows.ReadDirectoryChangesW(Self.fDirHandle, @Self.fBuf, sizeof(Self.fBuf), WATCH_SUBTREE, NotifyFilter, @Dummy, @AsyncRes, nil);
 
     if result then begin
       DirChange.FilePath := '';
