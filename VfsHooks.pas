@@ -489,9 +489,11 @@ begin
             WriteLog('[INNER] NtQueryDirectoryFile', 'Written entry: ' + EntryName);
           end;
 
-          with PFILE_ID_BOTH_DIR_INFORMATION(BufCaret)^ do begin
-            NextEntryOffset := 0;
-            FileIndex       := 0;
+          if StructConvertResult <> TOO_SMALL_BUF then begin
+            with PFILE_ID_BOTH_DIR_INFORMATION(BufCaret)^ do begin
+              NextEntryOffset := 0;
+              FileIndex       := 0;
+            end;
           end;
 
           if StructConvertResult = TOO_SMALL_BUF then begin
@@ -499,7 +501,6 @@ begin
 
             if IsFirstEntry then begin
               result := STATUS_INFO_LENGTH_MISMATCH;
-              VarDump([BufLength, WinNative.GetFileInformationClassSize(InfoClass), BytesWritten, '---', Buffer, BufCaret, BufSize]);
             end;            
           end else if StructConvertResult = TRUNCATED_NAME then begin
             if IsFirstEntry then begin

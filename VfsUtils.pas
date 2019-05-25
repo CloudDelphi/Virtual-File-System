@@ -79,7 +79,7 @@ type
 
   TSysDirScanner = class (Utils.TManagedObject, ISysDirScanner)
    protected const
-     BUF_SIZE = (sizeof(WinNative.FILE_ID_BOTH_DIR_INFORMATION) + MAX_FILENAME_SIZE) * 10;
+     BUF_SIZE = 65000;
 
    protected
     fOwnsDirHandle: boolean;
