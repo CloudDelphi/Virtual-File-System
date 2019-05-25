@@ -343,55 +343,49 @@ end;
 
 function RunVfs (DirListingOrder: TDirListingSortType): boolean;
 begin
-  result := not DisableVfsForThisThread;
+  result := true;
 
-  if result then begin
-    with VfsCritSection do begin
-      Enter;
+  with VfsCritSection do begin
+    Enter;
 
-      if not VfsIsRunning then begin
-        if not VfsTreeIsBuilt then begin
-          VfsDirListingOrder := DirListingOrder;
-          BuildVfsItemsTree();
-          SortVfsDirListings(DirListingOrder);
-          VfsTreeIsBuilt := true;
-        end;
-        
-        VfsIsRunning := true;
+    if not VfsIsRunning then begin
+      if not VfsTreeIsBuilt then begin
+        VfsDirListingOrder := DirListingOrder;
+        BuildVfsItemsTree();
+        SortVfsDirListings(DirListingOrder);
+        VfsTreeIsBuilt := true;
       end;
+      
+      VfsIsRunning := true;
+    end;
 
-      Leave;
-    end; // .with
-  end; // .if
+    Leave;
+  end; // .with
 end; // .function RunVfs
 
 function PauseVfs: LONGBOOL; stdcall;
 begin
-  result := not DisableVfsForThisThread;
+  result := true;
 
-  if result then begin
-    with VfsCritSection do begin
-      Enter;
-      VfsIsRunning := false;
-      Leave;
-    end;
+  with VfsCritSection do begin
+    Enter;
+    VfsIsRunning := false;
+    Leave;
   end;
 end;
 
 function ResetVfs: LONGBOOL; stdcall;
 begin
-  result := not DisableVfsForThisThread;
+  result := true;
 
-  if result then begin
-    with VfsCritSection do begin
-      Enter;
-      VfsItems.Clear;
-      MappedFiles.Clear;
-      Mappings.Clear;
-      VfsIsRunning   := false;
-      VfsTreeIsBuilt := false;
-      Leave;
-    end;
+  with VfsCritSection do begin
+    Enter;
+    VfsItems.Clear;
+    MappedFiles.Clear;
+    Mappings.Clear;
+    VfsIsRunning   := false;
+    VfsTreeIsBuilt := false;
+    Leave;
   end;
 end;
 
@@ -631,37 +625,33 @@ var
   i:             integer;
 
 begin
-  result := not DisableVfsForThisThread;
+  with VfsCritSection do begin
+    Enter;
+    result := VfsTreeIsBuilt;
 
-  if result then begin
-    with VfsCritSection do begin
-      Enter;
-      result := VfsTreeIsBuilt;
+    if result then begin
+      VfsItems.Clear;
+      MappedFiles.Clear;
+      VfsWasRunning  := VfsIsRunning;
+      VfsIsRunning   := false;
+      VfsTreeIsBuilt := false;
 
-      if result then begin
-        VfsItems.Clear;
-        MappedFiles.Clear;
-        VfsWasRunning  := VfsIsRunning;
-        VfsIsRunning   := false;
-        VfsTreeIsBuilt := false;
-
-        for i := 0 to Mappings.Count - 1 do begin
-          with TMapping(Mappings[i]) do begin
-            MapDir(AbsVirtPath, AbsRealPath, OverwriteExisting, Flags);
-          end;
-        end;
-
-        if VfsWasRunning then begin
-          BuildVfsItemsTree();
-          SortVfsDirListings(VfsDirListingOrder);
-          VfsTreeIsBuilt := true;
-          VfsIsRunning   := true;
+      for i := 0 to Mappings.Count - 1 do begin
+        with TMapping(Mappings[i]) do begin
+          MapDir(AbsVirtPath, AbsRealPath, OverwriteExisting, Flags);
         end;
       end;
 
-      Leave;
-    end; // .with
-  end; // .if
+      if VfsWasRunning then begin
+        BuildVfsItemsTree();
+        SortVfsDirListings(VfsDirListingOrder);
+        VfsTreeIsBuilt := true;
+        VfsIsRunning   := true;
+      end;
+    end;
+
+    Leave;
+  end; // .with
 end; // .function RefreshVfs
 
 function RefreshMappedFile (const FilePath: WideString): boolean;
@@ -674,30 +664,26 @@ var
 begin
   VfsItem := nil;
   // * * * * * //
-  result := not DisableVfsForThisThread;
+  with VfsCritSection do begin
+    Enter;
+    result := VfsTreeIsBuilt;
 
-  if result then begin
-    with VfsCritSection do begin
-      Enter;
-      result := VfsTreeIsBuilt;
+    if result then begin
+      VfsWasRunning := VfsIsRunning;
+      VfsIsRunning  := false;
+      AbsRealPath   := NormalizePath(FilePath);
+      VfsItem       := TVfsItem(MappedFiles[WideStrToCaselessKey(AbsRealPath)]);
+      result        := (VfsItem <> nil) and GetFileInfo(AbsRealPath, FileInfo);
 
       if result then begin
-        VfsWasRunning := VfsIsRunning;
-        VfsIsRunning  := false;
-        AbsRealPath   := NormalizePath(FilePath);
-        VfsItem       := TVfsItem(MappedFiles[WideStrToCaselessKey(AbsRealPath)]);
-        result        := (VfsItem <> nil) and GetFileInfo(AbsRealPath, FileInfo);
-
-        if result then begin
-          CopyFileInfoWithoutNames(FileInfo.Base, VfsItem.Info.Base);
-        end;
-
-        VfsIsRunning := VfsWasRunning;
+        CopyFileInfoWithoutNames(FileInfo.Base, VfsItem.Info.Base);
       end;
 
-      Leave;
-    end; // .with
-  end; // .if
+      VfsIsRunning := VfsWasRunning;
+    end;
+
+    Leave;
+  end; // .with
 end; // .function RefreshMappedFile
 
 begin

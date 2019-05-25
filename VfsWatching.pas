@@ -10,7 +10,7 @@ unit VfsWatching;
 uses
   Windows, SysUtils, Math,
   Utils, Concur, WinUtils, StrLib, WinNative,
-  VfsBase, VfsUtils, {FIXME} DlgMes;
+  VfsBase, VfsUtils;
 
 
 (* Spawns separate thread, which starts recursive monitoring for changes in specified directory.
@@ -253,7 +253,6 @@ begin
         if NeedFullRescan and (PlannedRescanTime <= CurrentTime) then begin
           VfsBase.RefreshVfs;
           NeedFullRescan := false;
-          VarDump(['Fully rescanned']);
         end;
 
         if DirChangesScanner = nil then begin
@@ -283,7 +282,6 @@ begin
           end else if DirChange.Action = NOTIFY_FILE_MODIFIED then begin
             if not NeedFullRescan then begin
               VfsBase.RefreshMappedFile(DirChange.FilePath);
-              VarDump(['Updated ' + DirChange.FilePath]);
             end;
             
             LastChangeTime := WinUtils.GetMicroTime;
