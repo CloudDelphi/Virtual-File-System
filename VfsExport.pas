@@ -8,7 +8,7 @@ unit VfsExport;
 
 uses
   Windows,
-  VfsDebug, VfsBase, VfsControl, DlgMes, Files, FilesEx;
+  VfsDebug, VfsBase, VfsControl, VfsWatching;
 
 exports
   VfsDebug.SetLoggingProc,
@@ -41,6 +41,11 @@ end;
 function MapModsFromListA (const RootDir, ModsDir, ModListFile: PAnsiChar; Flags: integer = 0): LONGBOOL; stdcall;
 begin
   result := VfsControl.MapModsFromList(WideString(RootDir), WideString(ModsDir), WideString(ModListFile), Flags);
+end;
+
+function RunWatcher (const WatchDir: PWideChar; DebounceInterval: integer): LONGBOOL; stdcall;
+begin
+  result := VfsWatching.RunWatcher(WatchDir, DebounceInterval);
 end;
 
 procedure ConsoleLoggingProc (Operation, Message: pchar); stdcall;
@@ -82,12 +87,7 @@ exports
   MapDirA,
   MapModsFromList,
   MapModsFromListA,
+  RunWatcher,
   InstallConsoleLogger;
 
-// var s: string;
-// begin
-//   assert(MapModsFromListA('D:\Heroes 3', 'D:\Heroes 3\Mods', 'D:\Heroes 3\Mods\list.txt'));
-//   VfsControl.RunVfs(SORT_FIFO);
-//   ReadFileContents('D:\Heroes 3\Data\s\pHoenix.erm', s);
-//   VarDump([GetFileList('D:\Heroes 3\Data\s\*', FILES_AND_DIRS).ToText(#13#10)]);
 end.

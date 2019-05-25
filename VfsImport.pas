@@ -28,6 +28,11 @@ function MapModsFromList (const RootDir, ModsDir, ModListFile: PWideChar; Flags:
 (* Runs all VFS subsystems, unless VFS is already running *)
 function RunVfs (DirListingOrder: TDirListingSortType): LONGBOOL; stdcall; external 'vfs.dll';
 
+(* Spawns separate thread, which starts recursive monitoring for changes in specified directory.
+   VFS will be fully refreshed or smartly updated on any change. Debounce interval specifies
+   time in msec to wait after last change before running full VFS rescanning routine *)
+function RunWatcher (const WatchDir: PWideChar; DebounceInterval: integer): LONGBOOL; stdcall; external 'vfs.dll';
+
 (* Allocates console and install logger, writing messages to console *)
 procedure InstallConsoleLogger; stdcall; external 'vfs.dll';
 

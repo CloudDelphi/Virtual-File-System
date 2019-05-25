@@ -10,7 +10,13 @@ unit VfsWatching;
 uses
   Windows, SysUtils, Math,
   Utils, Concur, WinUtils, StrLib, WinNative,
-  VfsBase, VfsUtils;
+  VfsBase, VfsUtils, {FIXME} DlgMes;
+
+
+(* Spawns separate thread, which starts recursive monitoring for changes in specified directory.
+   VFS will be fully refreshed or smartly updated on any change. Debounce interval specifies
+   time in msec to wait after last change before running full VFS rescanning routine *)
+function RunWatcher (const WatchDir: WideString; DebounceInterval: integer): boolean;
 
 
 (***)  implementation  (***)
@@ -74,8 +80,8 @@ var
   WatcherCritSection:        Concur.TCritSection;
   AbsWatcherDir:             WideString;
   WatcherDebounceInterval:   integer;
-  WatcherStopEvent:          THandle;
-  WatcherIsRunning:          boolean;
+  WatcherStopEvent:          THandle = 0;
+  WatcherIsRunning:          boolean = false;
   WatcherThreadHandle:       THandle;
   WatcherThreadId:           cardinal;
 
@@ -247,6 +253,7 @@ begin
         if NeedFullRescan and (PlannedRescanTime <= CurrentTime) then begin
           VfsBase.RefreshVfs;
           NeedFullRescan := false;
+          VarDump(['Fully rescanned']);
         end;
 
         if DirChangesScanner = nil then begin
@@ -276,6 +283,7 @@ begin
           end else if DirChange.Action = NOTIFY_FILE_MODIFIED then begin
             if not NeedFullRescan then begin
               VfsBase.RefreshMappedFile(DirChange.FilePath);
+              VarDump(['Updated ' + DirChange.FilePath]);
             end;
             
             LastChangeTime := WinUtils.GetMicroTime;
@@ -313,7 +321,36 @@ begin
     end;
 
     Leave;
-  end;
+  end; // .with
 end; // .function RunWatcher
 
+function StopWatcher: LONGBOOL;
+const
+  MANUAL_RESET = true;
+
+begin
+  with WatcherCritSection do begin
+    Enter;
+
+    result := WatcherIsRunning;
+
+    if result then begin
+      Windows.SetEvent(WatcherStopEvent);
+      result := Windows.WaitForSingleObject(WatcherThreadHandle, Windows.INFINITE) = Windows.WAIT_OBJECT_0;
+
+      if result then begin
+        Windows.CloseHandle(WatcherThreadHandle);
+        Windows.CloseHandle(WatcherStopEvent);
+        WatcherThreadHandle := 0;
+        WatcherStopEvent    := 0;
+        WatcherIsRunning    := false;
+      end;
+    end;
+
+    Leave;
+  end; // .with
+end; // .function StopWatcher
+
+begin
+  WatcherCritSection.Init;
 end.
