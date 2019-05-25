@@ -279,9 +279,9 @@ end; // .function Hook_NtCreateFile
 
 function Hook_NtClose (OrigFunc: WinNative.TNtClose; hData: HANDLE): NTSTATUS; stdcall;
 begin
-  // if VfsDebug.LoggingEnabled then begin
-  //   WriteLog('[ENTER] NtClose', Format('Handle: %x', [integer(hData)]));
-  // end;
+  if VfsDebug.LoggingEnabled then begin
+    WriteLog('[ENTER] NtClose', Format('Handle: %x', [integer(hData)]));
+  end;
 
   with VfsOpenFiles.OpenFilesCritSection do begin
     Enter;
@@ -295,9 +295,9 @@ begin
     Leave;
   end;
   
-  // if VfsDebug.LoggingEnabled then begin
-  //   WriteLog('[LEAVE] NtClose', Format('Status: %x', [integer(result)]));
-  // end;  
+  if VfsDebug.LoggingEnabled then begin
+    WriteLog('[LEAVE] NtClose', Format('Status: %x', [integer(result)]));
+  end;
 end; // .function Hook_NtClose
 
 function IsSupportedFileInformationClass (FileInformationClass: integer): boolean;

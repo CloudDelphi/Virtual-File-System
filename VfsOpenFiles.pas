@@ -117,7 +117,7 @@ begin
   end;
 
   // No real items added, maybe there is a need to add '.' and/or '..' manually
-  if VfsItemFound and (Self.DirListing.Count = NumVfsChildren) then begin
+  if VfsItemFound and (Self.DirListing.Count = NumVfsChildren) and not VfsUtils.IsRootDriveAbsPath(Self.AbsPath) then begin
     if VfsMatching.MatchPattern('.', Mask) then begin
       Self.DirListing.AddItem(@DirInfo, '.');
     end;

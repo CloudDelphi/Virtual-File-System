@@ -121,7 +121,10 @@ function NormalizePath (const Path: WideString; {n} HadTrailingDelim: pboolean =
    Optionally returns flag, whether path had trailing delim or not. *)
 function ToNtAbsPath (const Path: WideString; {n} HadTrailingDelim: pboolean = nil): WideString;
 
-(* Return true if path is valid absolute path to root drive like '\??\X:' with any/zero number of trailing slashes *)
+(* Return true if path is valid absolute path to root drive like 'X:' with any/zero number of trailing slashes *)
+function IsRootDriveAbsPath (const Path: WideString): boolean;
+
+(* Return true if path is valid absolute NT path to root drive like '\??\X:' with any/zero number of trailing slashes *)
 function IsNtRootDriveAbsPath (const Path: WideString): boolean;
 
 (* Adds backslash to path end, unless there is already existing one *)
@@ -138,7 +141,7 @@ function StripNtAbsPathPrefix (const Path: WideString): WideString;
 function SaveAndRet (Res: integer; out ResCopy): integer;
 
 (* Opens file/directory using absolute NT path and returns success flag *)
-function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = GENERIC_READ or SYNCHRONIZE): boolean;
+function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = FILE_GENERIC_READ): boolean;
 
 (* Returns TNativeFileInfo record for single file/directory. Short names and files indexes/ids in the result are always empty. *)
 function GetFileInfo (const FilePath: WideString; {OUT} var Res: TNativeFileInfo): boolean;
@@ -217,7 +220,7 @@ function NormalizeAbsPath (const Path: WideString; {n} HadTrailingDelim: pboolea
 begin
   result := StrLib.ExcludeTrailingBackslashW(Path, HadTrailingDelim);
 
-  if (Length(result) = 2) and (result[1] = ':') then begin
+  if (Length(result) = 2) and (result[2] = ':') then begin
     result := result + '\';
 
     if HadTrailingDelim <> nil then begin
@@ -239,6 +242,26 @@ begin
     result := '\??\' + result;
   end;
 end;
+
+function IsRootDriveAbsPath (const Path: WideString): boolean;
+const
+  MIN_VALID_LEN = Length('X:');
+
+var
+  i: integer;
+
+begin
+  result := (Length(Path) >= MIN_VALID_LEN) and (ord(Path[1]) < 256) and (char(Path[1]) in ['A'..'Z']) and (Path[2] = ':');
+
+  if result then begin
+    for i := MIN_VALID_LEN + 1 to Length(Path) do begin
+      if Path[i] <> '\' then begin
+        result := false;
+        exit;
+      end;
+    end;
+  end;
+end; // .function IsRootDriveAbsPath
 
 function IsNtRootDriveAbsPath (const Path: WideString): boolean;
 const
@@ -455,7 +478,7 @@ begin
   result := StrLib.Join(FileNames, #13#10);
 end;
 
-function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = GENERIC_READ or SYNCHRONIZE): boolean;
+function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = FILE_GENERIC_READ): boolean;
 var
   FilePathU:     WinNative.UNICODE_STRING;
   hFile:         Windows.THandle;
@@ -466,7 +489,9 @@ begin
   FilePathU.AssignExistingStr(NtAbsPath);
   ObjAttrs.Init(@FilePathU);
 
-  result := WinNative.NtOpenFile(@hFile, AccessMode, @ObjAttrs, @IoStatusBlock, FILE_SHARE_READ or FILE_SHARE_WRITE, ord(OpenMode) or FILE_SYNCHRONOUS_IO_NONALERT) = WinNative.STATUS_SUCCESS;
+
+  result := WinNative.NtOpenFile(@hFile, AccessMode, @ObjAttrs, @IoStatusBlock, FILE_SHARE_READ or FILE_SHARE_WRITE or FILE_SHARE_DELETE,
+                                 ord(OpenMode) or FILE_SYNCHRONOUS_IO_NONALERT or FILE_OPEN_FOR_BACKUP_INTENT) = WinNative.STATUS_SUCCESS;
 
   if result then begin
     Res := hFile;
@@ -488,7 +513,7 @@ begin
   FileAllInfo := @Buf;
   // * * * * * //
   NtAbsPath := ToNtAbsPath(FilePath); 
-  result    := SysOpenFile(NtAbsPath, hFile, OPEN_AS_ANY);
+  result    := SysOpenFile(NtAbsPath, hFile, OPEN_AS_ANY, STANDARD_RIGHTS_READ or FILE_READ_ATTRIBUTES or FILE_READ_EA or SYNCHRONIZE);
 
   if not result then begin
     exit;
@@ -549,7 +574,7 @@ var
 
 begin
   hDir := Windows.INVALID_HANDLE_VALUE;
-  SysOpenFile(ToNtAbsPath(DirPath), hDir, OPEN_AS_DIR);
+  SysOpenFile(ToNtAbsPath(DirPath), hDir, OPEN_AS_DIR, FILE_LIST_DIRECTORY or SYNCHRONIZE);
 
   Self.Create(hDir, Mask);
 
