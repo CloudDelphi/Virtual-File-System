@@ -662,20 +662,18 @@ end;
 
 procedure GetDirectoryListing (const SearchPath, FileMask: WideString; {Un} Exclude: TDict {OF CaselessKey => not NIL}; DirListing: TDirListing);
 var
-{O} Items:        {O} TList {OF TDirListingItem};
-{O} Item:         {O} TDirListingItem;
-    CompiledMask: Utils.TArrayOfByte;
-    i:            integer;
+{O} Items: {O} TList {OF TDirListingItem};
+{O} Item:  {O} TDirListingItem;
+    i:     integer;
 
 begin
   {!} Assert(DirListing <> nil);
-  Items        := DataLib.NewList(Utils.OWNS_ITEMS);
-  Item         := TDirListingItem.Create;
-  CompiledMask := VfsMatching.CompilePattern(FileMask);
+  Items := DataLib.NewList(Utils.OWNS_ITEMS);
+  Item  := TDirListingItem.Create;
   // * * * * * //
   with VfsUtils.SysScanDir(SearchPath, FileMask) do begin
     while IterNext(Item.Info.FileName, @Item.Info.Base) do begin     
-      if VfsMatching.MatchPattern(Item.Info.FileName, pointer(CompiledMask)) and ((Exclude = nil) or (Exclude[WideStrToCaselessKey(Item.Info.FileName)] = nil)) then begin
+      if (Exclude = nil) or (Exclude[WideStrToCaselessKey(Item.Info.FileName)] = nil) then begin
         Item.SearchName := StrLib.WideLowerCase(Item.Info.FileName);
         Items.Add(Item); Item := nil;
         Item := TDirListingItem.Create;
