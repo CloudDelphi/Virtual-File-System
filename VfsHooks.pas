@@ -11,8 +11,7 @@ uses
   Utils, WinNative, Concur,
   StrLib, Alg,
   VfsBase, VfsUtils, VfsPatching,
-  VfsDebug, VfsApiDigger, VfsOpenFiles,
-  {FIXME DELETEME} DlgMes;
+  VfsDebug, VfsApiDigger, VfsOpenFiles;
 
 
 (* Installs VFS hooks, if not already installed, in a thread-safe manner *)

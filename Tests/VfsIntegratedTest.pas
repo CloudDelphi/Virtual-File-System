@@ -56,7 +56,6 @@ begin
   VfsBase.MapDir(RootDir, VfsUtils.MakePath([RootDir, 'Mods\Apache']), DONT_OVERWRITE_EXISTING);
   VfsDebug.SetLoggingProc(LogSomething);
   VfsControl.RunVfs(VfsBase.SORT_FIFO);
-  //Windows.MessageBoxA(0, '', '', 0); FIXME DELETEME
 end;
 
 procedure TestIntegrated.TearDown;

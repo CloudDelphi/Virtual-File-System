@@ -9,7 +9,7 @@ unit VfsControl;
 uses
   Windows, SysUtils,
   Utils, WinUtils, TypeWrappers, DataLib, Files, StrLib,
-  VfsBase, VfsUtils, VfsHooks, VfsWatching, DlgMes, FilesEx {FIXME DELETEME};
+  VfsBase, VfsUtils, VfsHooks, VfsWatching;
 
 type
   (* Import *)
@@ -176,18 +176,4 @@ begin
   SysUtils.FreeAndNil(ModList);
 end; // .function MapModsFromList
 
-var s: string;
-begin
-  // MapModsFromList('D:\Heroes 3', 'D:\heroes 3\Mods', 'd:\heroes 3\mods\list.txt');
-  // RunVfs(SORT_FIFO);
-  // ReadFileContents('D:\heroes 3\data\s\__T.erm', s);
-  // s := copy(s, 1, 100);
-  // VarDump([s]);
-  // VfsBase.PauseVfs;
-  // VfsBase.RefreshVfs;
-  // VfsBase.RunVfs(SORT_FIFO);
-  // ReadFileContents('D:\heroes 3\data\s\__T.erm', s);
-  // s := copy(s, 1, 100);
-  // VarDump([s]);
-  // exit;
 end.

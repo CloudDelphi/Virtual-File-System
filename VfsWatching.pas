@@ -1,6 +1,6 @@
 unit VfsWatching;
 (*
-  Description: provides means to watch for mapped directories changes and refresh VFS.
+  Description: Provides means to watch for mapped directories changes and refresh VFS.
                Works unreliably when trying to watch the whole logical drive.
 *)
 
@@ -10,7 +10,7 @@ unit VfsWatching;
 uses
   Windows, SysUtils, Math,
   Utils, Concur, WinUtils, StrLib, WinNative,
-  VfsBase, VfsUtils, DlgMes, Files {FIXME DELETEME};
+  VfsBase, VfsUtils;
 
 
 (***)  implementation  (***)
@@ -216,22 +216,6 @@ begin
   result := TDirChangesIterator.Create(DirPath);
 end;
 
-// function ReadNotification (const DirPath: WideString; var NotificationHandle: THandle): boolean;
-// begin
-//   if IsValidHandle(NotificationHandle) then begin
-//     result := FindNextChangeNotification(NotificationHandle);
-
-//     if not result then begin
-//       Windows.FindCloseChangeNotification(NotificationHandle);
-//       NotificationHandle := INVALID_HANDLE_VALUE;
-//     end;
-//   end else begin
-//     NotificationHandle := FindFirstChangeNotificationW(PWideChar(DirPath), true, FILE_NOTIFY_CHANGE_FILE_NAME or FILE_NOTIFY_CHANGE_DIR_NAME or FILE_NOTIFY_CHANGE_ATTRIBUTES or
-//                                                                                  FILE_NOTIFY_CHANGE_SIZE or FILE_NOTIFY_CHANGE_LAST_WRITE);
-//     result := IsValidHandle(NotificationHandle);
-//   end;
-// end; // .function ReadNotification
-
 function WatcherThreadProc (Arg: integer): integer; stdcall;
 var
   IsEnd:             LONGBOOL;
@@ -243,8 +227,6 @@ var
   DummyEvent:        THandle;
   DirChangesScanner: IDirChangesIterator;
   DirChange:         TDirChange;
-
-  filesize: integer;
 
 begin
   DirChangesScanner := nil;
@@ -265,7 +247,6 @@ begin
         if NeedFullRescan and (PlannedRescanTime <= CurrentTime) then begin
           VfsBase.RefreshVfs;
           NeedFullRescan := false;
-          VarDump(['Rescaned']);
         end;
 
         if DirChangesScanner = nil then begin
@@ -274,7 +255,6 @@ begin
 
         // Failed to start watching directory
         if not DirChangesScanner.IterNext(DirChange, WatcherStopEvent, Utils.IfThen(boolean(NeedFullRescan), integer(PlannedRescanTime - CurrentTime), integer(Windows.INFINITE))) then begin
-          VarDump([':(', AbsWatcherDir]);
           // Force scanner recreation later
           DirChangesScanner := nil;
 
@@ -286,7 +266,6 @@ begin
           end;
         // Ok, got some signal
         end else begin
-          VarDump([ord(DirChange.Action), DirChange.FilePath]);
           if DirChange.Action = NOTIFY_STOP_EVENT then begin
             IsEnd := true;
           end else if DirChange.Action = NOTIFY_TIMEOUT then begin
@@ -297,13 +276,6 @@ begin
           end else if DirChange.Action = NOTIFY_FILE_MODIFIED then begin
             if not NeedFullRescan then begin
               VfsBase.RefreshMappedFile(DirChange.FilePath);
-              with VfsBase.GetThreadVfsDisabler do begin
-                EnableVfsForThread;
-                Files.GetFileSize(DirChange.FilePath, FileSize);
-                RestoreVfsForThread;
-              end;
-              
-              VarDump([DirChange.FilePath, 'New size is', FileSize], 'Updated');
             end;
             
             LastChangeTime := WinUtils.GetMicroTime;
@@ -344,18 +316,4 @@ begin
   end;
 end; // .function RunWatcher
 
-var
-  DirChange: TDirChange;
-
-begin
-  // WatcherCritSection.Init;
-  // RunWatcher(GetCurrentDir + '\Tests\', 250);
-
-  // with ReadDirChanges('D:') do begin
-  //   while IterNext(DirChange, 0) do begin
-  //     VarDump([ord(DirChange.Action), DirChange.FilePath]);
-  //   end;
-  // end;
-
-  // exit;
 end.
