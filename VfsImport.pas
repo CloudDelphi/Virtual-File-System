@@ -33,8 +33,17 @@ function RunVfs (DirListingOrder: TDirListingSortType): LONGBOOL; stdcall; exter
    time in msec to wait after last change before running full VFS rescanning routine *)
 function RunWatcher (const WatchDir: PWideChar; DebounceInterval: integer): LONGBOOL; stdcall; external 'vfs.dll';
 
+(* Frees buffer, that was transfered to client earlier using other VFS API *)
+procedure MemFree ({O} Buf: pointer); stdcall; external 'vfs.dll';
+
+(* Returns text with all applied mappings, separated via #13#10. If ShortenPaths is true, common part
+   of real and virtual paths is stripped. Call MemFree to release result buffer *)
+function GetMappingsReport: {O} PWideChar; stdcall; external 'vfs.dll';
+function GetMappingsReportA: {O} pchar; stdcall; external 'vfs.dll';
+
 (* Allocates console and install logger, writing messages to console *)
 procedure InstallConsoleLogger; stdcall; external 'vfs.dll';
+
 
 (***)  implementation  (***)
 

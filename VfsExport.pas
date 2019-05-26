@@ -8,6 +8,7 @@ unit VfsExport;
 
 uses
   Windows,
+  Utils,
   VfsDebug, VfsBase, VfsControl, VfsWatching;
 
 exports
@@ -46,6 +47,36 @@ end;
 function RunWatcher (const WatchDir: PWideChar; DebounceInterval: integer): LONGBOOL; stdcall;
 begin
   result := VfsWatching.RunWatcher(WatchDir, DebounceInterval);
+end;
+
+(* Frees buffer, that was transfered to client earlier using other VFS API *)
+procedure MemFree ({O} Buf: pointer); stdcall;
+begin
+  FreeMem(Buf);
+end;
+
+(* Returns text with all applied mappings, separated via #13#10. If ShortenPaths is true, common part
+   of real and virtual paths is stripped. Call MemFree to release result buffer *)
+function GetMappingsReport: {O} PWideChar; stdcall;
+var
+  Res: WideString;
+
+begin
+  result := nil;
+  Res    := VfsBase.GetMappingsReport;
+  GetMem(result, (Length(Res) + 1) * sizeof(WideChar));
+  Utils.CopyMem((Length(Res) + 1) * sizeof(WideChar), PWideChar(Res), result);
+end;
+
+function GetMappingsReportA: {O} pchar; stdcall;
+var
+  Res: string;
+
+begin
+  result := nil;
+  Res    := VfsBase.GetMappingsReport;
+  GetMem(result, Length(Res) + 1);
+  Utils.CopyMem(Length(Res) + 1, pchar(Res), result);
 end;
 
 procedure ConsoleLoggingProc (Operation, Message: pchar); stdcall;
@@ -88,6 +119,9 @@ exports
   MapModsFromList,
   MapModsFromListA,
   RunWatcher,
+  GetMappingsReport,
+  GetMappingsReportA,
+  MemFree,
   InstallConsoleLogger;
 
 end.

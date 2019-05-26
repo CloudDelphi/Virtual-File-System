@@ -140,6 +140,12 @@ function StripNtAbsPathPrefix (const Path: WideString): WideString;
 (* Saves API result in external variable and returns result as is *)
 function SaveAndRet (Res: integer; out ResCopy): integer;
 
+(* Returns attributes for file at given path *)
+function GetFileAttrs (const Path: WideString; {out} var Attrs: integer): boolean;
+
+(* Returns true if directory with given path exists *)
+function IsDir (const Path: WideString): boolean;
+
 (* Opens file/directory using absolute NT path and returns success flag *)
 function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = FILE_GENERIC_READ): boolean;
 
@@ -154,6 +160,7 @@ function SysScanDir (const DirPath, Mask: WideString): ISysDirScanner; overload;
    Applies filtering by mask to fix possible invalid native functions behavior, found at least on Win XP when
    tests were run on network drive *)
 procedure GetDirectoryListing (const SearchPath, FileMask: WideString; {Un} Exclude: TDict {OF CaselessKey => not NIL}; DirListing: TDirListing);
+
 
 (***)  implementation  (***)
 
@@ -478,6 +485,30 @@ begin
   result := StrLib.Join(FileNames, #13#10);
 end;
 
+function GetFileAttrs (const Path: WideString; {out} var Attrs: integer): boolean;
+const
+  INVALID_FILE_ATTRIBUTES = -1;
+
+var
+  Res: integer;
+
+begin
+  Res    := integer(Windows.GetFileAttributesW(PWideChar(Path)));
+  result := Res <> INVALID_FILE_ATTRIBUTES;
+
+  if result then begin
+    Attrs := Res;
+  end;
+end;
+
+function IsDir (const Path: WideString): boolean;
+var
+  FileAttrs: integer;
+
+begin
+  result := GetFileAttrs(Path, FileAttrs) and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileAttrs);
+end;
+
 function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = FILE_GENERIC_READ): boolean;
 var
   FilePathU:     WinNative.UNICODE_STRING;
@@ -521,7 +552,7 @@ begin
 
   if IsNtRootDriveAbsPath(NtAbsPath) then begin
     // Return fake info for root drive
-    result := SaveAndRet(Windows.GetFileAttributesW(PWideChar(StripNtAbsPathPrefix(NtAbsPath))), FileAllInfo.BasicInformation.FileAttributes) <> integer(Windows.INVALID_HANDLE_VALUE);
+    result := GetFileAttrs(StripNtAbsPathPrefix(NtAbsPath), integer(FileAllInfo.BasicInformation.FileAttributes));
 
     if result then begin
       FillChar(Res.Base, sizeof(Res.Base), 0);

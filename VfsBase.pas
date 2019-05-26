@@ -126,6 +126,10 @@ function MapDir (const VirtPath, RealPath: WideString; OverwriteExisting: boolea
 (* Calls specified function with a single argument and returns its result. VFS is disabled for current thread during function exection *)
 function CallWithoutVfs (Func: TSingleArgExternalFunc; Arg: pointer = nil): integer; stdcall;
 
+(* Returns text with all applied mappings, separated via #13#10. If ShortenPaths is true, common part
+   of real and virtual paths is stripped *)
+function GetMappingsReport: WideString;
+
 
 (***)  implementation  (***)
 
@@ -133,12 +137,13 @@ function CallWithoutVfs (Func: TSingleArgExternalFunc; Arg: pointer = nil): inte
 type
   (* Applied and remembered mapping. Used to refresh or report VFS *)
   TMapping = class
+    Applied:           LONGBOOL;
     AbsVirtPath:       WideString;
     AbsRealPath:       WideString;
-    OverwriteExisting: boolean;
+    OverwriteExisting: LONGBOOL;
     Flags:             integer;
 
-    class function Make (const AbsVirtPath, AbsRealPath: WideString; OverwriteExisting: boolean; Flags: integer): TMapping;
+    class function Make (Applied: boolean; const AbsVirtPath, AbsRealPath: WideString; OverwriteExisting: boolean; Flags: integer): TMapping;
   end;
 
 var
@@ -332,9 +337,10 @@ begin
   end;
 end; // .procedure BuildVfsItemsTree
 
-class function TMapping.Make (const AbsVirtPath, AbsRealPath: WideString; OverwriteExisting: boolean; Flags: integer): {O} TMapping;
+class function TMapping.Make (Applied: boolean; const AbsVirtPath, AbsRealPath: WideString; OverwriteExisting: boolean; Flags: integer): {O} TMapping;
 begin
   result                   := TMapping.Create;
+  result.Applied           := Applied;
   result.AbsVirtPath       := AbsVirtPath;
   result.AbsRealPath       := AbsRealPath;
   result.OverwriteExisting := OverwriteExisting;
@@ -468,7 +474,8 @@ begin
   Dest.EaSize         := Src.EaSize;
 end;
 
-(* Redirects single file/directory path (not including directory contents). Target must exist for success *)
+(* Redirects single file/directory path (not including directory contents). Returns redirected VFS item
+   for given real path if VFS item was successfully created/overwritten or it already existed and OverwriteExisting = false. *)
 function RedirectFile (const AbsVirtPath, AbsRealPath: WideString; {n} FileInfoPtr: WinNative.PFILE_ID_BOTH_DIR_INFORMATION; OverwriteExisting: boolean; Priority: integer): {Un} TVfsItem;
 const
   WIDE_NULL_CHAR_LEN = Length(#0);
@@ -550,7 +557,7 @@ begin
   end;
   
   DirVfsItem := RedirectFile(AbsVirtPath, AbsRealPath, FileInfoPtr, OverwriteExisting, Priority);
-  Success    := DirVfsItem <> nil;
+  Success    := (DirVfsItem <> nil) and ((DirVfsItem.RealPath = AbsRealPath) or VfsUtils.IsDir(AbsRealPath));
 
   if Success then begin
     VirtPathPrefix := AddBackslash(AbsVirtPath);
@@ -599,8 +606,8 @@ begin
     result      := (AbsVirtPath <> '') and (AbsRealPath <> '');
 
     if result then begin
-      Mappings.Add(TMapping.Make(AbsVirtPath, AbsRealPath, OverwriteExisting, Flags));
       result := _MapDir(AbsVirtPath, AbsRealPath, nil, OverwriteExisting, Flags, AUTO_PRIORITY) <> nil;
+      Mappings.Add(TMapping.Make(result, AbsVirtPath, AbsRealPath, OverwriteExisting, Flags));
     end;
 
     LeaveVfsConfig;
@@ -638,7 +645,7 @@ begin
 
       for i := 0 to Mappings.Count - 1 do begin
         with TMapping(Mappings[i]) do begin
-          MapDir(AbsVirtPath, AbsRealPath, OverwriteExisting, Flags);
+          TMapping(Mappings[i]).Applied := MapDir(AbsVirtPath, AbsRealPath, OverwriteExisting, Flags);
         end;
       end;
 
@@ -685,6 +692,126 @@ begin
     Leave;
   end; // .with
 end; // .function RefreshMappedFile
+
+function GetMappingsReport: WideString;
+const
+  COL_PATHS = 0;
+  COL_META  = 1;
+
+var
+{O} Buf:             StrLib.TStrBuilder;
+{O} Line:            StrLib.TStrBuilder;
+    Cols:            array [0..1] of array of WideString;
+    MaxPathColWidth: integer;
+    i:               integer;
+
+  procedure WriteMapping (Mapping: TMapping; LineN: integer);
+  var
+    StartPathPos:     integer;
+    MaxCommonPathLen: integer;
+    ShortestPath:     WideString;
+    LongestPath:      WideString;
+    i:                integer;
+
+  begin
+    {!} Assert(Mapping <> nil);
+    StartPathPos := 1;
+
+    if Length(Mapping.AbsRealPath) > Length(Mapping.AbsVirtPath) then begin
+      LongestPath  := Mapping.AbsRealPath;
+      ShortestPath := Mapping.AbsVirtPath;
+    end else begin
+      LongestPath  := Mapping.AbsVirtPath;
+      ShortestPath := Mapping.AbsRealPath;
+    end;
+
+    i                := 1;
+    MaxCommonPathLen := Length(ShortestPath);
+
+    while (i <= MaxCommonPathLen) and (ShortestPath[i] = LongestPath[i]) do begin
+      Inc(i);
+    end;
+
+    // Handle case: [xxx\yyy] zzz and [xxx\yyy]. Common part is [xxx]
+    if (Length(LongestPath) > MaxCommonPathLen) and (LongestPath[i] <> '\') then begin
+      while (i >= 2) and (LongestPath[i] <> '\') do begin
+        Dec(i);
+      end;
+    end
+    // Handle case: D:\App <= D:\Mods. Common part is D:
+    else if ShortestPath[i] = '\' then begin
+      Dec(i);
+    end;
+
+    StartPathPos := i;
+    Line.Clear;
+
+    if StartPathPos > 1 then begin
+      Line.AppendWide('$');
+    end;
+
+    Line.AppendWide(Copy(Mapping.AbsVirtPath, StartPathPos));
+    Line.AppendWide(' <= ');
+
+    if StartPathPos > 1 then begin
+      Line.AppendWide('$');
+    end;
+
+    Line.AppendWide(Copy(Mapping.AbsRealPath, StartPathPos));
+    
+    if not Mapping.Applied then begin
+      Line.AppendWide(' *MISS*');
+    end;
+
+    Cols[COL_PATHS][LineN] := Line.BuildWideStr;
+    MaxPathColWidth        := Max(MaxPathColWidth, Length(Cols[COL_PATHS][LineN]));
+
+    Line.Clear;
+    Line.AppendWide('[Overwrite = ' + IntToStr(ord(Mapping.OverwriteExisting)) + ', Flags = ' + IntToStr(Mapping.Flags));
+
+    if StartPathPos > 1 then begin
+      Line.AppendWide(', $ = "' + Copy(ShortestPath, 1, StartPathPos - 1) + '"]');
+    end else begin
+      Line.AppendWide(']');
+    end;
+
+    Cols[COL_META][LineN] := Line.BuildWideStr;
+  end; // .procedure WriteMapping
+
+  function FormatResultTable: WideString;
+  var
+    i: integer;
+
+  begin
+    for i := 0 to Mappings.Count - 1 do begin
+      Buf.AppendWide(Cols[COL_PATHS][i] + StringOfChar(WideChar(' '), MaxPathColWidth - Length(Cols[COL_PATHS][i]) + 1));
+      Buf.AppendWide(Cols[COL_META][i]);
+      
+      if i < Mappings.Count - 1 then begin
+        Buf.AppendWide(#13#10);
+      end;
+    end;
+
+    result := Buf.BuildWideStr;
+  end;
+
+begin
+  Buf  := StrLib.TStrBuilder.Create;
+  Line := StrLib.TStrBuilder.Create;
+  // * * * * * //
+  SetLength(Cols[COL_PATHS], Mappings.Count);
+  SetLength(Cols[COL_META],  Mappings.Count);
+  MaxPathColWidth := 0;
+
+  for i := 0 to Mappings.Count - 1 do begin
+    WriteMapping(TMapping(Mappings[i]), i);
+  end;
+
+  result := FormatResultTable;
+  // * * * * * //
+  SysUtils.FreeAndNil(Buf);
+  SysUtils.FreeAndNil(Line);
+end; // .function GetMappingsReport
 
 begin
   VfsCritSection.Init;
