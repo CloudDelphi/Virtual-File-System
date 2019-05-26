@@ -49,6 +49,11 @@ begin
   result := VfsWatching.RunWatcher(WatchDir, DebounceInterval);
 end;
 
+function RunWatcherA (const WatchDir: pchar; DebounceInterval: integer): LONGBOOL; stdcall;
+begin
+  result := VfsWatching.RunWatcher(WatchDir, DebounceInterval);
+end;
+
 (* Frees buffer, that was transfered to client earlier using other VFS API *)
 procedure MemFree ({O} Buf: pointer); stdcall;
 begin
@@ -119,6 +124,7 @@ exports
   MapModsFromList,
   MapModsFromListA,
   RunWatcher,
+  RunWatcherA,
   GetMappingsReport,
   GetMappingsReportA,
   MemFree,

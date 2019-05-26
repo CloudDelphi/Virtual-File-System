@@ -20,7 +20,7 @@ type
 
 function  SetLoggingProc ({n} Handler: TLoggingProc): {n} TLoggingProc; stdcall;
 procedure WriteLog (const Operation, Message: string);
-procedure WriteLog_ (const Operation, Message: pchar);
+procedure WriteLog_ (const Operation, Message: pchar); stdcall;
 
 
 var
