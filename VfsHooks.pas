@@ -9,7 +9,7 @@ unit VfsHooks;
 uses
   Windows, SysUtils, Math,
   Utils, WinNative, Concur,
-  StrLib, Alg,
+  StrLib, Alg, WinUtils,
   VfsBase, VfsUtils, VfsPatching,
   VfsDebug, VfsApiDigger, VfsOpenFiles;
 
@@ -48,6 +48,10 @@ var
 function GetFilePathByHandle (hFile: THandle): WideString;
 begin
   result := VfsOpenFiles.GetOpenedFilePath(hFile);
+
+  if (result = '') and VfsDebug.LoggingEnabled then begin
+    WriteLog('GetFilePathByHandle', Format('Failed to get path for handle %x. Current directory is: %s', [integer(hFile), WinUtils.GetCurrentDirW]));
+  end;
 end;
 
 (* Returns single absolute path, not dependant on RootDirectory member. '\??\' prefix is always removed, \\.\ and \\?\ paths remain not touched. *)

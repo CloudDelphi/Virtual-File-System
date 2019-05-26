@@ -37,6 +37,7 @@ type
 function RunVfs (DirListingOrder: VfsBase.TDirListingSortType): LONGBOOL; stdcall;
 var
   CurrDir: WideString;
+  SysDir:  WideString;
 
 begin
   with VfsBase.VfsCritSection do begin
@@ -47,11 +48,16 @@ begin
     if result then begin
       VfsHooks.InstallHooks;
 
-      // Try to ensure, that current directory handle is tracked by VfsOpenFiles
+      // Hask: Try to ensure, that current directory handle is tracked by VfsOpenFiles
+      // Windows SetCurrentDirectoryW is does not reopen directory for the same path, thus
+      // not triggering NtCreateFile
+      // Not thread safe
       CurrDir := WinUtils.GetCurrentDirW;
+      SysDir  := WinUtils.GetSysDirW;
 
-      if CurrDir <> '' then begin
-        WinUtils.SetCurrentDirW(CurrDir);
+      if (CurrDir <> '') and (SysDir <> '') then begin
+        WinUtils.SetCurrentDirW(SysDir);
+        {!} Assert(WinUtils.SetCurrentDirW(CurrDir), 'Failed to restore current directory from system directory during VFS initialization');
       end;
     end;
 
