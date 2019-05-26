@@ -5,6 +5,8 @@ library Vfs;
 
 uses VfsExport;
 
+{$R *.RES}
+
 begin
   System.IsMultiThread := true;
 end.
