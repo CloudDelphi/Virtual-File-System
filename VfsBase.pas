@@ -48,6 +48,9 @@ type
     (* Name in lower case, used for wildcard mask matching *)
     SearchName: WideString;
 
+    (* Absolute path to virtual file/folder location without trailing slash for non-drives *)
+    VirtPath: WideString;
+
     (* Absolute path to real file/folder location without trailing slash for non-drives *)
     RealPath: WideString;
 
@@ -129,6 +132,10 @@ function CallWithoutVfs (Func: TSingleArgExternalFunc; Arg: pointer = nil): inte
 (* Returns text with all applied mappings, separated via #13#10. If ShortenPaths is true, common part
    of real and virtual paths is stripped *)
 function GetMappingsReport: WideString;
+
+(* Returns text with all applied mappings on per-file level, separated via #13#10. If ShortenPaths is true, common part
+   of real and virtual paths is stripped *)
+function GetDetailedMappingsReport: WideString;
 
 
 (***)  implementation  (***)
@@ -517,6 +524,7 @@ begin
         CopyFileInfoWithoutNames(FileInfo.Base, VfsItem.Info.Base);
       end;
  
+      VfsItem.VirtPath := AbsVirtPath;
       VfsItem.RealPath := AbsRealPath;
       VfsItem.Priority := Priority;
       VfsItem.Attrs    := 0;
@@ -569,7 +577,7 @@ begin
 
     with SysScanDir(AbsRealPath, '*') do begin
       while IterNext(FileInfo.FileName, @FileInfo.Base) do begin
-        if Utils.HasFlag(FileInfo.Base.FileAttributes, Windows.FILE_ATTRIBUTE_DIRECTORY) then begin         
+        if Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes) then begin         
           if (FileInfo.FileName <> '.') and (FileInfo.FileName <> '..') then begin
             Subdirs.Add(TFileInfo.Create(@FileInfo));
           end;
@@ -693,7 +701,7 @@ begin
   end; // .with
 end; // .function RefreshMappedFile
 
-function GetMappingsReport: WideString;
+function GetMappingsReport_ (Mappings: TList {of TMapping}): WideString;
 const
   COL_PATHS = 0;
   COL_META  = 1;
@@ -811,7 +819,51 @@ begin
   // * * * * * //
   SysUtils.FreeAndNil(Buf);
   SysUtils.FreeAndNil(Line);
-end; // .function GetMappingsReport
+end; // .function GetMappingsReport_
+
+function GetMappingsReport: WideString;
+begin
+  with VfsCritSection do begin
+    Enter;
+    result := GetMappingsReport_(Mappings);
+    Leave;
+  end;
+end;
+
+function CompareMappingsByRealPath (A, B: integer): integer;
+begin
+  result := StrLib.CompareBinStringsW(TMapping(A).AbsRealPath, TMapping(B).AbsRealPath);
+end;
+
+function GetDetailedMappingsReport: WideString;
+var
+{O}  DetailedMappings: {O} TList {of TMapping};
+{Un} VfsItem:          TVfsItem;
+
+begin
+  DetailedMappings := DataLib.NewList(Utils.OWNS_ITEMS);
+  VfsItem          := nil;
+  // * * * * * //
+  with VfsCritSection do begin
+    Enter;
+
+    with DataLib.IterateDict(VfsItems) do begin
+      while IterNext do begin
+        VfsItem := TVfsItem(IterValue);
+
+        // Note, item Attrs is not the same as directory mapping Flags
+        DetailedMappings.Add(TMapping.Make(true, VfsItem.VirtPath, VfsItem.RealPath, false, VfsItem.Attrs));
+      end;
+    end;
+    
+    Leave;
+  end;
+
+  DetailedMappings.CustomSort(CompareMappingsByRealPath);
+  result := GetMappingsReport_(DetailedMappings);
+  // * * * * * //
+  SysUtils.FreeAndNil(DetailedMappings);
+end;
 
 begin
   VfsCritSection.Init;

@@ -24,6 +24,26 @@ exports
 (***)  implementation  (***)
 
 
+function Externalize (const Str: AnsiString): {O} pointer; overload;
+begin
+  result := nil;
+
+  if Str <> '' then begin
+    GetMem(result, Length(Str) + 1);
+    Utils.CopyMem(Length(Str) + 1, pointer(Str), result);
+  end;
+end;
+
+function Externalize (const Str: WideString): {O} pointer; overload;
+begin
+  result := nil;
+
+  if Str <> '' then begin
+    GetMem(result, (Length(Str) + 1) * sizeof(WideChar));
+    Utils.CopyMem((Length(Str) + 1) * sizeof(WideChar), pointer(Str), result);
+  end;
+end;
+
 function MapDir (const VirtPath, RealPath: PWideChar; OverwriteExisting: boolean; Flags: integer = 0): LONGBOOL; stdcall;
 begin
   result := VfsBase.MapDir(WideString(VirtPath), WideString(RealPath), OverwriteExisting, Flags);
@@ -63,25 +83,25 @@ end;
 (* Returns text with all applied mappings, separated via #13#10. If ShortenPaths is true, common part
    of real and virtual paths is stripped. Call MemFree to release result buffer *)
 function GetMappingsReport: {O} PWideChar; stdcall;
-var
-  Res: WideString;
-
 begin
-  result := nil;
-  Res    := VfsBase.GetMappingsReport;
-  GetMem(result, (Length(Res) + 1) * sizeof(WideChar));
-  Utils.CopyMem((Length(Res) + 1) * sizeof(WideChar), PWideChar(Res), result);
+  result := Externalize(VfsBase.GetMappingsReport);
 end;
 
 function GetMappingsReportA: {O} pchar; stdcall;
-var
-  Res: string;
-
 begin
-  result := nil;
-  Res    := VfsBase.GetMappingsReport;
-  GetMem(result, Length(Res) + 1);
-  Utils.CopyMem(Length(Res) + 1, pchar(Res), result);
+  result := Externalize(AnsiString(VfsBase.GetMappingsReport));
+end;
+
+(* Returns text with all applied mappings on per-file level, separated via #13#10. If ShortenPaths is true, common part
+   of real and virtual paths is stripped *)
+function GetDetailedMappingsReport: {O} PWideChar; stdcall;
+begin
+  result := Externalize(VfsBase.GetDetailedMappingsReport);
+end;
+
+function GetDetailedMappingsReportA: {O} pchar; stdcall;
+begin
+  result := Externalize(AnsiString(VfsBase.GetDetailedMappingsReport));
 end;
 
 procedure ConsoleLoggingProc (Operation, Message: pchar); stdcall;
@@ -127,6 +147,8 @@ exports
   RunWatcherA,
   GetMappingsReport,
   GetMappingsReportA,
+  GetDetailedMappingsReport,
+  GetDetailedMappingsReportA,
   MemFree,
   InstallConsoleLogger;
 

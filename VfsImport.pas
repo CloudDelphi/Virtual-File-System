@@ -51,6 +51,11 @@ procedure MemFree ({O} Buf: pointer); stdcall; external 'vfs.dll';
 function GetMappingsReport: {O} PWideChar; stdcall; external 'vfs.dll';
 function GetMappingsReportA: {O} pchar; stdcall; external 'vfs.dll';
 
+(* Returns text with all applied mappings on per-file level, separated via #13#10. If ShortenPaths is true, common part
+   of real and virtual paths is stripped *)
+function GetDetailedMappingsReport: {O} PWideChar; stdcall; external 'vfs.dll';
+function GetDetailedMappingsReportA: {O} pchar; stdcall; external 'vfs.dll';
+
 (* Allocates console and install logger, writing messages to console *)
 procedure InstallConsoleLogger; stdcall; external 'vfs.dll';
 
