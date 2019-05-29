@@ -149,8 +149,8 @@ begin
   AbsRootDir := VfsUtils.NormalizePath(RootDir);
   AbsModsDir := VfsUtils.NormalizePath(ModsDir);
   result     := (AbsRootDir <> '') and (AbsModsDir <> '')  and
-                VfsUtils.GetFileInfo(AbsRootDir, FileInfo) and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes) and
-                VfsUtils.GetFileInfo(AbsModsDir, FileInfo) and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes);
+                VfsUtils.GetFileInfo(AbsRootDir, FileInfo) and Utils.Flags(FileInfo.Base.FileAttributes).Have(Windows.FILE_ATTRIBUTE_DIRECTORY) and
+                VfsUtils.GetFileInfo(AbsModsDir, FileInfo) and Utils.Flags(FileInfo.Base.FileAttributes).Have(Windows.FILE_ATTRIBUTE_DIRECTORY);
   
   if result then begin
     ModPathPrefix := VfsUtils.AddBackslash(AbsModsDir);

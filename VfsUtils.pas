@@ -506,7 +506,7 @@ var
   FileAttrs: integer;
 
 begin
-  result := GetFileAttrs(Path, FileAttrs) and Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileAttrs);
+  result := GetFileAttrs(Path, FileAttrs) and Utils.Flags(FileAttrs).Have(Windows.FILE_ATTRIBUTE_DIRECTORY);
 end;
 
 function SysOpenFile (const NtAbsPath: WideString; {OUT} var Res: Windows.THandle; const OpenMode: TSysOpenFileMode = OPEN_AS_ANY; const AccessMode: ACCESS_MASK = FILE_GENERIC_READ): boolean;

@@ -577,7 +577,7 @@ begin
 
     with SysScanDir(AbsRealPath, '*') do begin
       while IterNext(FileInfo.FileName, @FileInfo.Base) do begin
-        if Utils.HasFlag(Windows.FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes) then begin         
+        if Utils.Flags(FileInfo.Base.FileAttributes).Have(Windows.FILE_ATTRIBUTE_DIRECTORY) then begin         
           if (FileInfo.FileName <> '.') and (FileInfo.FileName <> '..') then begin
             Subdirs.Add(TFileInfo.Create(@FileInfo));
           end;

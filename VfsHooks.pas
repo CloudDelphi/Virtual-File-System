@@ -111,7 +111,7 @@ begin
 
   // Return cached VFS file info
   if RedirectedPath <> '' then begin
-    if not HadTrailingDelim or Utils.HasFlag(FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes) then begin
+    if not HadTrailingDelim or Utils.Flags(FileInfo.Base.FileAttributes).Have(FILE_ATTRIBUTE_DIRECTORY) then begin
       FileInformation.CreationTime   := FileInfo.Base.CreationTime;
       FileInformation.LastAccessTime := FileInfo.Base.LastAccessTime;
       FileInformation.LastWriteTime  := FileInfo.Base.LastWriteTime;
@@ -171,7 +171,7 @@ begin
 
   // Return cached VFS file info
   if RedirectedPath <> '' then begin
-    if not HadTrailingDelim or Utils.HasFlag(FILE_ATTRIBUTE_DIRECTORY, FileInfo.Base.FileAttributes) then begin
+    if not HadTrailingDelim or Utils.Flags(FileInfo.Base.FileAttributes).Have(FILE_ATTRIBUTE_DIRECTORY) then begin
       FileInformation.CreationTime   := FileInfo.Base.CreationTime;
       FileInformation.LastAccessTime := FileInfo.Base.LastAccessTime;
       FileInformation.LastWriteTime  := FileInfo.Base.LastWriteTime;
