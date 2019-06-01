@@ -31,6 +31,8 @@ var
   NativeNtCreateFile:              WinNative.TNtCreateFile;
   NativeNtClose:                   WinNative.TNtClose;
   NativeNtQueryDirectoryFile:      WinNative.TNtQueryDirectoryFile;
+  NativeNtQueryDirectoryFileEx:    WinNative.TNtQueryDirectoryFileEx;
+
 
   NtQueryAttributesFilePatch:     VfsPatching.TAppliedPatch;
   NtQueryFullAttributesFilePatch: VfsPatching.TAppliedPatch;
@@ -38,6 +40,7 @@ var
   NtCreateFilePatch:              VfsPatching.TAppliedPatch;
   NtClosePatch:                   VfsPatching.TAppliedPatch;
   NtQueryDirectoryFilePatch:      VfsPatching.TAppliedPatch;
+  NtQueryDirectoryFileExPatch:    VfsPatching.TAppliedPatch;
 
 
 (* There is no 100% portable and reliable way to get file path by handle, unless file creation/opening
@@ -543,11 +546,28 @@ begin
   end;
 end; // .function Hook_NtQueryDirectoryFile
 
+function Hook_NtQueryDirectoryFileEx (OrigFunc: WinNative.TNtQueryDirectoryFileEx; FileHandle: HANDLE; Event: HANDLE; ApcRoutine: pointer; ApcContext: PVOID; Io: PIO_STATUS_BLOCK;
+                                      Buffer: PVOID; BufLength: ULONG; InfoClass: integer (* FILE_INFORMATION_CLASS *); QueryFlags: integer; Mask: PUNICODE_STRING): NTSTATUS; stdcall;
+var
+  SingleEntry: LONGBOOL;
+  RestartScan: LONGBOOL;
+
+begin
+  if VfsDebug.LoggingEnabled then begin
+    WriteLog('NtQueryDirectoryFileEx', Format('Handle: %x. QueryFlags: %x', [FileHandle, QueryFlags]));
+  end;
+
+  RestartScan := Utils.Flags(QueryFlags).Have(WinNative.SL_RESTART_SCAN);
+  SingleEntry := Utils.Flags(QueryFlags).Have(WinNative.SL_RETURN_SINGLE_ENTRY);
+  result      := WinNative.NtQueryDirectoryFile(FileHandle, Event, ApcRoutine, ApcContext, Io, Buffer, BufLength, InfoClass, SingleEntry, Mask, RestartScan);
+end;
+
 procedure InstallHooks;
 var
-  SetProcessDEPPolicy: function (dwFlags: integer): LONGBOOL; stdcall;
-  hDll:                Windows.THandle;
-  NtdllHandle:         integer;
+  SetProcessDEPPolicy:        function (dwFlags: integer): LONGBOOL; stdcall;
+  hDll:                       Windows.THandle;
+  NtdllHandle:                integer;
+  NtQueryDirectoryFileExAddr: WinNative.TNtQueryDirectoryFileEx;
 
 begin
   with HooksCritSection do begin
@@ -622,6 +642,18 @@ begin
         @Hook_NtQueryDirectoryFile,
         @NtQueryDirectoryFilePatch
       );
+
+      NtQueryDirectoryFileExAddr := VfsApiDigger.GetRealProcAddress(NtdllHandle, 'NtQueryDirectoryFileEx');
+
+      if @NtQueryDirectoryFileExAddr <> nil then begin
+        WriteLog('InstallHook', 'Installing NtQueryDirectoryFileEx hook');
+        NativeNtQueryDirectoryFileEx := VfsPatching.SpliceWinApi
+        (
+          @NtQueryDirectoryFileExAddr,
+          @Hook_NtQueryDirectoryFileEx,
+          @NtQueryDirectoryFileExPatch
+        );
+      end;
     end; // .if
 
     Leave;
@@ -639,6 +671,7 @@ begin
     NtCreateFilePatch.Rollback;
     NtClosePatch.Rollback;
     NtQueryDirectoryFilePatch.Rollback;
+    NtQueryDirectoryFileExPatch.Rollback;
 
     Leave;
   end;

@@ -4,5 +4,6 @@
 *.ini
 *.identcache
 *.map
+*.res
 _LOG_.txt
 __history/
