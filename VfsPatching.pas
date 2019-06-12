@@ -159,6 +159,7 @@ begin
   // Create and apply hook at target function start
   p.Clear();
   p.Jump(PatchForge.JMP, SpliceBridge);
+  p.Nop(OverwrittenCodeSize - p.Pos);
 
   if AppliedPatch <> nil then begin
     AppliedPatch.Addr := OrigFunc;
