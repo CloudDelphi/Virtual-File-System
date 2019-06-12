@@ -26,22 +26,14 @@ exports
 
 function Externalize (const Str: AnsiString): {O} pointer; overload;
 begin
-  result := nil;
-
-  if Str <> '' then begin
-    GetMem(result, Length(Str) + 1);
-    Utils.CopyMem(Length(Str) + 1, pointer(Str), result);
-  end;
+  GetMem(result, Length(Str) + 1);
+  Utils.CopyMem(Length(Str) + 1, pchar(Str), result);
 end;
 
 function Externalize (const Str: WideString): {O} pointer; overload;
 begin
-  result := nil;
-
-  if Str <> '' then begin
-    GetMem(result, (Length(Str) + 1) * sizeof(WideChar));
-    Utils.CopyMem((Length(Str) + 1) * sizeof(WideChar), pointer(Str), result);
-  end;
+  GetMem(result, (Length(Str) + 1) * sizeof(WideChar));
+  Utils.CopyMem((Length(Str) + 1) * sizeof(WideChar), PWideChar(Str), result);
 end;
 
 function MapDir (const VirtPath, RealPath: PWideChar; OverwriteExisting: boolean; Flags: integer = 0): LONGBOOL; stdcall;
